@@ -1,4 +1,4 @@
-const API_URL = "http://127.0.0.1:8000";
+const API_URL = "https://deportivaback-eudyf4h6csdfevgz.canadacentral-01.azurewebsites.net";
 
 const token = localStorage.getItem("token");
 const role = localStorage.getItem("role") || "general";
@@ -2248,7 +2248,7 @@ function renderAnnouncements(listId) {
 
   box.innerHTML = pageItems
     .map((a) => {
-      const targets = (a.targets || []).map(formatAnnouncementTarget).join(" ƒ?› ");
+      const targets = (a.targets || []).map(formatAnnouncementTarget).join(" ï¿½?ï¿½ ");
       const canEdit =
         (role === "admin") || (role === "coach" && a.created_by_user_id === getUserId());
       const attachments = (a.attachments || [])
@@ -5132,7 +5132,7 @@ async function reactivateAthlete(id) {
     if (!res.ok) throw new Error(data.detail || "No se pudo reactivar el atleta");
     await loadAthletes();
   } catch (e) {
-    showAlertModal("ƒ?O " + e.message);
+    showAlertModal("ï¿½?O " + e.message);
   }
 }
 

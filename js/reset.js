@@ -1,4 +1,4 @@
-const API_BASE = "http://127.0.0.1:8000";
+const API_BASE = "https://deportivaback-eudyf4h6csdfevgz.canadacentral-01.azurewebsites.net";
 
 // Obtener token desde la URL (?token=...)
 const urlParams = new URLSearchParams(window.location.search);

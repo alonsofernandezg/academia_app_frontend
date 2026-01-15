@@ -2,7 +2,7 @@
 // 🏃 COACHES (ENTRENADORES)
 // =====================================================
 // Define API_BASE en scope global si no está ya definido
-var API_BASE = window.API_BASE || "http://127.0.0.1:8000";
+var API_BASE = window.API_BASE || "https://deportivaback-eudyf4h6csdfevgz.canadacentral-01.azurewebsites.net";
 const roleName = window.role || localStorage.getItem("role") || "general";
 
 // --------------------------------------------------
