@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Restablecer contraseña | DeportIvA</title>
+
+  <!-- W3.CSS + fuente -->
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      background: linear-gradient(135deg, #ffffff 0%, #f7f8fc 40%, #eef2ff 100%);
+      font-family: "Poppins", system-ui, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      color: #1F2937;
+    }
+
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 32px;
+      max-width: 420px;
+      box-shadow: 0 18px 50px rgba(31,41,55,.08);
+      text-align: center;
+    }
+
+    .logo {
+      width: 60px; height: 60px;
+      display: flex; align-items: center; justify-content: center;
+      background-color: #3F51B5; color: white;
+      border-radius: 12px;
+      margin: 0 auto 16px;
+    }
+
+    .w3-input {
+      height: 42px;
+      border-radius: 10px;
+    }
+
+    .btn {
+      background-color: #3B82F6;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 10px;
+      width: 100%;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .btn:hover { background-color: #1E3A8A; }
+
+    .ok { color: #16A34A; }
+    .err { color: #DC2626; }
+    .fade { opacity: 0.6; transition: opacity .3s ease; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">
+      <svg viewBox="0 0 64 64" width="36" height="36">
+        <circle cx="32" cy="32" r="18" fill="white"/>
+        <path d="M14 32h36M32 14v36" stroke="#3F51B5" stroke-width="2"/>
+        <polygon points="32,24 38,28 36,36 28,36 26,28" fill="#3F51B5"/>
+      </svg>
+    </div>
+
+    <h3 class="w3-text-indigo">Restablecer contraseña</h3>
+    <p class="w3-small w3-text-grey">
+      Ingresa una nueva contraseña para tu cuenta de <b>DeportIvA</b>.
+    </p>
+
+    <input id="newPass" class="w3-input w3-border w3-margin-bottom" type="password" placeholder="Nueva contraseña">
+    <input id="confirmPass" class="w3-input w3-border" type="password" placeholder="Confirmar contraseña">
+
+    <button class="btn w3-margin-top" onclick="resetPassword()">Actualizar contraseña</button>
+
+    <div id="msg" class="w3-small w3-margin-top"></div>
+    <div id="redirect" class="w3-small w3-text-grey w3-margin-top"></div>
+  </div>
+
+  <script src="js/reset.js"></script>
+</body>
+</html>

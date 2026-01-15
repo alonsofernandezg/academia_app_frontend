@@ -1,0 +1,1716 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DeportIvA — Panel</title>
+
+  <!-- W3.CSS -->
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <!-- Fuente y estilo propio (mismo que index) -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css">
+</head>
+<body class="w3-light-gray">
+
+  <!-- Topbar -->
+  <div class="w3-bar w3-blue w3-card">
+    <span class="w3-bar-item w3-large"><b>DeportIvA</b></span>
+    <span id="userBadge" class="w3-bar-item w3-right w3-small"></span>
+    <button
+      class="w3-bar-item w3-button w3-right w3-white w3-round-xxlarge w3-small"
+      onclick="logout()">
+      Salir
+    </button>
+    <button
+      class="w3-bar-item w3-button w3-right w3-white w3-border w3-round-xxlarge w3-small"
+      onclick="openChangePassword()">
+      Cambiar contraseña
+    </button>
+  </div>
+
+  <!-- Content -->
+  <div class="w3-content" style="max-width:1100px">
+
+    <!-- Admin panel -->
+    <section id="adminPanel" class="w3-margin-top w3-hide">
+
+      <!-- Card: Administración de usuarios -->
+      <div class="w3-card w3-white w3-round-xxlarge w3-padding">
+        <div class="w3-row w3-margin-bottom">
+          <div class="w3-col s12 m8">
+            <h3 class="w3-text-blue" style="margin:8px 0">Panel de Administración</h3>
+            <p class="w3-small w3-text-gray">
+              Crea usuarios <b>admin</b> o <b>coach</b>, lista y activa/inactiva cuentas.
+            </p>
+          </div>
+          <div class="w3-col s12 m4 w3-right-align">
+            <button
+              class="w3-button w3-blue w3-round-xxlarge w3-small"
+              onclick="openCreateUser()">
+              + Crear usuario
+            </button>
+            <button
+              class="w3-button w3-white w3-border w3-round-xxlarge w3-small w3-margin-left"
+              data-collapsible="adminUsersContent">
+              Cerrar
+            </button>
+          </div>
+        </div>
+
+        <div id="adminUsersContent">
+          <div id="usersList" class="w3-margin-top">
+            <div class="w3-center w3-text-gray w3-small">Cargando usuarios…</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card: Configuración deportiva (academias, categorías, niveles) -->
+      <div class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top">
+        <div class="w3-row w3-margin-bottom">
+          <div class="w3-col s12">
+            <h3 class="w3-text-blue" style="margin:8px 0">Configuración deportiva</h3>
+            <p class="w3-small w3-text-gray">
+              Administra las <b>Academias</b>, sus <b>Categorías</b> y los <b>Niveles</b>.
+            </p>
+          </div>
+          <div class="w3-col s12 w3-right-align">
+            <button
+              class="w3-button w3-white w3-border w3-round-xxlarge w3-small"
+              data-collapsible="adminSportsContent">
+              Cerrar
+            </button>
+          </div>
+        </div>
+
+        <div id="adminSportsContent">
+          <div class="w3-row-padding" style="margin:0 -8px">
+
+            <!-- Sección Academias -->
+            <div class="w3-col s12 m4">
+              <div class="w3-padding w3-border w3-round-xxlarge w3-small w3-white">
+                <h4 class="w3-text-indigo" style="margin-top:0">Academias</h4>
+                <label class="w3-small w3-text-gray">Nombre</label>
+                <input id="admAcadName" class="w3-input w3-border w3-round-large w3-margin-bottom" type="text" placeholder="Academia Central">
+                <label class="w3-small w3-text-gray">Código corto</label>
+                <input id="admAcadCode" class="w3-input w3-border w3-round-large w3-margin-bottom" type="text" placeholder="ACENT">
+                <label class="w3-small w3-text-gray">Descripción</label>
+                <textarea id="admAcadDesc" class="w3-input w3-border w3-round-large" rows="2"></textarea>
+
+                <button
+                  id="admAcadCreateBtn"
+                  class="w3-button w3-blue w3-round-xxlarge w3-small w3-margin-top">
+                  Guardar academia
+                </button>
+                <button
+                  id="admAcadCancelBtn"
+                  class="w3-button w3-white w3-border w3-round-xxlarge w3-small w3-margin-top w3-margin-left"
+                  style="display:none;">
+                  Cancelar edición
+                </button>
+                <div id="admAcadMsg" class="w3-small w3-center w3-margin-top"></div>
+
+                <hr>
+                <div id="admAcadList" class="w3-small">
+                  <!-- Lista de academias -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Sección Categorías -->
+            <div class="w3-col s12 m4">
+              <div class="w3-padding w3-border w3-round-xxlarge w3-small w3-white w3-margin-top-small">
+                <h4 class="w3-text-indigo" style="margin-top:0">Categorías</h4>
+                <label class="w3-small w3-text-gray">Academia</label>
+                <select id="admCatAcademy" class="w3-select w3-border w3-round-large w3-margin-bottom">
+                  <option value="">Seleccione una academia…</option>
+                </select>
+
+                <label class="w3-small w3-text-gray">Nombre</label>
+                <input id="admCatName" class="w3-input w3-border w3-round-large w3-margin-bottom" type="text" placeholder="Sub 15">
+                <label class="w3-small w3-text-gray">Descripción</label>
+                <textarea id="admCatDesc" class="w3-input w3-border w3-round-large" rows="2"></textarea>
+
+                <button
+                  id="admCatCreateBtn"
+                  class="w3-button w3-blue w3-round-xxlarge w3-small w3-margin-top">
+                  Guardar categoría
+                </button>
+                <button
+                  id="admCatCancelBtn"
+                  class="w3-button w3-white w3-border w3-round-xxlarge w3-small w3-margin-top w3-margin-left"
+                  style="display:none;">
+                  Cancelar edición
+                </button>
+                <div id="admCatMsg" class="w3-small w3-center w3-margin-top"></div>
+
+                <hr>
+                <div id="admCatList" class="w3-small">
+                  <!-- Lista de categorías -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Sección Niveles -->
+            <div class="w3-col s12 m4">
+              <div class="w3-padding w3-border w3-round-xxlarge w3-small w3-white w3-margin-top-small">
+                <h4 class="w3-text-indigo" style="margin-top:0">Niveles</h4>
+                <label class="w3-small w3-text-gray">Categoría</label>
+                <select id="admLvlCategory" class="w3-select w3-border w3-round-large w3-margin-bottom">
+                  <option value="">Seleccione una categoría…</option>
+                </select>
+
+                <label class="w3-small w3-text-gray">Nombre</label>
+                <input id="admLvlName" class="w3-input w3-border w3-round-large w3-margin-bottom" type="text" placeholder="Principiante">
+                <label class="w3-small w3-text-gray">Descripción</label>
+                <textarea id="admLvlDesc" class="w3-input w3-border w3-round-large" rows="2"></textarea>
+
+                <button
+                  id="admLvlCreateBtn"
+                  class="w3-button w3-blue w3-round-xxlarge w3-small w3-margin-top">
+                  Guardar nivel
+                </button>
+                <button
+                  id="admLvlCancelBtn"
+                  class="w3-button w3-white w3-border w3-round-xxlarge w3-small w3-margin-top w3-margin-left"
+                  style="display:none;">
+                  Cancelar edición
+                </button>
+                <div id="admLvlMsg" class="w3-small w3-center w3-margin-top"></div>
+
+                <hr>
+                <div id="admLvlList" class="w3-small">
+                  <!-- Lista de niveles -->
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Card: Gestión de Entrenadores (Coaches) -->
+      <div class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top">
+        <div class="w3-row w3-margin-bottom">
+          <div class="w3-col s12 m8">
+            <h3 class="w3-text-blue" style="margin:8px 0">Gestión de Entrenadores</h3>
+            <p class="w3-small w3-text-gray">
+              Registra información de los <b>coaches</b>: identificación, teléfono, notas y más.
+            </p>
+          </div>
+          <div class="w3-col s12 m4 w3-right-align">
+            <button
+              class="w3-button w3-blue w3-round-xxlarge w3-small"
+              onclick="openCreateCoach()">
+              + Nuevo entrenador
+            </button>
+            <button
+              class="w3-button w3-white w3-border w3-round-xxlarge w3-small w3-margin-left"
+              data-collapsible="adminCoachesContent">
+              Cerrar
+            </button>
+          </div>
+        </div>
+
+        <div id="adminCoachesContent">
+          <div id="coachesList" class="w3-margin-top">
+            <div class="w3-center w3-text-gray w3-small">Cargando entrenadores…</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card: Asignación de entrenadores -->
+      <div class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top">
+        <div class="w3-row w3-margin-bottom">
+          <div class="w3-col s12">
+            <h3 class="w3-text-blue" style="margin:8px 0">Asignación de entrenadores</h3>
+            <p class="w3-small w3-text-gray">
+              Vincula <b>coaches</b> con <b>academias</b>, <b>categorías</b> y <b>niveles</b>.
+              Solo las asignaciones <b>activas</b> se usarán al momento de trabajar con los deportistas.
+            </p>
+          </div>
+          <div class="w3-col s12 w3-right-align">
+            <button
+              class="w3-button w3-white w3-border w3-round-xxlarge w3-small"
+              data-collapsible="adminAssignmentsContent">
+              Cerrar
+            </button>
+          </div>
+        </div>
+
+        <div id="adminAssignmentsContent">
+          <div class="w3-row-padding" style="margin:0 -8px">
+          <div class="w3-col s12 m5">
+            <div class="w3-small">
+              <label class="w3-small w3-text-gray">Entrenador (coach)</label>
+              <select id="caCoach" class="w3-select w3-border w3-round-large w3-margin-bottom">
+                <option value="">Seleccione un coach…</option>
+              </select>
+
+              <label class="w3-small w3-text-gray">Academia</label>
+              <select id="caAcademy" class="w3-select w3-border w3-round-large w3-margin-bottom">
+                <option value="">Seleccione una academia…</option>
+              </select>
+
+              <label class="w3-small w3-text-gray">Categoría</label>
+              <select id="caCategory" class="w3-select w3-border w3-round-large w3-margin-bottom">
+                <option value="">Seleccione una categoría…</option>
+              </select>
+
+              <label class="w3-small w3-text-gray">Nivel</label>
+              <select id="caLevel" class="w3-select w3-border w3-round-large w3-margin-bottom">
+                <option value="">Seleccione un nivel…</option>
+              </select>
+
+              <button
+                id="caCreateBtn"
+                class="w3-button w3-blue w3-round-xxlarge w3-small w3-margin-top">
+                Guardar asignaci\u00f3n
+              </button>
+              <button
+                id="caCancelBtn"
+                class="w3-button w3-white w3-border w3-round-xxlarge w3-small w3-margin-top w3-margin-left"
+                style="display:none;">
+                Cancelar edición
+              </button>
+              <div id="caMsg" class="w3-small w3-center w3-margin-top"></div>
+            </div>
+          </div>
+
+          <div class="w3-col s12 m7">
+            <div class="w3-small">
+              <h5 class="w3-text-indigo" style="margin:4px 0">Asignaciones actuales</h5>
+              <p class="w3-small w3-text-gray">
+                Se muestran las asignaciones activas e históricas del coach seleccionado. Puedes eliminar (inactivar) una asignaci\u00f3n para que deje de estar activa.
+              </p>
+              <div id="caList">
+                <!-- Lista de asignaciones del coach -->
+              </div>
+            </div>
+          </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top">
+        <div class="w3-row w3-margin-bottom">
+          <div class="w3-col s12 m8">
+            <h3 class="w3-text-blue" style="margin:8px 0">Sesiones de entrenamiento</h3>
+            <p class="w3-small w3-text-gray">
+              Crea sesiones (únicas o repetitivas) y gestiona asistencia.
+            </p>
+          </div>
+          <div class="w3-col s12 m4 w3-right-align">
+            <button
+              class="w3-button w3-blue w3-round-xxlarge w3-small"
+              onclick="openCreateSession()">
+              + Nueva sesión
+            </button>
+            <button
+              class="w3-button w3-white w3-border w3-round-xxlarge w3-small w3-margin-left"
+              data-collapsible="adminSessionsContent">
+              Cerrar
+            </button>
+          </div>
+        </div>
+
+        <div id="adminSessionsContent">
+          <div class="w3-row w3-margin-top">
+            <div class="w3-col s12 m6">
+              <button
+                class="w3-button w3-white w3-border w3-round-xxlarge w3-small"
+                onclick="adminPrevMonth()">
+                ◀
+              </button>
+              <span id="adminCalendarLabel" class="w3-small w3-text-gray w3-margin-left"></span>
+              <button
+                class="w3-button w3-white w3-border w3-round-xxlarge w3-small w3-margin-left"
+                onclick="adminNextMonth()">
+                ▶
+              </button>
+            </div>
+            <div class="w3-col s12 m6 w3-right-align">
+              <input id="adminReportMonth" type="month" class="w3-input w3-border w3-round-large" style="max-width:180px; display:inline-block;">
+              <button
+                class="w3-button w3-blue w3-round-xxlarge w3-small w3-margin-left"
+                onclick="loadMonthlyReport()">
+                Reporte mensual
+              </button>
+            </div>
+          </div>
+          <div id="adminSessionCalendar" class="w3-margin-top"></div>
+          <div class="w3-margin-top">
+            <button
+              class="w3-button w3-white w3-border w3-round-xxlarge w3-small"
+              onclick="exportReportCsv('admin')">
+              Exportar CSV
+            </button>
+            <button
+              class="w3-button w3-white w3-border w3-round-xxlarge w3-small w3-margin-left"
+              onclick="exportReportPdf('admin')">
+              Exportar PDF
+            </button>
+          </div>
+          <div id="adminMonthlyReport" class="w3-margin-top"></div>
+        </div>
+      </div>
+
+      <div class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top">
+        <div class="w3-row w3-margin-bottom">
+          <div class="w3-col s12 m8">
+            <h3 class="w3-text-blue" style="margin:8px 0">Facturacion</h3>
+            <p class="w3-small w3-text-gray">
+              Crea planes y facturas. Los pagos se registran con comprobantes.
+            </p>
+          </div>
+          <div class="w3-col s12 m4 w3-right-align">
+            <button
+              class="w3-button w3-white w3-border w3-round-xxlarge w3-small"
+              data-collapsible="adminBillingContent">
+              Cerrar
+            </button>
+          </div>
+        </div>
+
+        <div id="adminBillingContent">
+          <div class="w3-row-padding" style="margin:0 -8px">
+            <div class="w3-col s12 m5">
+              <div class="w3-padding w3-border w3-round-xxlarge w3-small w3-white">
+                <h4 class="w3-text-indigo" style="margin-top:0">Nuevo plan</h4>
+                <label class="w3-small w3-text-gray">Nombre</label>
+                <input id="billPlanName" class="w3-input w3-border w3-round-large w3-margin-bottom" type="text" placeholder="Plan mensual">
+
+                <div class="w3-row-padding" style="margin:0 -8px">
+                  <div class="w3-col s6">
+                    <label class="w3-small w3-text-gray">Monto</label>
+                    <input id="billPlanAmount" class="w3-input w3-border w3-round-large" type="number" step="0.01">
+                  </div>
+                  <div class="w3-col s6">
+                    <label class="w3-small w3-text-gray">Tipo</label>
+                    <select id="billPlanType" class="w3-select w3-border w3-round-large">
+                      <option value="monthly">Mensual</option>
+                      <option value="per_class">Por clase</option>
+                    </select>
+                  </div>
+                </div>
+
+                <button
+                  id="billPlanCreateBtn"
+                  class="w3-button w3-blue w3-round-xxlarge w3-small w3-margin-top"
+                  onclick="createBillingPlan()">
+                  Guardar plan
+                </button>
+                <button
+                  id="billPlanCancelBtn"
+                  class="w3-button w3-white w3-border w3-round-xxlarge w3-small w3-margin-top w3-margin-left"
+                  style="display:none;">
+                  Cancelar edicion
+                </button>
+                <div id="billPlanMsg" class="w3-small w3-center w3-margin-top"></div>
+
+                <hr>
+                <div id="billPlanList" class="w3-small">
+                  <div class="w3-center w3-text-gray w3-small">Cargando planes...</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="w3-col s12 m7">
+              <div class="w3-padding w3-border w3-round-xxlarge w3-small w3-white">
+                <h4 class="w3-text-indigo" style="margin-top:0">Nueva factura</h4>
+                <label class="w3-small w3-text-gray">Atleta</label>
+                <select id="billInvoiceAthlete" class="w3-select w3-border w3-round-large w3-margin-bottom">
+                  <option value="">Seleccione un atleta...</option>
+                </select>
+
+                <label class="w3-small w3-text-gray">Plan (opcional)</label>
+                <select id="billInvoicePlan" class="w3-select w3-border w3-round-large w3-margin-bottom">
+                  <option value="">Manual</option>
+                </select>
+
+                <div class="w3-row-padding" style="margin:0 -8px">
+                  <div class="w3-col s6">
+                    <label class="w3-small w3-text-gray">Periodo inicio</label>
+                    <input id="billInvoiceStart" type="date" class="w3-input w3-border w3-round-large">
+                  </div>
+                  <div class="w3-col s6">
+                    <label class="w3-small w3-text-gray">Periodo fin</label>
+                    <input id="billInvoiceEnd" type="date" class="w3-input w3-border w3-round-large">
+                  </div>
+                </div>
+
+                <label class="w3-small w3-text-gray w3-margin-top">Monto total</label>
+                <input id="billInvoiceAmount" class="w3-input w3-border w3-round-large w3-margin-bottom" type="number" step="0.01">
+
+                <label class="w3-small w3-text-gray">Notas</label>
+                <textarea id="billInvoiceNotes" class="w3-input w3-border w3-round-large" rows="2"></textarea>
+
+                <button
+                  class="w3-button w3-blue w3-round-xxlarge w3-small w3-margin-top"
+                  onclick="createBillingInvoice()">
+                  Guardar factura
+                </button>
+                <div id="billInvoiceMsg" class="w3-small w3-center w3-margin-top"></div>
+              </div>
+
+              <div class="w3-padding w3-border w3-round-xxlarge w3-small w3-white w3-margin-top">
+                <h4 class="w3-text-indigo" style="margin-top:0">Facturas</h4>
+                <div class="w3-margin-bottom">
+                  <div class="w3-row-padding" style="margin:0 -8px">
+                    <div class="w3-col s12 m5">
+                      <label class="w3-small w3-text-gray">Buscar</label>
+                      <input id="billInvoiceSearch" class="w3-input w3-border w3-round-large" placeholder="Atleta o plan">
+                    </div>
+                    <div class="w3-col s12 m4">
+                      <label class="w3-small w3-text-gray">Estado</label>
+                      <select id="billInvoiceStatus" class="w3-select w3-border w3-round-large">
+                        <option value="">Todos</option>
+                        <option value="pending">Pendiente</option>
+                        <option value="submitted">Comprobante enviado</option>
+                        <option value="paid">Pagada</option>
+                        <option value="cancelled">Cancelada</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div id="billInvoiceList">
+                  <div class="w3-center w3-text-gray w3-small">Cargando facturas...</div>
+                </div>
+              </div>
+
+              <div class="w3-padding w3-border w3-round-xxlarge w3-small w3-white w3-margin-top">
+                <h4 class="w3-text-indigo" style="margin-top:0">Reporte mensual</h4>
+                <div class="w3-row w3-margin-bottom">
+                  <div class="w3-col s12 m6">
+                    <input id="billingReportMonth" type="month" class="w3-input w3-border w3-round-large" style="max-width:180px; display:inline-block;">
+                    <button
+                      class="w3-button w3-blue w3-round-xxlarge w3-small w3-margin-left"
+                      onclick="loadBillingReport()">
+                    <button
+                      class="w3-button w3-white w3-border w3-round-xxlarge w3-small w3-margin-left"
+                      onclick="generateMonthlyInvoices()">
+                      Generar facturas
+                    </button>
+                      Generar
+                    </button>
+                  </div>
+                  <div class="w3-col s12 m6 w3-right-align">
+                    <button
+                      class="w3-button w3-white w3-border w3-round-xxlarge w3-small"
+                      onclick="exportBillingCsv()">
+                      Exportar CSV
+                    </button>
+                    <button
+                      class="w3-button w3-white w3-border w3-round-xxlarge w3-small w3-margin-left"
+                      onclick="exportBillingPdf()">
+                      Exportar PDF
+                    </button>
+                  </div>
+                </div>
+                <div id="billingReportList">
+                  <div class="w3-center w3-text-gray w3-small">Selecciona un mes para generar el reporte.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top">
+        <div class="w3-row w3-margin-bottom">
+          <div class="w3-col s12 m8">
+            <h3 class="w3-text-blue" style="margin:8px 0">Comunicaciones</h3>
+            <p class="w3-small w3-text-gray">
+              Envia avisos a grupos por academia, categoria, nivel o equipo.
+            </p>
+          </div>
+          <div class="w3-col s12 m4 w3-right-align">
+            <button
+              class="w3-button w3-white w3-border w3-round-xxlarge w3-small"
+              data-collapsible="adminAnnouncementsContent">
+              Cerrar
+            </button>
+          </div>
+        </div>
+
+        <div id="adminAnnouncementsContent">
+          <div class="w3-row-padding" style="margin:0 -8px">
+            <div class="w3-col s12 m5">
+              <div class="w3-padding w3-border w3-round-xxlarge w3-small w3-white">
+                <h4 class="w3-text-indigo" style="margin-top:0">Nuevo aviso</h4>
+                <label class="w3-small w3-text-gray">Titulo</label>
+                <input id="adminAnnTitle" class="w3-input w3-border w3-round-large w3-margin-bottom" type="text">
+
+                <label class="w3-small w3-text-gray">Mensaje</label>
+                <textarea id="adminAnnMessage" class="w3-input w3-border w3-round-large w3-margin-bottom" rows="3"></textarea>
+
+                <label class="w3-small w3-text-gray">Prioridad</label>
+                <select id="adminAnnPriority" class="w3-select w3-border w3-round-large w3-margin-bottom">
+                  <option value="low">Baja</option>
+                  <option value="normal" selected>Media</option>
+                  <option value="high">Alta</option>
+                </select>
+
+                <label class="w3-small w3-text-gray">Destino</label>
+                <select id="adminAnnScope" class="w3-select w3-border w3-round-large w3-margin-bottom">
+                  <option value="academy">Academia</option>
+                  <option value="category">Categoria</option>
+                  <option value="level">Nivel</option>
+                  <option value="team">Equipo (nivel + coach)</option>
+                </select>
+
+                <div id="adminAnnAcademyWrap" class="w3-margin-bottom">
+                  <label class="w3-small w3-text-gray">Academia</label>
+                  <select id="adminAnnAcademy" class="w3-select w3-border w3-round-large">
+                    <option value="">Seleccione una academia...</option>
+                  </select>
+                </div>
+
+                <div id="adminAnnCategoryWrap" class="w3-margin-bottom w3-hide">
+                  <label class="w3-small w3-text-gray">Categoria</label>
+                  <select id="adminAnnCategory" class="w3-select w3-border w3-round-large">
+                    <option value="">Seleccione una categoria...</option>
+                  </select>
+                </div>
+
+                <div id="adminAnnLevelWrap" class="w3-margin-bottom w3-hide">
+                  <label class="w3-small w3-text-gray">Nivel</label>
+                  <select id="adminAnnLevel" class="w3-select w3-border w3-round-large">
+                    <option value="">Seleccione un nivel...</option>
+                  </select>
+                </div>
+
+                <div id="adminAnnTeamWrap" class="w3-margin-bottom w3-hide">
+                  <label class="w3-small w3-text-gray">Coach</label>
+                  <select id="adminAnnCoach" class="w3-select w3-border w3-round-large w3-margin-bottom">
+                    <option value="">Seleccione un coach...</option>
+                  </select>
+                  <label class="w3-small w3-text-gray">Nivel del coach</label>
+                  <select id="adminAnnTeamLevel" class="w3-select w3-border w3-round-large">
+                    <option value="">Seleccione un nivel...</option>
+                  </select>
+                </div>
+
+                <label class="w3-small w3-text-gray">Adjuntos</label>
+                <input id="adminAnnFiles" type="file" class="w3-input w3-border w3-round-large" multiple>
+
+                <button
+                  class="w3-button w3-blue w3-round-xxlarge w3-small w3-margin-top"
+                  onclick="createAnnouncement('admin')">
+                  Enviar aviso
+                </button>
+                <div id="adminAnnMsg" class="w3-small w3-center w3-margin-top"></div>
+              </div>
+            </div>
+
+            <div class="w3-col s12 m7">
+              <div class="w3-padding w3-border w3-round-xxlarge w3-small w3-white">
+                <h4 class="w3-text-indigo" style="margin-top:0">Avisos</h4>
+                <div id="adminAnnouncementsList">
+                  <div class="w3-center w3-text-gray w3-small">Cargando avisos...</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Panel General (deportistas) -->
+    <section id="generalPanel" class="w3-margin-top w3-hide">
+      <div class="w3-card w3-white w3-round-xxlarge w3-padding">
+        <div class="w3-row w3-margin-bottom">
+          <div class="w3-col s12 m8">
+            <h3 class="w3-text-blue" style="margin:8px 0">Mis Deportistas</h3>
+            <p class="w3-small w3-text-gray">
+              Registra y gestiona tus atletas.
+            </p>
+          </div>
+          <div class="w3-col s12 m4 w3-right-align">
+            <button
+              class="w3-button w3-blue w3-round-xxlarge w3-small"
+              onclick="openCreateAthlete()">
+              + Agregar atleta
+            </button>
+            <button
+              class="w3-button w3-white w3-border w3-round-xxlarge w3-small w3-margin-left"
+              data-collapsible="generalAthletesContent">
+              Cerrar
+            </button>
+          </div>
+        </div>
+
+        <div id="generalAthletesContent">
+          <div id="adminAthleteFilters" class="w3-margin-top w3-padding-small w3-border w3-round-xxlarge">
+            <div class="w3-row-padding" style="margin:0 -8px">
+              <div class="w3-col s12 m4">
+                <label class="w3-small w3-text-gray">Buscar</label>
+                <input id="adminAthleteSearch" class="w3-input w3-border w3-round-large" placeholder="Nombre o identificación">
+              </div>
+              <div class="w3-col s12 m4">
+                <label class="w3-small w3-text-gray">Academia</label>
+                <select id="adminFilterAcademy" class="w3-select w3-border w3-round-large">
+                  <option value="">Todas</option>
+                </select>
+              </div>
+              <div class="w3-col s12 m4">
+                <label class="w3-small w3-text-gray">Categoría</label>
+                <select id="adminFilterCategory" class="w3-select w3-border w3-round-large">
+                  <option value="">Todas</option>
+                </select>
+              </div>
+            </div>
+            <div class="w3-row-padding w3-margin-top" style="margin:0 -8px">
+              <div class="w3-col s12 m4">
+                <label class="w3-small w3-text-gray">Nivel</label>
+                <select id="adminFilterLevel" class="w3-select w3-border w3-round-large">
+                  <option value="">Todos</option>
+                </select>
+              </div>
+              <div class="w3-col s12 m4">
+                <label class="w3-small w3-text-gray">Entrenador</label>
+                <select id="adminFilterCoach" class="w3-select w3-border w3-round-large">
+                  <option value="">Todos</option>
+                </select>
+              </div>
+              <div class="w3-col s6 m2">
+                <label class="w3-small w3-text-gray">Nacimiento desde</label>
+                <input id="adminBirthFrom" type="date" class="w3-input w3-border w3-round-large">
+              </div>
+              <div class="w3-col s6 m2">
+                <label class="w3-small w3-text-gray">Nacimiento hasta</label>
+                <input id="adminBirthTo" type="date" class="w3-input w3-border w3-round-large">
+              </div>
+            </div>
+          </div>
+          <div class="w3-right-align w3-margin-top">
+  <button class="w3-button w3-white w3-border w3-round-xxlarge w3-small" onclick="exportAthletesCsv('admin')">
+    Exportar CSV
+  </button>
+  <button class="w3-button w3-white w3-border w3-round-xxlarge w3-small w3-margin-left" onclick="exportAthletesPdf('admin')">
+    Exportar PDF
+  </button>
+</div>
+<div id="athleteList" class="w3-margin-top">
+            <div class="w3-center w3-text-gray w3-small">Cargando atletas…</div>
+          </div>
+        </div>
+      </div>
+      <div id="generalReportSection" class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top">
+        <div class="w3-row w3-margin-bottom">
+          <div class="w3-col s12 m8">
+            <h3 class="w3-text-blue" style="margin:8px 0">Reporte de asistencia</h3>
+            <p class="w3-small w3-text-gray">Solo tus deportistas.</p>
+          </div>
+        </div>
+        <div class="w3-row w3-margin-top">
+          <div class="w3-col s12 m6">
+            <input id="generalReportMonth" type="month" class="w3-input w3-border w3-round-large" style="max-width:180px; display:inline-block;">
+            <button
+              class="w3-button w3-blue w3-round-xxlarge w3-small w3-margin-left"
+              onclick="loadGeneralMonthlyReport()">
+              Reporte mensual
+            </button>
+          </div>
+          <div class="w3-col s12 m6 w3-right-align">
+            <button
+              class="w3-button w3-white w3-border w3-round-xxlarge w3-small"
+              onclick="exportReportCsv('general')">
+              Exportar CSV
+            </button>
+            <button
+              class="w3-button w3-white w3-border w3-round-xxlarge w3-small w3-margin-left"
+              onclick="exportReportPdf('general')">
+              Exportar PDF
+            </button>
+          </div>
+        </div>
+        <div id="generalMonthlyReport" class="w3-margin-top"></div>
+      </div>
+
+      <div id="generalPlansSection" class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top">
+        <div class="w3-row w3-margin-bottom">
+          <div class="w3-col s12 m8">
+            <h3 class="w3-text-blue" style="margin:8px 0">Planes de facturacion</h3>
+            <p class="w3-small w3-text-gray">
+              Selecciona un plan por atleta. El cambio aplica desde el proximo periodo.
+            </p>
+          </div>
+          <div class="w3-col s12 m4 w3-right-align">
+            <button
+              class="w3-button w3-white w3-border w3-round-xxlarge w3-small"
+              data-collapsible="generalPlansContent">
+              Cerrar
+            </button>
+          </div>
+        </div>
+        <div id="generalPlansContent">
+          <div class="w3-row-padding" style="margin:0 -8px">
+            <div class="w3-col s12 m5">
+              <div class="w3-padding w3-border w3-round-xxlarge w3-small w3-white">
+                <label class="w3-small w3-text-gray">Atleta</label>
+                <select id="generalPlanAthlete" class="w3-select w3-border w3-round-large w3-margin-bottom">
+                  <option value="">Seleccione un atleta...</option>
+                </select>
+
+                <label class="w3-small w3-text-gray">Plan</label>
+                <select id="generalPlanSelect" class="w3-select w3-border w3-round-large w3-margin-bottom">
+                  <option value="">Seleccione un plan...</option>
+                </select>
+
+                <button
+                  class="w3-button w3-blue w3-round-xxlarge w3-small w3-margin-top"
+                  onclick="selectAthletePlan()">
+                  Elegir plan
+                </button>
+                <div id="generalPlanMsg" class="w3-small w3-center w3-margin-top"></div>
+              </div>
+            </div>
+            <div class="w3-col s12 m7">
+              <div class="w3-padding w3-border w3-round-xxlarge w3-small w3-white">
+                <h4 class="w3-text-indigo" style="margin-top:0">Mis planes</h4>
+                <div id="generalPlanStatusList">
+                  <div class="w3-center w3-text-gray w3-small">Cargando planes...</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="generalPaymentsSection" class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top">
+        <div class="w3-row w3-margin-bottom">
+          <div class="w3-col s12 m8">
+            <h3 class="w3-text-blue" style="margin:8px 0">Pagos</h3>
+            <p class="w3-small w3-text-gray">
+              Registra tus pagos subiendo el comprobante de transferencia.
+            </p>
+          </div>
+          <div class="w3-col s12 m4 w3-right-align">
+            <button
+              class="w3-button w3-white w3-border w3-round-xxlarge w3-small"
+              data-collapsible="generalPaymentsContent">
+              Cerrar
+            </button>
+          </div>
+        </div>
+        <div id="generalPaymentsContent">
+          <div class="w3-margin-bottom w3-padding-small w3-border w3-round-xxlarge">
+            <div class="w3-row-padding" style="margin:0 -8px">
+              <div class="w3-col s12 m5">
+                <label class="w3-small w3-text-gray">Buscar</label>
+                <input id="generalPaymentsSearch" class="w3-input w3-border w3-round-large" placeholder="Nombre o plan">
+              </div>
+              <div class="w3-col s12 m4">
+                <label class="w3-small w3-text-gray">Estado</label>
+                <select id="generalPaymentsStatus" class="w3-select w3-border w3-round-large">
+                  <option value="">Todos</option>
+                  <option value="pending">Pendiente</option>
+                  <option value="submitted">Comprobante enviado</option>
+                  <option value="paid">Pagada</option>
+                  <option value="cancelled">Cancelada</option>
+                </select>
+              </div>
+              <div class="w3-col s12 m3">
+                <label class="w3-small w3-text-gray">Por pagina</label>
+                <select id="generalPaymentsPerPage" class="w3-select w3-border w3-round-large">
+                  <option value="10">10</option>
+                  <option value="20">20</option>
+                  <option value="30">30</option>
+                </select>
+              </div>
+            </div>
+            <div class="w3-right-align w3-margin-top">
+              <button id="generalPaymentsPrev" class="w3-button w3-white w3-border w3-round-xxlarge w3-small">Anterior</button>
+              <span id="generalPaymentsPageInfo" class="w3-small w3-text-gray w3-margin-left">Pagina 1</span>
+              <button id="generalPaymentsNext" class="w3-button w3-white w3-border w3-round-xxlarge w3-small w3-margin-left">Siguiente</button>
+            </div>
+          </div>
+          <div id="generalPaymentsList" class="w3-small">
+            <div class="w3-center w3-text-gray w3-small">Cargando pagos...</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="generalAnnouncementsSection" class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top">
+        <div class="w3-row w3-margin-bottom">
+          <div class="w3-col s12 m8">
+            <h3 class="w3-text-blue" style="margin:8px 0">Comunicaciones</h3>
+            <p class="w3-small w3-text-gray">Avisos para tus deportistas.</p>
+          </div>
+          <div class="w3-col s12 m4 w3-right-align">
+            <button
+              class="w3-button w3-white w3-border w3-round-xxlarge w3-small"
+              data-collapsible="generalAnnouncementsContent">
+              Cerrar
+            </button>
+          </div>
+        </div>
+        <div id="generalAnnouncementsContent">
+          <div id="generalAnnouncementsList" class="w3-small">
+            <div class="w3-center w3-text-gray w3-small">Cargando avisos...</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Panel Coach (Entrenadores) -->
+    <section id="coachPanel" class="w3-margin-top w3-hide">
+      <div class="w3-card w3-white w3-round-xxlarge w3-padding">
+        <div class="w3-row w3-margin-bottom">
+          <div class="w3-col s12 m8">
+            <h3 class="w3-text-blue" style="margin:8px 0">Mi Perfil de Entrenador</h3>
+            <p class="w3-small w3-text-gray">
+              Registra y actualiza tu información como entrenador: identificación, teléfono y notas.
+            </p>
+          </div>
+          <div class="w3-col s12 m4 w3-right-align">
+            <button
+              class="w3-button w3-blue w3-round-xxlarge w3-small"
+              id="btnCoachCreate"
+              onclick="openCreateCoachProfile()"
+              style="display:none;">
+              + Registrar como Entrenador
+            </button>
+            <button
+              class="w3-button w3-green w3-round-xxlarge w3-small"
+              id="btnCoachEdit"
+              onclick="openEditCoachProfile()"
+              style="display:none;">
+              ✏️ Editar mi Perfil
+            </button>
+            <button
+              class="w3-button w3-white w3-border w3-round-xxlarge w3-small w3-margin-left"
+              data-collapsible="coachProfileContent">
+              Cerrar
+            </button>
+          </div>
+        </div>
+
+        <div id="coachProfileContent">
+          <div id="coachProfileInfo" class="w3-margin-top">
+            <div class="w3-center w3-text-gray w3-small">Cargando perfil…</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top">
+        <div class="w3-row w3-margin-bottom">
+          <div class="w3-col s12 m8">
+            <h3 class="w3-text-blue" style="margin:8px 0">Todos los deportistas</h3>
+            <p class="w3-small w3-text-gray">
+              Lista general de atletas disponibles en el sistema.
+            </p>
+          </div>
+          <div class="w3-col s12 m4 w3-right-align">
+            <button
+              class="w3-button w3-white w3-border w3-round-xxlarge w3-small"
+              data-collapsible="coachAllAthletesContent">
+              Cerrar
+            </button>
+          </div>
+        </div>
+
+        <div id="coachAllAthletesContent">
+          <div class="w3-margin-top w3-padding-small w3-border w3-round-xxlarge">
+            <div class="w3-row-padding" style="margin:0 -8px">
+              <div class="w3-col s12 m4">
+                <label class="w3-small w3-text-gray">Buscar</label>
+                <input id="coachAthleteSearch" class="w3-input w3-border w3-round-large" placeholder="Nombre o identificación">
+              </div>
+              <div class="w3-col s12 m4">
+                <label class="w3-small w3-text-gray">Academia</label>
+                <select id="coachFilterAcademy" class="w3-select w3-border w3-round-large">
+                  <option value="">Todas</option>
+                </select>
+              </div>
+              <div class="w3-col s12 m4">
+                <label class="w3-small w3-text-gray">Categoría</label>
+                <select id="coachFilterCategory" class="w3-select w3-border w3-round-large">
+                  <option value="">Todas</option>
+                </select>
+              </div>
+            </div>
+            <div class="w3-row-padding w3-margin-top" style="margin:0 -8px">
+              <div class="w3-col s12 m4">
+                <label class="w3-small w3-text-gray">Nivel</label>
+                <select id="coachFilterLevel" class="w3-select w3-border w3-round-large">
+                  <option value="">Todos</option>
+                </select>
+              </div>
+              <div class="w3-col s12 m4">
+                <label class="w3-small w3-text-gray">Entrenador</label>
+                <select id="coachFilterCoach" class="w3-select w3-border w3-round-large">
+                  <option value="">Todos</option>
+                </select>
+              </div>
+              <div class="w3-col s6 m2">
+                <label class="w3-small w3-text-gray">Nacimiento desde</label>
+                <input id="coachBirthFrom" type="date" class="w3-input w3-border w3-round-large">
+              </div>
+              <div class="w3-col s6 m2">
+                <label class="w3-small w3-text-gray">Nacimiento hasta</label>
+                <input id="coachBirthTo" type="date" class="w3-input w3-border w3-round-large">
+              </div>
+            </div>
+          </div>
+          <div class="w3-right-align w3-margin-top">
+  <button class="w3-button w3-white w3-border w3-round-xxlarge w3-small" onclick="exportAthletesCsv('coach')">
+    Exportar CSV
+  </button>
+  <button class="w3-button w3-white w3-border w3-round-xxlarge w3-small w3-margin-left" onclick="exportAthletesPdf('coach')">
+    Exportar PDF
+  </button>
+</div>
+<div id="coachAllAthletesList" class="w3-margin-top">
+            <div class="w3-center w3-text-gray w3-small">Cargando atletas…</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top">
+        <div class="w3-row w3-margin-bottom">
+          <div class="w3-col s12 m8">
+            <h3 class="w3-text-blue" style="margin:8px 0">Mis deportistas por nivel</h3>
+            <p class="w3-small w3-text-gray">
+              Deportistas agrupados por niveles en los que tienes asignaci&oacute;n activa.
+            </p>
+          </div>
+          <div class="w3-col s12 m4 w3-right-align">
+            <button
+              class="w3-button w3-white w3-border w3-round-xxlarge w3-small"
+              data-collapsible="coachTeamsContent">
+              Cerrar
+            </button>
+          </div>
+        </div>
+
+        <div id="coachTeamsContent">
+          <div id="coachTeamsList" class="w3-margin-top">
+            <div class="w3-center w3-text-gray w3-small">Cargando equipos…</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top">
+        <div class="w3-row w3-margin-bottom">
+          <div class="w3-col s12 m8">
+            <h3 class="w3-text-blue" style="margin:8px 0">Comunicaciones</h3>
+            <p class="w3-small w3-text-gray">
+              Envia avisos a tus niveles y equipos.
+            </p>
+          </div>
+          <div class="w3-col s12 m4 w3-right-align">
+            <button
+              class="w3-button w3-white w3-border w3-round-xxlarge w3-small"
+              data-collapsible="coachAnnouncementsContent">
+              Cerrar
+            </button>
+          </div>
+        </div>
+
+        <div id="coachAnnouncementsContent">
+          <div class="w3-row-padding" style="margin:0 -8px">
+            <div class="w3-col s12 m5">
+              <div class="w3-padding w3-border w3-round-xxlarge w3-small w3-white">
+                <h4 class="w3-text-indigo" style="margin-top:0">Nuevo aviso</h4>
+                <label class="w3-small w3-text-gray">Titulo</label>
+                <input id="coachAnnTitle" class="w3-input w3-border w3-round-large w3-margin-bottom" type="text">
+
+                <label class="w3-small w3-text-gray">Mensaje</label>
+                <textarea id="coachAnnMessage" class="w3-input w3-border w3-round-large w3-margin-bottom" rows="3"></textarea>
+
+                <label class="w3-small w3-text-gray">Prioridad</label>
+                <select id="coachAnnPriority" class="w3-select w3-border w3-round-large w3-margin-bottom">
+                  <option value="low">Baja</option>
+                  <option value="normal" selected>Media</option>
+                  <option value="high">Alta</option>
+                </select>
+
+                <label class="w3-small w3-text-gray">Destino</label>
+                <select id="coachAnnScope" class="w3-select w3-border w3-round-large w3-margin-bottom">
+                  <option value="level">Nivel</option>
+                  <option value="team">Equipo (nivel + coach)</option>
+                </select>
+
+                <div id="coachAnnLevelWrap" class="w3-margin-bottom">
+                  <label class="w3-small w3-text-gray">Nivel</label>
+                  <select id="coachAnnLevel" class="w3-select w3-border w3-round-large">
+                    <option value="">Seleccione un nivel...</option>
+                  </select>
+                </div>
+
+                <div id="coachAnnTeamWrap" class="w3-margin-bottom w3-hide">
+                  <label class="w3-small w3-text-gray">Nivel del coach</label>
+                  <select id="coachAnnTeamLevel" class="w3-select w3-border w3-round-large">
+                    <option value="">Seleccione un nivel...</option>
+                  </select>
+                </div>
+
+                <label class="w3-small w3-text-gray">Adjuntos</label>
+                <input id="coachAnnFiles" type="file" class="w3-input w3-border w3-round-large" multiple>
+
+                <button
+                  class="w3-button w3-blue w3-round-xxlarge w3-small w3-margin-top"
+                  onclick="createAnnouncement('coach')">
+                  Enviar aviso
+                </button>
+                <div id="coachAnnMsg" class="w3-small w3-center w3-margin-top"></div>
+              </div>
+            </div>
+
+            <div class="w3-col s12 m7">
+              <div class="w3-padding w3-border w3-round-xxlarge w3-small w3-white">
+                <h4 class="w3-text-indigo" style="margin-top:0">Avisos</h4>
+                <div id="coachAnnouncementsList">
+                  <div class="w3-center w3-text-gray w3-small">Cargando avisos...</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top">
+        <div class="w3-row w3-margin-bottom">
+          <div class="w3-col s12 m8">
+            <h3 class="w3-text-blue" style="margin:8px 0">Asistencia</h3>
+            <p class="w3-small w3-text-gray">
+              Marca la asistencia de tus deportistas por sesión.
+            </p>
+          </div>
+          <div class="w3-col s12 m4 w3-right-align">
+            <button
+              class="w3-button w3-white w3-border w3-round-xxlarge w3-small"
+              data-collapsible="coachSessionsContent">
+              Cerrar
+            </button>
+          </div>
+        </div>
+
+        <div id="coachSessionsContent">
+          <div class="w3-row w3-margin-top">
+            <div class="w3-col s12 m6">
+              <button
+                class="w3-button w3-white w3-border w3-round-xxlarge w3-small"
+                onclick="coachPrevMonth()">
+                ◀
+              </button>
+              <span id="coachCalendarLabel" class="w3-small w3-text-gray w3-margin-left"></span>
+              <button
+                class="w3-button w3-white w3-border w3-round-xxlarge w3-small w3-margin-left"
+                onclick="coachNextMonth()">
+                ▶
+              </button>
+            </div>
+          </div>
+          <div id="coachSessionCalendar" class="w3-margin-top"></div>
+          <div class="w3-row w3-margin-top">
+            <div class="w3-col s12 m6">
+              <input id="coachReportMonth" type="month" class="w3-input w3-border w3-round-large" style="max-width:180px; display:inline-block;">
+              <button
+                class="w3-button w3-blue w3-round-xxlarge w3-small w3-margin-left"
+                onclick="loadCoachMonthlyReport()">
+                Reporte mensual
+              </button>
+            </div>
+            <div class="w3-col s12 m6 w3-right-align">
+              <button
+                class="w3-button w3-white w3-border w3-round-xxlarge w3-small"
+                onclick="exportReportCsv('coach')">
+                Exportar CSV
+              </button>
+              <button
+                class="w3-button w3-white w3-border w3-round-xxlarge w3-small w3-margin-left"
+                onclick="exportReportPdf('coach')">
+                Exportar PDF
+              </button>
+            </div>
+          </div>
+          <div id="coachMonthlyReport" class="w3-margin-top"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Modal: Crear usuario (admin) -->
+  <div id="modalCreateUser" class="w3-modal">
+    <div class="w3-modal-content w3-animate-top w3-round-xxlarge" style="max-width:480px">
+      <header class="w3-container w3-blue w3-round-xxlarge">
+        <h4>Crear usuario</h4>
+      </header>
+      <div class="w3-container w3-padding">
+        <label class="w3-small w3-text-gray">Correo</label>
+        <input
+          id="cuEmail"
+          type="email"
+          class="w3-input w3-border w3-round-large w3-margin-bottom"
+          placeholder="correo@ejemplo.com">
+
+        <label class="w3-small w3-text-gray">Rol</label>
+        <select id="cuRole" class="w3-select w3-border w3-round-large">
+          <option value="coach">Coach</option>
+          <option value="admin">Admin</option>
+        </select>
+        <div id="cuMsg" class="w3-small w3-center w3-margin-top"></div>
+      </div>
+      <footer class="w3-container w3-padding w3-right-align">
+        <button
+          class="w3-button w3-white w3-border w3-round-xxlarge w3-small"
+          onclick="closeCreateUser()">
+          Cancelar
+        </button>
+        <button
+          class="w3-button w3-blue w3-round-xxlarge w3-small"
+          onclick="createUser()">
+          Crear
+        </button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Modal: Editar usuario (admin) -->
+  <div id="modalEditUser" class="w3-modal">
+    <div class="w3-modal-content w3-animate-top w3-round-xxlarge" style="max-width:520px">
+      <header class="w3-container w3-blue w3-round-xxlarge">
+        <h4>Editar usuario</h4>
+      </header>
+      <div class="w3-container w3-padding">
+        <input type="hidden" id="euId">
+
+        <label class="w3-small w3-text-gray">Correo</label>
+        <input
+          id="euEmail"
+          type="email"
+          class="w3-input w3-border w3-round-large w3-margin-bottom">
+
+        <label class="w3-small w3-text-gray">Rol</label>
+        <select id="euRole" class="w3-select w3-border w3-round-large w3-margin-bottom">
+          <option value="general">General</option>
+          <option value="coach">Coach</option>
+          <option value="admin">Admin</option>
+        </select>
+
+        <label class="w3-small w3-text-gray">Estado</label>
+        <select id="euActive" class="w3-select w3-border w3-round-large">
+          <option value="true">Activo</option>
+          <option value="false">Inactivo</option>
+        </select>
+
+        <div id="euMsg" class="w3-small w3-center w3-margin-top"></div>
+      </div>
+      <footer class="w3-container w3-padding w3-right-align">
+        <button
+          class="w3-button w3-white w3-border w3-round-xxlarge w3-small"
+          onclick="closeEditUser()">
+          Cancelar
+        </button>
+        <button
+          class="w3-button w3-blue w3-round-xxlarge w3-small"
+          onclick="updateUser()">
+          Guardar
+        </button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Modal: Crear atleta -->
+  <div id="modalCreateAthlete" class="w3-modal">
+    <div class="w3-modal-content w3-animate-top w3-round-xxlarge" style="max-width:520px">
+      <header class="w3-container w3-blue w3-round-xxlarge">
+        <h4>Nuevo atleta</h4>
+      </header>
+      <div class="w3-container w3-padding">
+
+        <label class="w3-small w3-text-gray">Identificación</label>
+        <input
+          id="aIdNumber"
+          class="w3-input w3-border w3-round-large w3-margin-bottom"
+          type="text"
+          placeholder="Número de identificación">
+
+        <div class="w3-row-padding" style="margin:0 -8px">
+          <div class="w3-half">
+            <label class="w3-small w3-text-gray">Nombre</label>
+            <input id="aFirst" class="w3-input w3-border w3-round-large" placeholder="Nombre">
+          </div>
+          <div class="w3-half">
+            <label class="w3-small w3-text-gray">Apellido</label>
+            <input id="aLast" class="w3-input w3-border w3-round-large" placeholder="Apellido">
+          </div>
+        </div>
+
+        <label class="w3-small w3-text-gray w3-margin-top">Academia</label>
+        <select id="aAcademy" class="w3-select w3-border w3-round-large">
+          <option value="">Seleccione una academia…</option>
+        </select>
+
+        <div class="w3-row-padding" style="margin:0 -8px">
+          <div class="w3-half">
+            <label class="w3-small w3-text-gray">Fecha de nacimiento</label>
+            <input id="aBirth" type="date" class="w3-input w3-border w3-round-large">
+          </div>
+          <div class="w3-half">
+            <label class="w3-small w3-text-gray">Género</label>
+            <select id="aGender" class="w3-select w3-border w3-round-large">
+              <option value="">—</option>
+              <option value="M">M</option>
+              <option value="F">F</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="w3-row-padding" style="margin:0 -8px">
+          <div class="w3-half">
+            <label class="w3-small w3-text-gray">Altura (cm)</label>
+            <input id="aHeight" type="number" step="0.01" class="w3-input w3-border w3-round-large">
+          </div>
+          <div class="w3-half">
+            <label class="w3-small w3-text-gray">Peso (kg)</label>
+            <input id="aWeight" type="number" step="0.01" class="w3-input w3-border w3-round-large">
+          </div>
+        </div>
+
+        <label class="w3-small w3-text-gray">Disciplina</label>
+        <input id="aDiscipline" class="w3-input w3-border w3-round-large" placeholder="Fútbol, Atletismo, ...">
+
+        <label class="w3-small w3-text-gray">Notas</label>
+        <textarea id="aNotes" class="w3-input w3-border w3-round-large" rows="2"></textarea>
+
+        <label class="w3-small w3-text-gray">Foto del atleta</label>
+        <input id="aPhoto" type="file" accept="image/*" class="w3-input w3-border w3-round-large">
+
+        <div id="aMsg" class="w3-small w3-center w3-margin-top"></div>
+      </div>
+      <footer class="w3-container w3-padding w3-right-align">
+        <button
+          class="w3-button w3-white w3-border w3-round-xxlarge w3-small"
+          onclick="closeCreateAthlete()">
+          Cancelar
+        </button>
+        <button
+          class="w3-button w3-blue w3-round-xxlarge w3-small"
+          onclick="createAthlete()">
+          Guardar
+        </button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Modal: Editar atleta -->
+  <div id="modalEditAthlete" class="w3-modal">
+    <div class="w3-modal-content w3-animate-top w3-round-xxlarge" style="max-width:520px">
+      <header class="w3-container w3-blue w3-round-xxlarge">
+        <h4>Editar atleta</h4>
+      </header>
+      <div class="w3-container w3-padding">
+        <input type="hidden" id="editId">
+        <input type="hidden" id="eIdNumber">
+
+        <label class="w3-small w3-text-gray">Nombre</label>
+        <input id="eFirst" class="w3-input w3-border w3-round-large" placeholder="Nombre">
+
+        <label class="w3-small w3-text-gray">Apellido</label>
+        <input id="eLast" class="w3-input w3-border w3-round-large" placeholder="Apellido">
+
+        <label class="w3-small w3-text-gray">Fecha de nacimiento</label>
+        <input id="eBirth" type="date" class="w3-input w3-border w3-round-large">
+
+        <label class="w3-small w3-text-gray">Género</label>
+        <select id="eGender" class="w3-select w3-border w3-round-large">
+          <option value="">—</option>
+          <option value="M">M</option>
+          <option value="F">F</option>
+        </select>
+
+        <label class="w3-small w3-text-gray">Altura (cm)</label>
+        <input id="eHeight" type="number" step="0.01" class="w3-input w3-border w3-round-large">
+
+        <label class="w3-small w3-text-gray">Peso (kg)</label>
+        <input id="eWeight" type="number" step="0.01" class="w3-input w3-border w3-round-large">
+
+        <label class="w3-small w3-text-gray">Disciplina</label>
+        <input id="eDiscipline" class="w3-input w3-border w3-round-large">
+
+        <label class="w3-small w3-text-gray">Notas</label>
+        <textarea id="eNotes" class="w3-input w3-border w3-round-large" rows="2"></textarea>
+
+        <label class="w3-small w3-text-gray">Actualizar foto</label>
+        <input id="ePhoto" type="file" accept="image/*" class="w3-input w3-border w3-round-large">
+
+        <div id="eaMsg" class="w3-small w3-center w3-margin-top"></div>
+      </div>
+      <footer class="w3-container w3-padding w3-right-align">
+        <button
+          class="w3-button w3-white w3-border w3-round-xxlarge w3-small"
+          onclick="closeEditAthlete()">
+          Cancelar
+        </button>
+        <button
+          class="w3-button w3-blue w3-round-xxlarge w3-small"
+          onclick="updateAthlete()">
+          Guardar cambios
+        </button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Modal: Detalle de atleta -->
+  <div id="modalAthleteDetail" class="w3-modal">
+    <div class="w3-modal-content w3-animate-top w3-round-xxlarge" style="max-width:620px">
+      <header class="w3-container w3-blue w3-round-xxlarge">
+        <h4>Detalle del atleta</h4>
+      </header>
+      <div class="w3-container w3-padding">
+        <div id="athleteDetailBody" class="w3-small"></div>
+      </div>
+      <footer class="w3-container w3-padding w3-right-align">
+        <button
+          class="w3-button w3-white w3-border w3-round-xxlarge w3-small"
+          onclick="closeAthleteDetail()">
+          Cerrar
+        </button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Modal: Asignar nivel a atleta -->
+  <div id="modalAssignLevel" class="w3-modal">
+    <div class="w3-modal-content w3-animate-top w3-round-xxlarge" style="max-width:520px">
+      <header class="w3-container w3-blue w3-round-xxlarge">
+        <h4>Asignar nivel</h4>
+      </header>
+      <div class="w3-container w3-padding">
+        <input type="hidden" id="assignAthleteId">
+
+        <div id="assignCoachWrap" style="display:none;">
+          <label class="w3-small w3-text-gray">Coach</label>
+          <select id="assignCoachUserId" class="w3-select w3-border w3-round-large w3-margin-bottom">
+            <option value="">Seleccione un coach…</option>
+          </select>
+        </div>
+
+        <label class="w3-small w3-text-gray">Nivel</label>
+        <select id="assignLevelId" class="w3-select w3-border w3-round-large w3-margin-bottom">
+          <option value="">Seleccione un nivel…</option>
+        </select>
+
+        <div id="assignLevelMsg" class="w3-small w3-center w3-margin-top"></div>
+      </div>
+      <footer class="w3-container w3-padding w3-right-align">
+        <button
+          class="w3-button w3-white w3-border w3-round-xxlarge w3-small"
+          onclick="closeAssignLevel()">
+          Cancelar
+        </button>
+        <button
+          class="w3-button w3-blue w3-round-xxlarge w3-small"
+          onclick="saveAssignLevel()">
+          Guardar
+        </button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Modal: Crear sesión -->
+  <div id="modalCreateSession" class="w3-modal">
+    <div class="w3-modal-content w3-animate-top w3-round-xxlarge" style="max-width:620px">
+      <header class="w3-container w3-blue w3-round-xxlarge">
+        <h4>Nueva sesión</h4>
+      </header>
+      <div class="w3-container w3-padding">
+        <div class="w3-row-padding" style="margin:0 -8px">
+          <div class="w3-col s12 m6">
+            <label class="w3-small w3-text-gray">Inicio</label>
+            <input id="tsStart" type="datetime-local" class="w3-input w3-border w3-round-large">
+          </div>
+          <div class="w3-col s12 m6">
+            <label class="w3-small w3-text-gray">Fin</label>
+            <input id="tsEnd" type="datetime-local" class="w3-input w3-border w3-round-large">
+          </div>
+        </div>
+
+        <label class="w3-small w3-text-gray w3-margin-top">Notas</label>
+        <textarea id="tsNotes" class="w3-input w3-border w3-round-large" rows="2"></textarea>
+
+        <label class="w3-small w3-text-gray w3-margin-top">Niveles</label>
+        <div class="w3-small w3-text-gray">
+          <label>
+            <input id="tsAllLevels" type="checkbox" class="w3-check">
+            Todos los niveles activos
+          </label>
+        </div>
+        <div class="w3-margin-top">
+          <button
+            id="tsLevelToggle"
+            class="w3-button w3-white w3-border w3-round-xxlarge w3-small"
+            onclick="toggleLevelDropdown()">
+            Seleccionar niveles
+          </button>
+          <div id="tsLevelDropdown" class="w3-padding-small w3-border w3-round-xxlarge w3-small w3-white w3-margin-top w3-hide" style="max-height:220px; overflow:auto;">
+            <div id="tsLevelList"></div>
+          </div>
+        </div>
+
+        <label class="w3-small w3-text-gray w3-margin-top">Repetición</label>
+        <select id="tsFrequency" class="w3-select w3-border w3-round-large">
+          <option value="none">No repetir</option>
+          <option value="daily">Diaria</option>
+          <option value="weekly">Semanal</option>
+          <option value="monthly">Mensual</option>
+        </select>
+
+        <div id="tsWeekdaysWrap" class="w3-small w3-text-gray w3-margin-top w3-hide">
+          Días de la semana:
+          <label class="w3-margin-left"><input type="checkbox" value="0" class="tsWeekday"> L</label>
+          <label class="w3-margin-left"><input type="checkbox" value="1" class="tsWeekday"> M</label>
+          <label class="w3-margin-left"><input type="checkbox" value="2" class="tsWeekday"> X</label>
+          <label class="w3-margin-left"><input type="checkbox" value="3" class="tsWeekday"> J</label>
+          <label class="w3-margin-left"><input type="checkbox" value="4" class="tsWeekday"> V</label>
+          <label class="w3-margin-left"><input type="checkbox" value="5" class="tsWeekday"> S</label>
+          <label class="w3-margin-left"><input type="checkbox" value="6" class="tsWeekday"> D</label>
+        </div>
+
+        <label class="w3-small w3-text-gray w3-margin-top">Repetir hasta</label>
+        <input id="tsUntil" type="date" class="w3-input w3-border w3-round-large">
+
+        <div id="tsMsg" class="w3-small w3-center w3-margin-top"></div>
+      </div>
+      <footer class="w3-container w3-padding w3-right-align">
+        <button
+          class="w3-button w3-white w3-border w3-round-xxlarge w3-small"
+          onclick="closeCreateSession()">
+          Cancelar
+        </button>
+        <button
+          id="tsCancelSessionBtn"
+          class="w3-button w3-white w3-border w3-round-xxlarge w3-small w3-margin-left"
+          style="display:none;"
+          onclick="cancelSession()">
+          Cancelar sesion
+        </button>
+        <button
+          id="tsSaveBtn"
+          class="w3-button w3-blue w3-round-xxlarge w3-small w3-margin-left"
+          onclick="saveCreateSession()">
+          Guardar
+        </button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Modal: Asistencia -->
+  <div id="modalAttendance" class="w3-modal">
+    <div class="w3-modal-content w3-animate-top w3-round-xxlarge" style="max-width:720px">
+      <header class="w3-container w3-blue w3-round-xxlarge">
+        <h4>Asistencia</h4>
+      </header>
+      <div class="w3-container w3-padding">
+        <input type="hidden" id="attendanceSessionId">
+        <div id="attendanceSessionInfo" class="w3-small w3-text-gray w3-margin-bottom"></div>
+        <div id="attendanceRoster" class="w3-small"></div>
+        <div id="attendanceMsg" class="w3-small w3-center w3-margin-top"></div>
+      </div>
+      <footer class="w3-container w3-padding w3-right-align">
+        <button
+          class="w3-button w3-white w3-border w3-round-xxlarge w3-small"
+          onclick="closeAttendance()">
+          Cancelar
+        </button>
+        <button
+          class="w3-button w3-blue w3-round-xxlarge w3-small"
+          onclick="saveAttendance()">
+          Guardar
+        </button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Modal: Crear/Editar Entrenador (Coach) -->
+  <div id="modalCreateCoach" class="w3-modal">
+    <div class="w3-modal-content w3-animate-top w3-round-xxlarge" style="max-width:540px">
+      <header class="w3-container w3-blue w3-round-xxlarge">
+        <h4 id="coachModalTitle">Nuevo entrenador</h4>
+      </header>
+      <div class="w3-container w3-padding">
+        <input type="hidden" id="coachEditId">
+        
+        <!-- Para admin: mostrar select con usuarios; para coach: usar input hidden -->
+        <div id="coachUserIdAdmin" style="display:none;">
+          <label class="w3-small w3-text-gray">Seleccionar usuario (Coach)</label>
+          <select id="coachUserId" class="w3-select w3-border w3-round-large w3-margin-bottom">
+            <option value="">Seleccione un coach…</option>
+          </select>
+          <p class="w3-small w3-text-gray" style="margin-top:-8px">
+            Los usuarios con rol "coach" aparecen aquí. Crea usuarios desde "Panel de Administración".
+          </p>
+        </div>
+        
+        <!-- Para coach: input hidden que siempre tiene el valor del user_id actual -->
+        <input type="hidden" id="coachUserIdHidden" value="">
+
+        <label class="w3-small w3-text-gray">Nombre completo</label>
+        <input
+          id="coachFullName"
+          class="w3-input w3-border w3-round-large w3-margin-bottom"
+          type="text"
+          placeholder="Juan Carlos García">
+
+        <label class="w3-small w3-text-gray">Identificación (Cédula/Pasaporte)</label>
+        <input
+          id="coachIdNumber"
+          class="w3-input w3-border w3-round-large w3-margin-bottom"
+          type="text"
+          placeholder="12345678">
+
+        <label class="w3-small w3-text-gray">Teléfono</label>
+        <input
+          id="coachPhone"
+          class="w3-input w3-border w3-round-large w3-margin-bottom"
+          type="tel"
+          placeholder="+34 912 345 678">
+
+        <label class="w3-small w3-text-gray">Notas / Información adicional</label>
+        <textarea
+          id="coachNotes"
+          class="w3-input w3-border w3-round-large w3-margin-bottom"
+          rows="3"
+          placeholder="Especialidades, horarios disponibles, etc."></textarea>
+
+        <div id="coachMsg" class="w3-small w3-center w3-margin-top"></div>
+      </div>
+      <footer class="w3-container w3-padding w3-right-align">
+        <button
+          class="w3-button w3-white w3-border w3-round-xxlarge w3-small"
+          onclick="closeCreateCoach()">
+          Cancelar
+        </button>
+        <button
+          class="w3-button w3-blue w3-round-xxlarge w3-small"
+          onclick="saveCoach()">
+          Guardar
+        </button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Modal: Cambiar contraseña -->
+  <div id="modalChangePassword" class="w3-modal">
+    <div class="w3-modal-content w3-animate-top w3-round-xxlarge" style="max-width:520px">
+      <header class="w3-container w3-blue w3-round-xxlarge">
+        <h4>Cambiar contraseña</h4>
+      </header>
+      <div class="w3-container w3-padding">
+        <label class="w3-small w3-text-gray">Contraseña actual</label>
+        <input id="dashCpCurrent" class="w3-input w3-border w3-round-large w3-margin-bottom" type="password">
+
+        <div class="w3-row-padding no-left-right">
+          <div class="w3-half s12">
+            <label class="w3-small w3-text-gray">Nueva contraseña</label>
+            <input id="dashCpNew" class="w3-input w3-border w3-round-large" type="password">
+          </div>
+          <div class="w3-half s12">
+            <label class="w3-small w3-text-gray">Confirmar nueva</label>
+            <input id="dashCpConfirm" class="w3-input w3-border w3-round-large" type="password">
+          </div>
+        </div>
+
+        <div id="dashCpMsg" class="w3-small w3-center w3-margin-top"></div>
+      </div>
+      <footer class="w3-container w3-padding w3-right-align">
+        <button
+          class="w3-button w3-white w3-border w3-round-xxlarge w3-small"
+          onclick="closeChangePassword()">
+          Cancelar
+        </button>
+        <button
+          class="w3-button w3-blue w3-round-xxlarge w3-small"
+          onclick="submitChangePassword()">
+          Guardar
+        </button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Modal: Subir comprobante de pago -->
+  <div id="modalPaymentProof" class="w3-modal">
+    <div class="w3-modal-content w3-animate-top w3-round-xxlarge" style="max-width:520px">
+      <header class="w3-container w3-blue w3-round-xxlarge">
+        <h4>Subir comprobante</h4>
+      </header>
+      <div class="w3-container w3-padding">
+        <input type="hidden" id="paymentInvoiceId">
+        <div id="paymentInvoiceSummary" class="w3-small w3-text-gray w3-margin-bottom"></div>
+
+        <label class="w3-small w3-text-gray">Monto</label>
+        <input id="paymentAmount" type="number" step="0.01" class="w3-input w3-border w3-round-large w3-margin-bottom">
+
+        <label class="w3-small w3-text-gray">Metodo</label>
+        <select id="paymentMethod" class="w3-select w3-border w3-round-large w3-margin-bottom">
+          <option value="transfer">Transferencia</option>
+          <option value="cash">Efectivo</option>
+        </select>
+
+        <label class="w3-small w3-text-gray">Comprobante (imagen o PDF)</label>
+        <input id="paymentProofFile" type="file" accept="image/*,application/pdf" class="w3-input w3-border w3-round-large">
+
+        <div id="paymentMsg" class="w3-small w3-center w3-margin-top"></div>
+      </div>
+      <footer class="w3-container w3-padding w3-right-align">
+        <button
+          class="w3-button w3-white w3-border w3-round-xxlarge w3-small"
+          onclick="closePaymentProof()">
+          Cancelar
+        </button>
+        <button
+          class="w3-button w3-blue w3-round-xxlarge w3-small"
+          onclick="submitPaymentProof()">
+          Enviar
+        </button>
+      </footer>
+    </div>
+  </div>
+
+  
+  <!-- Modal: Confirmacion -->
+  <div id="confirmModal" class="w3-modal">
+    <div class="w3-modal-content w3-animate-top w3-round-xxlarge" style="max-width:420px">
+      <header class="w3-container w3-blue w3-round-xxlarge">
+        <h4 id="confirmTitle">Confirmar acci&oacute;n</h4>
+      </header>
+      <div class="w3-container w3-padding">
+        <p id="confirmMessage" class="w3-small"></p>
+      </div>
+      <footer class="w3-container w3-padding w3-right-align">
+        <button id="confirmCancel" class="w3-button w3-white w3-border w3-round-xxlarge w3-small">
+          Cancelar
+        </button>
+        <button id="confirmOk" class="w3-button w3-blue w3-round-xxlarge w3-small w3-margin-left">
+          Confirmar
+        </button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Modal: Alerta -->
+  <div id="alertModal" class="w3-modal">
+    <div class="w3-modal-content w3-animate-top w3-round-xxlarge" style="max-width:420px">
+      <header class="w3-container w3-blue w3-round-xxlarge">
+        <h4 id="alertTitle">Aviso</h4>
+      </header>
+      <div class="w3-container w3-padding">
+        <p id="alertMessage" class="w3-small"></p>
+      </div>
+      <footer class="w3-container w3-padding w3-right-align">
+        <button id="alertOk" class="w3-button w3-blue w3-round-xxlarge w3-small">
+          Entendido
+        </button>
+      </footer>
+    </div>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/locales-all.global.min.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/coaches.js"></script>
