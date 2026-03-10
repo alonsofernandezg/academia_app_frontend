@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>DeportIvA — Estadísticas</title>
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body { font-family: 'Poppins', sans-serif; }
+
+    /* ── Main tabs ── */
+    .main-tab-btn {
+      border: none; background: #e0e0e0;
+      padding: 10px 24px; margin-right: 6px;
+      border-radius: 24px; cursor: pointer;
+      font-size: 0.95em; font-weight: 500;
+      transition: background .2s;
+    }
+    .main-tab-btn.active { background: #1565c0; color: #fff; }
+
+    /* ── Filter pills ── */
+    .pill-btn {
+      border: none; background: #e8eaf6;
+      padding: 6px 14px; margin-right: 4px; margin-bottom: 4px;
+      border-radius: 20px; cursor: pointer; font-size: 0.82em;
+    }
+    .pill-btn.active-period { background: #1976D2; color: #fff; }
+    .pill-btn.active-venue  { background: #388E3C; color: #fff; }
+
+    /* ── Summary cards ── */
+    .scard {
+      background: linear-gradient(135deg,#667eea,#764ba2);
+      color:#fff; border-radius:14px; padding:16px 20px;
+      text-align:center; margin:6px;
+    }
+    .scard.green  { background: linear-gradient(135deg,#11998e,#38ef7d); }
+    .scard.orange { background: linear-gradient(135deg,#f093fb,#f5576c); }
+    .scard.blue   { background: linear-gradient(135deg,#4facfe,#00f2fe); }
+    .scard.gray   { background: linear-gradient(135deg,#757f9a,#d7dde8); }
+    .scard-val    { font-size:2em; font-weight:700; }
+    .scard-lbl    { font-size:0.78em; opacity:.9; }
+
+    /* ── Team table ── */
+    .team-row {
+      display:grid;
+      grid-template-columns: 2fr repeat(7,1fr);
+      padding:11px 8px; border-bottom:1px solid #eee;
+      align-items:center; font-size:0.88em;
+    }
+    .team-row.hdr { background:#f5f5f5; font-weight:600; font-size:0.8em; }
+
+    /* ── Phase cards ── */
+    .phase-card { text-align:center; padding:14px; background:#f8f9fa; border-radius:12px; margin:4px; }
+    .phase-card .pval { font-size:1.8em; font-weight:700; }
+    .phase-card .plbl { font-size:0.72em; color:#666; margin-top:4px; }
+    .phase-card.first  .pval { color:#1976D2; }
+    .phase-card.second .pval { color:#388E3C; }
+    .phase-card.extra  .pval { color:#F57C00; }
+
+    /* ── Player stat boxes ── */
+    .pstat { text-align:center; padding:14px 8px; }
+    .pstat .pval { font-size:2em; font-weight:700; color:#1565c0; }
+    .pstat .plbl { font-size:0.78em; color:#666; }
+
+    /* ── Match history table ── */
+    .mh-row {
+      display:grid;
+      grid-template-columns: 90px 1fr 60px 50px 50px 50px 40px 40px;
+      padding:9px 8px; border-bottom:1px solid #eee;
+      align-items:center; font-size:0.83em;
+    }
+    .mh-row.hdr { background:#f5f5f5; font-weight:600; font-size:0.78em; }
+
+    /* ── Badges ── */
+    .badge {
+      display:inline-block; padding:2px 8px;
+      border-radius:12px; font-size:10px; font-weight:600;
+    }
+    .badge.won  { background:#c8e6c9; color:#2e7d32; }
+    .badge.draw { background:#fff9c4; color:#f57f17; }
+    .badge.lost { background:#ffcdd2; color:#c62828; }
+    .badge.local     { background:#e3f2fd; color:#1565c0; }
+    .badge.visitante { background:#fce4ec; color:#b71c1c; }
+
+    /* ── Selects ── */
+    .filter-select {
+      border:1px solid #ccc; border-radius:20px;
+      padding:7px 14px; font-size:0.88em; cursor:pointer;
+      background:#fff; outline:none;
+    }
+  </style>
+</head>
+<body class="w3-light-gray">
+
+  <!-- Topbar -->
+  <div class="w3-bar w3-blue w3-card">
+    <a href="dashboard.html" class="w3-bar-item w3-button">← Volver</a>
+    <span class="w3-bar-item w3-large"><b>📊 Estadísticas</b></span>
+    <span id="userBadge" class="w3-bar-item w3-right w3-small"></span>
+  </div>
+
+  <div class="w3-content" style="max-width:1200px; padding:16px;">
+
+    <!-- Loading -->
+    <div id="loadingSpinner" class="w3-center w3-padding-64">
+      <div class="w3-text-blue w3-xlarge">Cargando estadísticas…</div>
+    </div>
+
+    <!-- Main content -->
+    <div id="mainContent" class="w3-hide">
+
+      <!-- ── Main tab switcher ── -->
+      <div class="w3-card w3-white w3-round-large w3-padding w3-margin-bottom">
+        <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px">
+          <b style="margin-right:8px">Vista:</b>
+          <button class="main-tab-btn active" id="tabTeamBtn"   onclick="switchTab('team')">🏆 Por Equipo</button>
+          <button class="main-tab-btn"        id="tabPlayerBtn" onclick="switchTab('player')">👤 Por Jugador</button>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════
+           TAB: EQUIPO
+      ════════════════════════════════════════ -->
+      <div id="tabTeam">
+
+        <!-- Filters row -->
+        <div class="w3-card w3-white w3-round-large w3-padding w3-margin-bottom">
+          <div class="w3-row-padding" style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;">
+
+            <!-- Level selector -->
+            <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:220px;">
+              <span>👥</span>
+              <select id="teamLevelSelect" class="filter-select" style="flex:1" onchange="onTeamLevelChange()">
+                <option value="">Todos los equipos</option>
+              </select>
+            </div>
+
+            <!-- Period -->
+            <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+              <span style="font-size:0.82em;color:#555;margin-right:4px">📅</span>
+              <button class="pill-btn active-period" id="tp-all"     onclick="setTeamPeriod('all')">Todo</button>
+              <button class="pill-btn"               id="tp-year"    onclick="setTeamPeriod('year')">Año</button>
+              <button class="pill-btn"               id="tp-quarter" onclick="setTeamPeriod('quarter')">3 meses</button>
+              <button class="pill-btn"               id="tp-month"   onclick="setTeamPeriod('month')">Mes</button>
+            </div>
+
+            <!-- Venue -->
+            <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+              <span style="font-size:0.82em;color:#555;margin-right:4px">🏟️</span>
+              <button class="pill-btn active-venue" id="tv-all"       onclick="setTeamVenue('all')">Ambas</button>
+              <button class="pill-btn"              id="tv-local"     onclick="setTeamVenue('local')">🏠 Local</button>
+              <button class="pill-btn"              id="tv-visitante" onclick="setTeamVenue('visitante')">✈️ Visita</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Team stats loading -->
+        <div id="teamLoading" class="w3-center w3-text-gray w3-padding">Cargando…</div>
+        <div id="teamData" class="w3-hide">
+
+          <!-- Summary cards -->
+          <div id="teamSummaryCards" class="w3-margin-bottom" style="display:flex;flex-wrap:wrap;justify-content:center;"></div>
+
+          <!-- Match table -->
+          <div class="w3-card w3-white w3-round-large w3-padding w3-margin-bottom">
+            <h4 class="w3-text-blue" style="margin-top:0">📋 Resultados por Equipo</h4>
+            <div id="teamTableContent"></div>
+          </div>
+
+          <!-- Goals by phase -->
+          <div class="w3-card w3-white w3-round-large w3-padding w3-margin-bottom">
+            <h4 class="w3-text-blue" style="margin-top:0">⏱️ Goles por Fase del Partido</h4>
+            <div id="teamGoalsPhase"></div>
+          </div>
+
+        </div>
+        <div id="teamEmpty" class="w3-hide w3-center w3-text-gray w3-padding-32">
+          No hay partidos registrados con estos filtros.
+        </div>
+
+      </div><!-- /tabTeam -->
+
+
+      <!-- ════════════════════════════════════════
+           TAB: JUGADOR
+      ════════════════════════════════════════ -->
+      <div id="tabPlayer" class="w3-hide">
+
+        <!-- Filters row -->
+        <div class="w3-card w3-white w3-round-large w3-padding w3-margin-bottom">
+          <div class="w3-row-padding" style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;">
+
+            <!-- Player selector -->
+            <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:240px;">
+              <span>👤</span>
+              <select id="playerSelect" class="filter-select" style="flex:1" onchange="onPlayerChange()">
+                <option value="">— Selecciona un jugador —</option>
+              </select>
+            </div>
+
+            <!-- Period -->
+            <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+              <span style="font-size:0.82em;color:#555;margin-right:4px">📅</span>
+              <button class="pill-btn active-period" id="pp-all"     onclick="setPlayerPeriod('all')">Todo</button>
+              <button class="pill-btn"               id="pp-year"    onclick="setPlayerPeriod('year')">Año</button>
+              <button class="pill-btn"               id="pp-quarter" onclick="setPlayerPeriod('quarter')">3 meses</button>
+              <button class="pill-btn"               id="pp-month"   onclick="setPlayerPeriod('month')">Mes</button>
+            </div>
+
+            <!-- Venue -->
+            <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+              <span style="font-size:0.82em;color:#555;margin-right:4px">🏟️</span>
+              <button class="pill-btn active-venue" id="pv-all"       onclick="setPlayerVenue('all')">Ambas</button>
+              <button class="pill-btn"              id="pv-local"     onclick="setPlayerVenue('local')">🏠 Local</button>
+              <button class="pill-btn"              id="pv-visitante" onclick="setPlayerVenue('visitante')">✈️ Visita</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Player prompt -->
+        <div id="playerPrompt" class="w3-center w3-text-gray w3-padding-32">
+          Selecciona un jugador para ver sus estadísticas.
+        </div>
+        <div id="playerLoading" class="w3-hide w3-center w3-text-gray w3-padding">Cargando…</div>
+
+        <div id="playerData" class="w3-hide">
+
+          <!-- Player name header -->
+          <div class="w3-card w3-blue w3-round-large w3-padding w3-margin-bottom">
+            <h3 id="playerNameHeader" style="margin:0;color:#fff"></h3>
+          </div>
+
+          <!-- Summary stats -->
+          <div id="playerSummaryCards" class="w3-margin-bottom" style="display:flex;flex-wrap:wrap;justify-content:center;"></div>
+
+          <!-- Match history -->
+          <div class="w3-card w3-white w3-round-large w3-padding w3-margin-bottom">
+            <h4 class="w3-text-blue" style="margin-top:0">📅 Historial de Partidos</h4>
+            <div id="playerHistoryContent"></div>
+          </div>
+
+        </div>
+        <div id="playerEmpty" class="w3-hide w3-center w3-text-gray w3-padding-32">
+          Sin partidos registrados para este jugador con los filtros actuales.
+        </div>
+
+      </div><!-- /tabPlayer -->
+
+    </div><!-- /mainContent -->
+
+    <!-- No access -->
+    <div id="noAccessMsg" class="w3-hide w3-center w3-padding-64">
+      <div class="w3-text-gray w3-xlarge">😕</div>
+      <div class="w3-text-gray">No tienes equipos o jugadores asignados.</div>
+      <a href="dashboard.html" class="w3-button w3-blue w3-round-large w3-margin-top">Volver al Panel</a>
+    </div>
+
+  </div><!-- /content -->
+
+<script>
+// ══════════════════════════════════════════════
+// CONFIG & STATE
+// ══════════════════════════════════════════════
+const API_URL = "http://127.0.0.1:8000";
+let token = localStorage.getItem("token");
+
+// Team tab state
+let teamPeriod = "all";
+let teamVenue  = "all";
+let teamLevelId = null;
+
+// Player tab state
+let playerPeriod  = "all";
+let playerVenue   = "all";
+let currentAthleteId = null;
+
+function authHeaders() {
+  return { "Content-Type": "application/json", "Authorization": `Bearer ${token}` };
+}
+
+// ══════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════
+window.addEventListener("load", async () => {
+  if (!token) { window.location.href = "index.html"; return; }
+
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    const email = payload.sub || "";
+    const role  = payload.role || "usuario";
+    document.getElementById("userBadge").innerHTML =
+      `<span class="w3-tag w3-white w3-round-xxlarge w3-padding-small" style="color:#1565c0">
+        ${email} · rol: <b>${role}</b>
+      </span>`;
+  } catch(e) {}
+
+  // Load teams dropdown + initial team stats in parallel
+  await Promise.all([
+    loadTeamDropdown(),
+    loadPlayerDropdown(),
+  ]);
+
+  await loadTeamStats();
+  document.getElementById("loadingSpinner").classList.add("w3-hide");
+  document.getElementById("mainContent").classList.remove("w3-hide");
+});
+
+// ══════════════════════════════════════════════
+// TAB SWITCHER
+// ══════════════════════════════════════════════
+function switchTab(tab) {
+  document.getElementById("tabTeam").classList.toggle("w3-hide", tab !== "team");
+  document.getElementById("tabPlayer").classList.toggle("w3-hide", tab !== "player");
+  document.getElementById("tabTeamBtn").classList.toggle("active", tab === "team");
+  document.getElementById("tabPlayerBtn").classList.toggle("active", tab === "player");
+}
+
+// ══════════════════════════════════════════════
+// TEAM TAB
+// ══════════════════════════════════════════════
+async function loadTeamDropdown() {
+  try {
+    const res = await fetch(`${API_URL}/stats/team?period=all&venue=all`, { headers: authHeaders() });
+    if (!res.ok) return;
+    const data = await res.json();
+    const sel = document.getElementById("teamLevelSelect");
+    sel.innerHTML = '<option value="">Todos los equipos</option>';
+    (data.available_teams || []).forEach(t => {
+      const opt = document.createElement("option");
+      opt.value = t.level_id;
+      opt.textContent = `${t.category_name} / ${t.level_name}`;
+      sel.appendChild(opt);
+    });
+  } catch(e) {}
+}
+
+function onTeamLevelChange() {
+  const v = document.getElementById("teamLevelSelect").value;
+  teamLevelId = v ? parseInt(v) : null;
+  loadTeamStats();
+}
+
+function setTeamPeriod(p) {
+  teamPeriod = p;
+  ["all","year","quarter","month"].forEach(k =>
+    document.getElementById(`tp-${k}`).classList.toggle("active-period", k === p)
+  );
+  loadTeamStats();
+}
+
+function setTeamVenue(v) {
+  teamVenue = v;
+  ["all","local","visitante"].forEach(k =>
+    document.getElementById(`tv-${k}`).classList.toggle("active-venue", k === v)
+  );
+  loadTeamStats();
+}
+
+async function loadTeamStats() {
+  document.getElementById("teamLoading").classList.remove("w3-hide");
+  document.getElementById("teamData").classList.add("w3-hide");
+  document.getElementById("teamEmpty").classList.add("w3-hide");
+
+  let url = `${API_URL}/stats/team?period=${teamPeriod}&venue=${teamVenue}`;
+  if (teamLevelId) url += `&level_id=${teamLevelId}`;
+
+  try {
+    const res = await fetch(url, { headers: authHeaders() });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || "Error");
+
+    document.getElementById("teamLoading").classList.add("w3-hide");
+
+    if (!data.team_stats || data.team_stats.length === 0) {
+      document.getElementById("teamEmpty").classList.remove("w3-hide");
+      return;
+    }
+
+    renderTeamSummaryCards(data.team_stats);
+    renderTeamTable(data.team_stats);
+    renderGoalsByPhase(data.goals_by_phase, "teamGoalsPhase");
+    document.getElementById("teamData").classList.remove("w3-hide");
+
+  } catch(err) {
+    document.getElementById("teamLoading").innerHTML =
+      `<div class="w3-text-red w3-small">${err.message}</div>`;
+  }
+}
+
+// ══════════════════════════════════════════════
+// PLAYER TAB
+// ══════════════════════════════════════════════
+async function loadPlayerDropdown() {
+  try {
+    const res = await fetch(`${API_URL}/stats/players`, { headers: authHeaders() });
+    if (!res.ok) return;
+    const players = await res.json();
+    const sel = document.getElementById("playerSelect");
+    sel.innerHTML = '<option value="">— Selecciona un jugador —</option>';
+    players.forEach(p => {
+      const opt = document.createElement("option");
+      opt.value = p.athlete_id;
+      opt.textContent = `${p.name}  (${p.team})`;
+      sel.appendChild(opt);
+    });
+    // If only one player (parent/athlete), auto-select
+    if (players.length === 1) {
+      sel.value = players[0].athlete_id;
+      onPlayerChange();
+    }
+  } catch(e) {}
+}
+
+function onPlayerChange() {
+  const v = document.getElementById("playerSelect").value;
+  currentAthleteId = v ? parseInt(v) : null;
+  if (!currentAthleteId) {
+    document.getElementById("playerPrompt").classList.remove("w3-hide");
+    document.getElementById("playerData").classList.add("w3-hide");
+    document.getElementById("playerEmpty").classList.add("w3-hide");
+    return;
+  }
+  loadPlayerStats();
+}
+
+function setPlayerPeriod(p) {
+  playerPeriod = p;
+  ["all","year","quarter","month"].forEach(k =>
+    document.getElementById(`pp-${k}`).classList.toggle("active-period", k === p)
+  );
+  if (currentAthleteId) loadPlayerStats();
+}
+
+function setPlayerVenue(v) {
+  playerVenue = v;
+  ["all","local","visitante"].forEach(k =>
+    document.getElementById(`pv-${k}`).classList.toggle("active-venue", k === v)
+  );
+  if (currentAthleteId) loadPlayerStats();
+}
+
+async function loadPlayerStats() {
+  document.getElementById("playerPrompt").classList.add("w3-hide");
+  document.getElementById("playerLoading").classList.remove("w3-hide");
+  document.getElementById("playerData").classList.add("w3-hide");
+  document.getElementById("playerEmpty").classList.add("w3-hide");
+
+  const url = `${API_URL}/stats/player?athlete_id=${currentAthleteId}&period=${playerPeriod}&venue=${playerVenue}`;
+
+  try {
+    const res = await fetch(url, { headers: authHeaders() });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || "Error");
+
+    document.getElementById("playerLoading").classList.add("w3-hide");
+
+    if (data.summary.matches === 0) {
+      document.getElementById("playerEmpty").classList.remove("w3-hide");
+      return;
+    }
+
+    document.getElementById("playerNameHeader").textContent = `👤 ${data.name}`;
+    renderPlayerSummary(data.summary);
+    renderMatchHistory(data.match_history);
+    document.getElementById("playerData").classList.remove("w3-hide");
+
+  } catch(err) {
+    document.getElementById("playerLoading").innerHTML =
+      `<div class="w3-text-red w3-small">${err.message}</div>`;
+  }
+}
+
+// ══════════════════════════════════════════════
+// RENDER: TEAM SUMMARY CARDS
+// ══════════════════════════════════════════════
+function renderTeamSummaryCards(teams) {
+  let mp=0, w=0, d=0, l=0, gf=0, ga=0;
+  teams.forEach(t => { mp+=t.matches_played; w+=t.won; d+=t.drawn; l+=t.lost; gf+=t.goals_for; ga+=t.goals_against; });
+  const gd = gf - ga;
+  document.getElementById("teamSummaryCards").innerHTML = `
+    <div class="scard"><div class="scard-val">${mp}</div><div class="scard-lbl">Partidos</div></div>
+    <div class="scard green"><div class="scard-val">${w}</div><div class="scard-lbl">Victorias</div></div>
+    <div class="scard gray"><div class="scard-val">${d}</div><div class="scard-lbl">Empates</div></div>
+    <div class="scard orange"><div class="scard-val">${l}</div><div class="scard-lbl">Derrotas</div></div>
+    <div class="scard blue"><div class="scard-val">${gf}</div><div class="scard-lbl">Goles a favor</div></div>
+    <div class="scard"><div class="scard-val">${ga}</div><div class="scard-lbl">Goles en contra</div></div>
+    <div class="scard ${gd>=0?'green':'orange'}"><div class="scard-val">${gd>0?'+':''}${gd}</div><div class="scard-lbl">Diferencia</div></div>
+  `;
+}
+
+// ══════════════════════════════════════════════
+// RENDER: TEAM TABLE
+// ══════════════════════════════════════════════
+function renderTeamTable(teams) {
+  if (!teams.length) {
+    document.getElementById("teamTableContent").innerHTML = `<div class="w3-center w3-text-gray w3-small w3-padding">Sin datos.</div>`;
+    return;
+  }
+  let html = `
+    <div class="team-row hdr">
+      <div>Equipo</div><div>PJ</div><div>G</div><div>E</div><div>P</div>
+      <div>GF</div><div>GC</div><div>Dif</div>
+    </div>`;
+  teams.forEach(t => {
+    const gd = t.goals_for - t.goals_against;
+    html += `
+      <div class="team-row">
+        <div><b>${t.category_name}</b><br><small style="color:#666">${t.level_name}</small></div>
+        <div>${t.matches_played}</div>
+        <div style="color:#2e7d32;font-weight:600">${t.won}</div>
+        <div style="color:#f57f17">${t.drawn}</div>
+        <div style="color:#c62828">${t.lost}</div>
+        <div>${t.goals_for}</div>
+        <div>${t.goals_against}</div>
+        <div style="font-weight:600;color:${gd>0?'#2e7d32':gd<0?'#c62828':'#555'}">${gd>0?'+':''}${gd}</div>
+      </div>`;
+  });
+  document.getElementById("teamTableContent").innerHTML = html;
+}
+
+// ══════════════════════════════════════════════
+// RENDER: GOALS BY PHASE
+// ══════════════════════════════════════════════
+function renderGoalsByPhase(g, containerId) {
+  const container = document.getElementById(containerId);
+  if (!g) { container.innerHTML = ""; return; }
+  const total = (g.first||0) + (g.second||0) + (g.extra_first||0) + (g.extra_second||0);
+  const extraTotal = (g.extra_first||0) + (g.extra_second||0);
+  const bar = (val) => `<div style="background:#e0e0e0;border-radius:4px;height:8px;margin-top:6px">
+    <div style="background:currentColor;width:${total?Math.round(val/total*100):0}%;height:100%;border-radius:4px"></div></div>`;
+
+  container.innerHTML = `
+    <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">
+      <div class="phase-card first" style="flex:1;min-width:100px">
+        <div class="pval">${g.first||0}</div><div class="plbl">1er Tiempo</div>${bar(g.first||0)}
+      </div>
+      <div class="phase-card second" style="flex:1;min-width:100px">
+        <div class="pval">${g.second||0}</div><div class="plbl">2do Tiempo</div>${bar(g.second||0)}
+      </div>
+      ${extraTotal>0 ? `
+      <div class="phase-card extra" style="flex:1;min-width:100px">
+        <div class="pval">${g.extra_first||0}</div><div class="plbl">Prórroga 1</div>${bar(g.extra_first||0)}
+      </div>
+      <div class="phase-card extra" style="flex:1;min-width:100px">
+        <div class="pval">${g.extra_second||0}</div><div class="plbl">Prórroga 2</div>${bar(g.extra_second||0)}
+      </div>` : ''}
+    </div>
+    <div style="text-align:center;font-size:12px;color:#888">Total: <b>${total}</b> goles</div>`;
+}
+
+// ══════════════════════════════════════════════
+// RENDER: PLAYER SUMMARY
+// ══════════════════════════════════════════════
+function renderPlayerSummary(s) {
+  document.getElementById("playerSummaryCards").innerHTML = `
+    <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px;width:100%">
+      <div class="scard blue"><div class="scard-val">${s.matches}</div><div class="scard-lbl">Partidos</div></div>
+      <div class="scard green"><div class="scard-val">${s.goals}</div><div class="scard-lbl">⚽ Goles</div></div>
+      <div class="scard"><div class="scard-val">${s.assists}</div><div class="scard-lbl">🅰️ Asistencias</div></div>
+      <div class="scard gray"><div class="scard-val">${fmtMin(s.minutes)}</div><div class="scard-lbl">⏱️ Minutos</div></div>
+      <div class="scard" style="background:linear-gradient(135deg,#f6d365,#fda085)">
+        <div class="scard-val">${s.yellow_cards}</div><div class="scard-lbl">🟨 Amarillas</div>
+      </div>
+      <div class="scard orange"><div class="scard-val">${s.red_cards}</div><div class="scard-lbl">🟥 Rojas</div></div>
+    </div>`;
+}
+
+// ══════════════════════════════════════════════
+// RENDER: MATCH HISTORY
+// ══════════════════════════════════════════════
+function renderMatchHistory(history) {
+  if (!history || history.length === 0) {
+    document.getElementById("playerHistoryContent").innerHTML =
+      `<div class="w3-center w3-text-gray w3-small w3-padding">Sin partidos registrados.</div>`;
+    return;
+  }
+  let html = `
+    <div class="mh-row hdr">
+      <div>Fecha</div><div>Partido / Equipo</div><div>Localía</div>
+      <div>⚽</div><div>🅰️</div><div>⏱️</div><div>🟨</div><div>🟥</div>
+    </div>`;
+  history.forEach(m => {
+    const dateStr = m.date ? new Date(m.date).toLocaleDateString("es", {day:"2-digit",month:"short",year:"numeric"}) : "—";
+    html += `
+      <div class="mh-row">
+        <div style="font-size:0.78em;color:#555">${dateStr}</div>
+        <div>
+          <b style="font-size:0.88em">${m.title || "Partido"}</b>
+          ${m.opponent ? `<span style="font-size:0.78em;color:#777"> vs ${m.opponent}</span>` : ""}
+          <br><span style="font-size:0.74em;color:#999">${m.team}</span>
+        </div>
+        <div><span class="badge ${m.venue==='visitante'?'visitante':'local'}">${m.venue==='visitante'?'Visita':'Local'}</span></div>
+        <div style="font-weight:600;color:#1976d2">${m.goals}</div>
+        <div>${m.assists}</div>
+        <div style="font-size:0.82em">${fmtMin(m.minutes)}</div>
+        <div>${m.yellow_cards>0?'🟨':'-'}</div>
+        <div>${m.red_card?'🟥':'-'}</div>
+      </div>`;
+  });
+  document.getElementById("playerHistoryContent").innerHTML = html;
+}
+
+// ══════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════
+function fmtMin(min) {
+  if (!min) return "0'";
+  if (min < 60) return `${min}'`;
+  return `${Math.floor(min/60)}h${min%60>0?` ${min%60}'`:''}`;
+}
+</script>
+</body>
+</html>

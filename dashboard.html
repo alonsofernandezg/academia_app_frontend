@@ -11,6 +11,15 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css">
+  <style>
+    .badge { display:inline-block; padding:2px 8px; border-radius:12px; font-size:11px; margin-left:4px; }
+    .badge-main { background:#e3f2fd; color:#1565c0; }
+    .badge-other { background:#fff3e0; color:#e65100; }
+    .badge-external { background:#fce4ec; color:#c62828; }
+    .player-row { display:flex; align-items:center; justify-content:space-between; padding:6px 0; border-bottom:1px solid #eee; }
+    .player-row:last-child { border-bottom:none; }
+    .scope-tabs button.active { background:#2196F3!important; color:#fff!important; }
+  </style>
 </head>
 <body class="w3-light-gray">
 
@@ -27,6 +36,12 @@
       class="w3-bar-item w3-button w3-right w3-white w3-border w3-round-xxlarge w3-small"
       onclick="openChangePassword()">
       Cambiar contraseña
+    </button>
+    <button
+      class="w3-bar-item w3-button w3-right w3-light-blue w3-round-xxlarge w3-small"
+      onclick="window.location.href='stats.html'"
+      title="Ver estadísticas">
+      📊 Estadísticas
     </button>
   </div>
 
@@ -506,6 +521,12 @@
                       onclick="exportBillingPdf()">
                       Exportar PDF
                     </button>
+                    <button
+                      class="w3-button w3-orange w3-round-xxlarge w3-small w3-margin-left"
+                      title="Corrige facturas con fechas de inicio/fin fuera del 1\u00ba y \u00faltimo d\u00eda del mes"
+                      onclick="fixInvoicePeriods()">
+                      Corregir fechas
+                    </button>
                   </div>
                 </div>
                 <div id="billingReportList">
@@ -616,6 +637,200 @@
         </div>
       </div>
 
+      <!-- Card: Convocatorias (admin) -->
+      <div id="adminCallupsCard" class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top">
+        <div class="w3-row w3-margin-bottom">
+          <div class="w3-col s12 m8">
+            <h3 class="w3-text-blue" style="margin:8px 0">Convocatorias</h3>
+            <p class="w3-small w3-text-gray">
+              Crea y gestiona <b>convocatorias</b> de fogueos y campeonatos.
+            </p>
+          </div>
+          <div class="w3-col s12 m4 w3-right-align">
+            <button class="w3-button w3-blue w3-round-xxlarge w3-small" onclick="showCreateForm()">
+              + Nueva Convocatoria
+            </button>
+            <button class="w3-button w3-white w3-border w3-round-xxlarge w3-small w3-margin-left"
+              data-collapsible="adminCallupsContent">
+              Cerrar
+            </button>
+          </div>
+        </div>
+
+        <div id="adminCallupsContent">
+          <!-- ===== LIST VIEW ===== -->
+          <div id="callupListSection">
+            <div class="w3-row-padding w3-margin-bottom">
+              <div class="w3-col s6 m3">
+                <label class="w3-small w3-text-gray">Academia</label>
+                <select id="filterAcademy" class="w3-select w3-border w3-round-large w3-small" onchange="loadCallups()">
+                  <option value="">Cargando…</option>
+                </select>
+              </div>
+              <div class="w3-col s6 m3">
+                <label class="w3-small w3-text-gray">Estado</label>
+                <select id="filterStatus" class="w3-select w3-border w3-round-large w3-small" onchange="loadCallups()">
+                  <option value="">Todos</option>
+                  <option value="draft">Borrador</option>
+                  <option value="sent">Enviada</option>
+                  <option value="completed">Completada</option>
+                  <option value="cancelled">Cancelada</option>
+                </select>
+              </div>
+            </div>
+            <div id="callupsList">
+              <div class="w3-center w3-text-gray w3-small">Selecciona una academia para ver convocatorias.</div>
+            </div>
+          </div>
+
+          <!-- ===== CREATE FORM ===== -->
+          <div id="callupCreateSection" class="w3-margin-top w3-hide">
+            <h4 class="w3-text-blue" style="margin:4px 0">Nueva Convocatoria</h4>
+            <div id="createMsg" class="w3-small w3-center"></div>
+            <div id="createConflictWarning"></div>
+
+            <div class="w3-row-padding">
+              <div class="w3-col s12 m6">
+                <label class="w3-small w3-text-gray">Título *</label>
+                <input id="cTitle" class="w3-input w3-border w3-round-large" type="text" maxlength="200">
+              </div>
+              <div class="w3-col s12 m3">
+                <label class="w3-small w3-text-gray">Tipo de Evento *</label>
+                <select id="cEventType" class="w3-select w3-border w3-round-large">
+                  <option value="fogueo">Fogueo</option>
+                  <option value="campeonato">Campeonato</option>
+                </select>
+              </div>
+              <div class="w3-col s6 m1.5">
+                <label class="w3-small w3-text-gray">Fecha *</label>
+                <input id="cEventDate" class="w3-input w3-border w3-round-large" type="date" onchange="createCheckConflict()">
+              </div>
+              <div class="w3-col s6 m1.5">
+                <label class="w3-small w3-text-gray">Hora *</label>
+                <input id="cEventTime" class="w3-input w3-border w3-round-large" type="time">
+              </div>
+            </div>
+
+            <div class="w3-row-padding w3-margin-top">
+              <div class="w3-col s12 m4">
+                <label class="w3-small w3-text-gray">Ubicación *</label>
+                <input id="cLocation" class="w3-input w3-border w3-round-large" type="text" maxlength="200">
+              </div>
+              <div class="w3-col s12 m4">
+                <label class="w3-small w3-text-gray">Localía *</label>
+                <select id="cVenue" class="w3-select w3-border w3-round-large">
+                  <option value="local">Local</option>
+                  <option value="visita">Visita</option>
+                </select>
+              </div>
+              <div class="w3-col s12 m4">
+                <label class="w3-small w3-text-gray">Oponente</label>
+                <input id="cOpponent" class="w3-input w3-border w3-round-large" type="text" maxlength="200">
+              </div>
+            </div>
+
+            <div class="w3-row-padding w3-margin-top">
+              <div class="w3-col s12">
+                <label class="w3-small w3-text-gray">Descripción</label>
+                <textarea id="cDescription" class="w3-input w3-border w3-round-large" rows="2"></textarea>
+              </div>
+            </div>
+
+            <div class="w3-row-padding w3-margin-top">
+              <div class="w3-col s12 m4">
+                <label class="w3-small w3-text-gray">Academia *</label>
+                <select id="cAcademy" class="w3-select w3-border w3-round-large" onchange="onAcademyChange()">
+                  <option value="">Seleccionar…</option>
+                </select>
+              </div>
+              <div class="w3-col s12 m4">
+                <label class="w3-small w3-text-gray">Categoría *</label>
+                <select id="cCategory" class="w3-select w3-border w3-round-large" onchange="onCategoryChange()">
+                  <option value="">Seleccionar academia primero</option>
+                </select>
+              </div>
+              <div class="w3-col s12 m4">
+                <label class="w3-small w3-text-gray">Nivel</label>
+                <select id="cLevel" class="w3-select w3-border w3-round-large" onchange="onLevelChange()">
+                  <option value="">Todos los niveles</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="w3-row-padding w3-margin-top">
+              <div class="w3-col s12 m6">
+                <label class="w3-small w3-text-gray">Entrenador *</label>
+                <div class="w3-row">
+                  <div class="w3-col s9">
+                    <select id="cCoach" class="w3-select w3-border w3-round-large">
+                      <option value="">Seleccionar…</option>
+                    </select>
+                  </div>
+                  <div class="w3-col s3">
+                    <button class="w3-button w3-light-blue w3-round-xxlarge w3-small w3-margin-left" onclick="autoResolveCoach()">
+                      Auto
+                    </button>
+                  </div>
+                </div>
+                <div id="coachResolveMsg" class="w3-small w3-text-gray w3-margin-top"></div>
+              </div>
+            </div>
+
+            <div class="w3-row-padding w3-margin-top">
+              <div class="w3-col s12 w3-right-align">
+                <button class="w3-button w3-white w3-border w3-round-xxlarge w3-small" onclick="hideCreateForm()">Cancelar</button>
+                <button class="w3-button w3-blue w3-round-xxlarge w3-small w3-margin-left" onclick="createCallup()">Crear Convocatoria</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===== DETAIL VIEW ===== -->
+          <div id="callupDetailSection" class="w3-margin-top w3-hide">
+            <div class="w3-row w3-margin-bottom">
+              <div class="w3-col s6">
+                <h4 id="detailTitle" class="w3-text-blue" style="margin:4px 0"></h4>
+              </div>
+              <div class="w3-col s6 w3-right-align">
+                <button class="w3-button w3-white w3-border w3-round-xxlarge w3-small" onclick="backToList()">← Volver</button>
+              </div>
+            </div>
+
+            <div id="detailInfo" class="w3-margin-bottom"></div>
+
+            <!-- Players panel -->
+            <div class="w3-card w3-round-xlarge w3-padding w3-margin-top">
+              <h4 class="w3-text-blue" style="margin:4px 0">
+                Jugadores Convocados (<span id="detailPlayersCount">0</span>)
+              </h4>
+              <div id="detailPlayersList"></div>
+            </div>
+
+            <!-- Add players panel (only for draft/sent) -->
+            <div id="addPlayersPanel" class="w3-card w3-round-xlarge w3-padding w3-margin-top">
+              <h4 class="w3-text-blue" style="margin:4px 0">Agregar Jugadores</h4>
+
+              <!-- Scope tabs -->
+              <div class="scope-tabs w3-margin-bottom">
+                <button class="w3-button w3-round-xxlarge w3-small w3-border active" data-scope="main" onclick="changeScope('main')">Mi Nivel</button>
+                <button class="w3-button w3-round-xxlarge w3-small w3-border" data-scope="category" onclick="changeScope('category')">Mi Categoría</button>
+                <button class="w3-button w3-round-xxlarge w3-small w3-border" data-scope="academy" onclick="changeScope('academy')">Toda la Academia</button>
+              </div>
+
+              <div id="availableAthletesList">
+                <div class="w3-center w3-text-gray w3-small">Cargando atletas…</div>
+              </div>
+
+              <div class="w3-margin-top w3-right-align">
+                <button class="w3-button w3-green w3-round-xxlarge w3-small" onclick="addSelectedPlayers()">
+                  Agregar Seleccionados
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
     </section>
 
     <!-- Panel General (deportistas) -->
@@ -704,7 +919,15 @@
             <h3 class="w3-text-blue" style="margin:8px 0">Reporte de asistencia</h3>
             <p class="w3-small w3-text-gray">Solo tus deportistas.</p>
           </div>
+          <div class="w3-col s12 m4 w3-right-align">
+            <button
+              class="w3-button w3-white w3-border w3-round-xxlarge w3-small"
+              data-collapsible="generalReportContent">
+              Cerrar
+            </button>
+          </div>
         </div>
+        <div id="generalReportContent">
         <div class="w3-row w3-margin-top">
           <div class="w3-col s12 m6">
             <input id="generalReportMonth" type="month" class="w3-input w3-border w3-round-large" style="max-width:180px; display:inline-block;">
@@ -728,6 +951,7 @@
           </div>
         </div>
         <div id="generalMonthlyReport" class="w3-margin-top"></div>
+        </div>
       </div>
 
       <div id="generalPlansSection" class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top">
@@ -1131,6 +1355,32 @@
           <div id="coachMonthlyReport" class="w3-margin-top"></div>
         </div>
       </div>
+
+      <!-- Card: Convocatorias (coach) -->
+      <div id="coachCallupsCard" class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top">
+        <div class="w3-row w3-margin-bottom">
+          <div class="w3-col s12 m8">
+            <h3 class="w3-text-blue" style="margin:8px 0">Mis Convocatorias</h3>
+            <p class="w3-small w3-text-gray">
+              Gestiona las <b>convocatorias</b> de tus equipos.
+            </p>
+          </div>
+          <div class="w3-col s12 m4 w3-right-align">
+            <button class="w3-button w3-blue w3-round-xxlarge w3-small" onclick="showCreateForm()">
+              + Nueva Convocatoria
+            </button>
+            <button class="w3-button w3-white w3-border w3-round-xxlarge w3-small w3-margin-left"
+              data-collapsible="coachCallupsContent">
+              Cerrar
+            </button>
+          </div>
+        </div>
+
+        <div id="coachCallupsContent">
+          <div class="w3-small w3-text-gray w3-center">Las convocatorias se muestran arriba en la sección de admin o aquí según tu rol.</div>
+        </div>
+      </div>
+
     </section>
   </div>
 
@@ -1435,12 +1685,6 @@
         <textarea id="tsNotes" class="w3-input w3-border w3-round-large" rows="2"></textarea>
 
         <label class="w3-small w3-text-gray w3-margin-top">Niveles</label>
-        <div class="w3-small w3-text-gray">
-          <label>
-            <input id="tsAllLevels" type="checkbox" class="w3-check">
-            Todos los niveles activos
-          </label>
-        </div>
         <div class="w3-margin-top">
           <button
             id="tsLevelToggle"
@@ -1451,6 +1695,7 @@
           <div id="tsLevelDropdown" class="w3-padding-small w3-border w3-round-xxlarge w3-small w3-white w3-margin-top w3-hide" style="max-height:220px; overflow:auto;">
             <div id="tsLevelList"></div>
           </div>
+          <input id="tsAllLevels" type="hidden" value="">
         </div>
 
         <label class="w3-small w3-text-gray w3-margin-top">Repetición</label>
@@ -1488,7 +1733,14 @@
           class="w3-button w3-white w3-border w3-round-xxlarge w3-small w3-margin-left"
           style="display:none;"
           onclick="cancelSession()">
-          Cancelar sesion
+          Cancelar sesión
+        </button>
+        <button
+          id="tsCancelSeriesBtn"
+          class="w3-button w3-red w3-round-xxlarge w3-small w3-margin-left"
+          style="display:none;"
+          onclick="cancelSeries()">
+          🗑️ Cancelar serie
         </button>
         <button
           id="tsSaveBtn"
@@ -1714,3 +1966,4 @@
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/locales-all.global.min.js"></script>
   <script src="js/dashboard.js"></script>
   <script src="js/coaches.js"></script>
+  <script src="js/callups.js"></script>

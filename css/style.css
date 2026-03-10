@@ -91,8 +91,7 @@ body {
 }
 
 .fc .fc-daygrid-event {
-  background: #ffffff;
-  border: 1px solid #d9e3fb;
+  border: none;
   border-radius: 12px;
   padding: 6px;
   margin: 4px 0;
@@ -100,7 +99,7 @@ body {
   max-width: 100%;
 }
 .fc .fc-daygrid-event .fc-event-main {
-  color: var(--dark);
+  color: #fff;
   white-space: normal;
 }
 .fc .fc-event-time {
@@ -110,8 +109,10 @@ body {
   display: none;
 }
 .fc .fc-time {
-  font-weight: 500;
+  font-weight: 600;
   margin-bottom: 4px;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.15);
 }
 .fc .fc-levels {
   display: none;
@@ -136,20 +137,21 @@ body {
 }
 
 .fc .fc-attendance-btn {
-  background: #F59E0B !important;
+  background: rgba(255,255,255,0.92) !important;
   color: #1B1F28 !important;
-  border-color: #F59E0B !important;
+  border-color: rgba(255,255,255,0.6) !important;
 }
 
 .fc .fc-edit-btn {
-  background: #FB923C !important;
+  background: rgba(255,255,255,0.92) !important;
   color: #1B1F28 !important;
-  border-color: #FB923C !important;
+  border-color: rgba(255,255,255,0.6) !important;
 }
 
 .fc .fc-attendance-btn:hover,
 .fc .fc-edit-btn:hover {
-  filter: brightness(0.95);
+  background: #fff !important;
+  filter: brightness(0.97);
 }
 
 .fc .fc-button-primary {

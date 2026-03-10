@@ -39,6 +39,9 @@ let announcementsCache = [];
 let adminCalendar = null;
 let coachCalendar = null;
 let levelLabelMap = null;
+let levelColorMap = null;
+let categoryColorMap = {};   // category_id → { color, name }
+let levelToCategoryMap = {};  // level_id → category_id
 let sessionCache = {};
 let editingInvoiceId = null;
 let editingPlanId = null;
@@ -457,8 +460,6 @@ function closeChangePassword() {
 document.addEventListener("DOMContentLoaded", () => {
   const freq = document.getElementById("tsFrequency");
   if (freq) freq.addEventListener("change", handleFrequencyChange);
-  const allLevels = document.getElementById("tsAllLevels");
-  if (allLevels) allLevels.addEventListener("change", handleAllLevelsToggle);
 });
 
 async function submitChangePassword() {
@@ -637,6 +638,7 @@ window.addEventListener("load", async () => {
     await loadAdminTrainingSessions();
     await loadAdminBilling();
     await initAdminAnnouncements();
+    await initCallups();
     const generalReport = document.getElementById("generalReportSection");
     if (generalReport) generalReport.style.display = "none";
     const generalPayments = document.getElementById("generalPaymentsSection");
@@ -652,6 +654,7 @@ window.addEventListener("load", async () => {
     await loadCoachAthletePanels();
     await loadCoachTrainingSessions();
     await initCoachAnnouncements();
+    await initCallups();
   } else {
     hide(adminPanel);
     show(generalPanel);
@@ -1143,17 +1146,20 @@ function renderGeneralPayments() {
             <span class="w3-small w3-text-gray">
               Plan: ${inv.plan_name || "Manual"}${inv.billing_type ? " (" + formatBillingType(inv.billing_type) + ")" : ""}
             </span><br>
+            ${inv.callup_id ? `<span class="w3-small w3-text-blue" style="cursor:pointer" onclick="window.location.hash='#callups';setTimeout(()=>loadCallupDetail(${inv.callup_id}),200)">📋 Convocatoria: ${inv.callup_title || 'Ver'}</span><br>` : ''}
             <span class="w3-small w3-text-gray">Periodo: ${periodText}</span><br>
             <span class="w3-small w3-text-gray">Monto: ${formatMoney(inv.total_amount, inv.currency)}</span><br>
             <span class="w3-small ${statusClass}">Estado: ${formatInvoiceStatus(inv.status)}</span>
             ${proofLink}
           </div>
           <div class="w3-col s12 m4 w3-right-align w3-padding-small">
+            ${inv.status !== "paid" && inv.status !== "cancelled" ? `
             <button
               class="w3-button w3-blue w3-round-xxlarge w3-small"
               onclick="openPaymentProof(${inv.id})">
               Subir comprobante
             </button>
+            ` : ''}
           </div>
         </div>
       </div>
@@ -1754,6 +1760,7 @@ function renderAdminInvoices() {
         <span class="w3-small w3-text-gray">
           Plan: ${inv.plan_name || "Manual"}${inv.billing_type ? " (" + formatBillingType(inv.billing_type) + ")" : ""}
         </span><br>
+        ${inv.callup_id ? `<span class="w3-small w3-text-blue" style="cursor:pointer" onclick="window.location.hash='#callups';setTimeout(()=>loadCallupDetail(${inv.callup_id}),200)">📋 Convocatoria: ${inv.callup_title || 'Ver'}</span><br>` : ''}
         <span class="w3-small w3-text-gray">Periodo: ${periodText}</span><br>
         <span class="w3-small w3-text-gray">Monto: ${formatMoney(inv.total_amount, inv.currency)}</span><br>
         <span class="w3-small ${statusClass}">Estado: ${formatInvoiceStatus(inv.status)}</span>
@@ -1844,6 +1851,24 @@ async function generateMonthlyInvoices() {
     if (msgBox) {
       msgBox.innerHTML = `<div class="w3-center w3-text-red w3-small">${e.message}</div>`;
     }
+  }
+}
+async function fixInvoicePeriods() {
+  const ok = await showConfirmModal(
+    "\u00bfCorregir todas las fechas de per\u00edodo? Las facturas con fechas incorrectas se normalizar\u00e1n al primer y \u00faltimo d\u00eda de su mes."
+  );
+  if (!ok) return;
+  try {
+    const res = await fetch(`${API_URL}/billing/invoices/fix-periods`, {
+      method: "POST",
+      headers: authHeaders(),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || "Error");
+    showAlertModal(data.message || `${data.fixed} factura(s) corregida(s).`);
+    await loadAdminInvoices();
+  } catch (e) {
+    showAlertModal(`Error: ${e.message}`);
   }
 }
 function renderBillingReportTable(rows) {
@@ -2286,22 +2311,31 @@ function renderAnnouncements(listId) {
               </button>
             </div>`
           : "";
+      const priorityBadge = a.priority === "high"
+        ? `<span class="w3-tag w3-round-xxlarge w3-red w3-tiny" style="font-size:10px;">Alta</span>`
+        : a.priority === "low"
+        ? `<span class="w3-tag w3-round-xxlarge w3-light-gray w3-tiny" style="font-size:10px;">Baja</span>`
+        : `<span class="w3-tag w3-round-xxlarge w3-blue w3-tiny" style="font-size:10px;">Media</span>`;
       return `
-      <div class="w3-padding-small w3-border-bottom">
-        <div class="w3-row">
-          <div class="w3-col s12 m8">
-            <b>${a.title}</b>
-            <span class="w3-small w3-text-gray"> - ${formatAnnouncementPriority(a.priority)}</span>
-            ${statusTag}
-            <div class="w3-small w3-text-gray">${targets || "-"}</div>
+      <div class="w3-card-2 w3-round-large w3-margin-bottom" style="overflow:hidden;">
+        <div style="border-left:4px solid ${a.priority === 'high' ? '#EF4444' : a.priority === 'low' ? '#9CA3AF' : '#3B82F6'}; padding:16px 20px;">
+          <div class="w3-row">
+            <div class="w3-col s12 m8">
+              <div style="font-weight:600; font-size:15px; color:#1f2937;">${a.title}</div>
+              <div style="margin-top:4px;">
+                ${priorityBadge}
+                ${statusTag}
+                <span class="w3-small w3-text-gray" style="margin-left:6px;">${targets || ""}</span>
+              </div>
+            </div>
+            <div class="w3-col s12 m4 w3-right-align w3-small w3-text-gray" style="padding-top:4px;">
+              ${a.created_at ? new Date(a.created_at).toLocaleDateString("es-ES", {year:"numeric", month:"short", day:"numeric"}) : ""}
+            </div>
           </div>
-          <div class="w3-col s12 m4 w3-right-align w3-small w3-text-gray">
-            ${a.created_at ? new Date(a.created_at).toLocaleDateString("es-ES") : ""}
-          </div>
+          <div style="margin-top:12px; font-size:14px; line-height:1.6; color:#374151; text-align:justify; white-space:pre-line;">${a.message}</div>
+          ${attachmentBlock}
+          ${actions}
         </div>
-        <div class="w3-small">${a.message}</div>
-        ${attachmentBlock}
-        ${actions}
       </div>
     `;
     })
@@ -2309,9 +2343,41 @@ function renderAnnouncements(listId) {
 }
 
 async function getLevelLabelMap() {
-  if (levelLabelMap) return levelLabelMap;
+  // Only skip if ALL maps are already populated
+  if (levelLabelMap && levelColorMap && categoryColorMap && Object.keys(levelColorMap).length > 0) {
+    return levelLabelMap;
+  }
 
   const map = {};
+  const colorMap = {};
+  const catColorMap = {};       // category_id → { color, name }
+  const lvlToCatMap = {};       // level_id → category_id
+  let categoryIndex = 0;
+
+  // Pre-defined palette of distinct, accessible colors (up to 12).
+  // Falls back to golden-angle HSL for additional categories.
+  const CATEGORY_PALETTE = [
+    "hsl(210, 70%, 50%)",  // blue
+    "hsl(130, 55%, 42%)",  // green
+    "hsl(350, 70%, 50%)",  // red
+    "hsl(45,  85%, 48%)",  // amber/yellow
+    "hsl(280, 60%, 50%)",  // purple
+    "hsl(180, 55%, 42%)",  // teal
+    "hsl(15,  75%, 50%)",  // orange
+    "hsl(320, 60%, 50%)",  // pink
+    "hsl(90,  50%, 42%)",  // lime
+    "hsl(240, 55%, 55%)",  // indigo
+    "hsl(60,  70%, 42%)",  // olive
+    "hsl(0,   0%, 50%)",   // gray
+  ];
+
+  function getCategoryColor(index) {
+    if (index < CATEGORY_PALETTE.length) return CATEGORY_PALETTE[index];
+    // Fallback: golden-angle spread
+    const hue = (index * 137) % 360;
+    return `hsl(${hue}, 65%, 48%)`;
+  }
+
   try {
     const res = await fetch(`${API_URL}/academies/`, { headers: authHeaders() });
     const academies = await res.json();
@@ -2326,6 +2392,13 @@ async function getLevelLabelMap() {
       if (!catRes.ok) continue;
 
       for (const category of categories) {
+        // Assign one distinct color per category
+        if (!catColorMap[category.id]) {
+          const color = getCategoryColor(categoryIndex++);
+          catColorMap[category.id] = { color, name: category.name };
+        }
+        const catColor = catColorMap[category.id].color;
+
         const lvlRes = await fetch(
           `${API_URL}/levels?category_id=${category.id}`,
           { headers: authHeaders() }
@@ -2335,15 +2408,23 @@ async function getLevelLabelMap() {
 
         levels.forEach((level) => {
           map[level.id] = `${academy.name} / ${category.name} / ${level.name}`;
+          colorMap[level.id] = catColor;        // same color for all levels in this category
+          lvlToCatMap[level.id] = category.id;  // reverse lookup
         });
       }
     }
   } catch (e) {
     levelLabelMap = {};
+    levelColorMap = {};
+    categoryColorMap = {};
+    levelToCategoryMap = {};
     return levelLabelMap;
   }
 
   levelLabelMap = map;
+  levelColorMap = colorMap;
+  categoryColorMap = catColorMap;
+  levelToCategoryMap = lvlToCatMap;
   return levelLabelMap;
 }
 
@@ -2800,6 +2881,12 @@ function ensureAdminCalendar() {
       };
     },
     eventDidMount: (info) => {
+      // Force-apply category background color (CSS may override FC inline styles)
+      const bgColor = info.event.backgroundColor;
+      if (bgColor) {
+        info.el.style.backgroundColor = bgColor;
+        info.el.style.borderColor = bgColor;
+      }
       const levels = info.event.extendedProps.levelLabels || "";
       const timeText = formatCalendarTimeRange(info.event.start, info.event.end);
       const tooltip = levels ? `${timeText} | ${levels}` : timeText;
@@ -2857,6 +2944,12 @@ function ensureCoachCalendar() {
       };
     },
     eventDidMount: (info) => {
+      // Force-apply category background color (CSS may override FC inline styles)
+      const bgColor = info.event.backgroundColor;
+      if (bgColor) {
+        info.el.style.backgroundColor = bgColor;
+        info.el.style.borderColor = bgColor;
+      }
       const levels = info.event.extendedProps.levelLabels || "";
       const timeText = formatCalendarTimeRange(info.event.start, info.event.end);
       const tooltip = levels ? `${timeText} | ${levels}` : timeText;
@@ -2880,17 +2973,69 @@ function ensureCoachCalendar() {
 
 function setCalendarEvents(calendarInstance, sessions, labelMap) {
   if (!calendarInstance) return;
-  const events = sessions.map((s) => ({
-    id: String(s.id),
-    start: s.start_datetime,
-    end: s.end_datetime,
-    extendedProps: {
-      sessionId: s.id,
-      levelLabels: formatLevelLabels(s.level_ids, labelMap),
-    },
-  }));
+
+  const DEFAULT_COLOR = "hsl(0, 0%, 65%)"; // neutral gray for sessions without category
+  const usedCategoryIds = new Set();
+
+  const events = sessions.map((s) => {
+    // Determine color from the category of the first level_id
+    let bgColor = DEFAULT_COLOR;
+    if (s.level_ids && s.level_ids.length > 0 && levelColorMap) {
+      bgColor = levelColorMap[s.level_ids[0]] || DEFAULT_COLOR;
+      // Track which categories are visible this month
+      const catId = levelToCategoryMap[s.level_ids[0]];
+      if (catId) usedCategoryIds.add(catId);
+    }
+    return {
+      id: String(s.id),
+      start: s.start_datetime,
+      end: s.end_datetime,
+      backgroundColor: bgColor,
+      borderColor: bgColor,
+      extendedProps: {
+        sessionId: s.id,
+        seriesId: s.series_id || null,
+        levelLabels: formatLevelLabels(s.level_ids, labelMap),
+      },
+    };
+  });
   calendarInstance.removeAllEvents();
   calendarInstance.addEventSource(events);
+
+  // Render color legend next to this calendar
+  const calEl = calendarInstance.el;
+  renderCategoryLegend(calEl, usedCategoryIds);
+}
+
+/**
+ * Render a small color legend below the calendar showing
+ * which color corresponds to each category.
+ */
+function renderCategoryLegend(calendarEl, usedCategoryIds) {
+  // Find or create the legend container right after the calendar element
+  let legend = calendarEl.parentElement.querySelector(".calendar-category-legend");
+  if (!legend) {
+    legend = document.createElement("div");
+    legend.className = "calendar-category-legend";
+    calendarEl.parentElement.insertBefore(legend, calendarEl.nextSibling);
+  }
+
+  if (!usedCategoryIds || usedCategoryIds.size === 0) {
+    legend.innerHTML = "";
+    return;
+  }
+
+  const items = [...usedCategoryIds].map((catId) => {
+    const cat = categoryColorMap[catId];
+    if (!cat) return "";
+    return `
+      <span style="display:inline-flex;align-items:center;margin-right:14px;margin-bottom:4px">
+        <span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:${cat.color};margin-right:5px;flex-shrink:0"></span>
+        <span class="w3-small">${cat.name}</span>
+      </span>`;
+  }).join("");
+
+  legend.innerHTML = `<div style="display:flex;flex-wrap:wrap;padding:6px 0">${items}</div>`;
 }
 
 function formatCalendarTimeRange(start, end) {
@@ -2914,7 +3059,7 @@ function formatLevelLabels(levelIds, labelMap) {
 function cacheSessions(sessions) {
   if (!sessions || !sessions.length) return;
   sessions.forEach((s) => {
-    sessionCache[s.id] = s;
+    sessionCache[s.id] = s; // includes series_id from backend
   });
 }
 
@@ -3107,14 +3252,12 @@ async function openCreateSession() {
   document.getElementById("tsStart").value = "";
   document.getElementById("tsEnd").value = "";
   document.getElementById("tsNotes").value = "";
-  document.getElementById("tsAllLevels").checked = false;
   document.getElementById("tsFrequency").value = "none";
   document.getElementById("tsUntil").value = "";
   msg.textContent = "";
 
   await loadAllActiveLevels();
   handleFrequencyChange();
-  document.getElementById("tsAllLevels").onchange = handleAllLevelsToggle;
   updateSessionModalState(false);
 
   modal.style.display = "block";
@@ -3131,7 +3274,6 @@ async function openEditSession(sessionId) {
   document.getElementById("tsStart").value = toLocalInput(session.start_datetime);
   document.getElementById("tsEnd").value = toLocalInput(session.end_datetime);
   document.getElementById("tsNotes").value = session.notes || "";
-  document.getElementById("tsAllLevels").checked = false;
   document.getElementById("tsFrequency").value = "none";
   document.getElementById("tsUntil").value = "";
   msg.textContent = "";
@@ -3139,7 +3281,6 @@ async function openEditSession(sessionId) {
   await loadAllActiveLevels();
   setSelectedLevels(session.level_ids || []);
   handleFrequencyChange();
-  document.getElementById("tsAllLevels").onchange = handleAllLevelsToggle;
   updateSessionModalState(true);
 
   modal.style.display = "block";
@@ -3147,9 +3288,16 @@ async function openEditSession(sessionId) {
 
 function updateSessionModalState(isEdit) {
   const cancelBtn = document.getElementById("tsCancelSessionBtn");
+  const cancelSeriesBtn = document.getElementById("tsCancelSeriesBtn");
   const saveBtn = document.getElementById("tsSaveBtn");
   if (cancelBtn) cancelBtn.style.display = isEdit ? "inline-block" : "none";
   if (saveBtn) saveBtn.textContent = isEdit ? "Actualizar" : "Guardar";
+
+  // Show "Cancelar serie" only if editing a session that belongs to a series
+  if (cancelSeriesBtn) {
+    const session = editingSessionId ? sessionCache[editingSessionId] : null;
+    cancelSeriesBtn.style.display = (isEdit && session && session.series_id) ? "inline-block" : "none";
+  }
 }
 
 function setSelectedLevels(levelIds) {
@@ -3157,6 +3305,8 @@ function setSelectedLevels(levelIds) {
   document.querySelectorAll(".tsLevelOption").forEach((el) => {
     el.checked = ids.has(Number(el.value));
   });
+  // Trigger category lock based on restored selection
+  handleLevelCategoryLock();
 }
 
 function toLocalInput(value) {
@@ -3183,22 +3333,12 @@ function handleFrequencyChange() {
 }
 
 function handleAllLevelsToggle() {
-  const allLevels = document.getElementById("tsAllLevels").checked;
-  const dropdown = document.getElementById("tsLevelDropdown");
-  const toggle = document.getElementById("tsLevelToggle");
-  if (!dropdown || !toggle) return;
-  if (allLevels) {
-    dropdown.classList.add("w3-hide");
-    toggle.textContent = "Todos los niveles activos";
-  } else {
-    toggle.textContent = "Seleccionar niveles";
-  }
+  // No-op: "all levels" option removed in favor of single-category selection
 }
 
 function toggleLevelDropdown() {
   const dropdown = document.getElementById("tsLevelDropdown");
-  const allLevels = document.getElementById("tsAllLevels").checked;
-  if (!dropdown || allLevels) return;
+  if (!dropdown) return;
   dropdown.classList.toggle("w3-hide");
 }
 
@@ -3212,7 +3352,8 @@ async function loadAllActiveLevels() {
     const academies = await resAcad.json();
     if (!resAcad.ok) throw new Error(academies.detail || "Error cargando academias");
 
-    const options = [];
+    // Build grouped structure: category → levels
+    const groups = []; // { catId, catName, acadName, levels: [{id,name}] }
     for (const acad of academies) {
       const resCat = await fetch(`${API_URL}/categories?academy_id=${acad.id}`, { headers: authHeaders() });
       const categories = await resCat.json();
@@ -3221,27 +3362,74 @@ async function loadAllActiveLevels() {
         const resLvl = await fetch(`${API_URL}/levels?category_id=${cat.id}`, { headers: authHeaders() });
         const levels = await resLvl.json();
         if (!resLvl.ok) throw new Error(levels.detail || "Error cargando niveles");
-        for (const lvl of levels) {
-          options.push({
-            id: lvl.id,
-            label: `${acad.name} / ${cat.name} / ${lvl.name}`,
+        if (levels.length) {
+          groups.push({
+            catId: cat.id,
+            catName: cat.name,
+            acadName: acad.name,
+            levels,
           });
         }
       }
     }
 
-    list.innerHTML = options
-      .map(
-        (o) => `
-        <label class="w3-small w3-margin-right" style="display:block; margin-bottom:4px;">
-          <input type="checkbox" class="tsLevelOption" value="${o.id}"> ${o.label}
-        </label>
-      `
-      )
-      .join("");
+    // Render grouped by category with a header per group
+    let html = "";
+    for (const g of groups) {
+      html += `<div class="w3-margin-bottom" data-cat-group="${g.catId}">`;
+      html += `<div class="w3-small w3-text-gray" style="font-weight:600;margin-bottom:2px">${g.acadName} / ${g.catName}</div>`;
+      for (const lvl of g.levels) {
+        html += `
+          <label class="w3-small" style="display:block;margin-bottom:3px;padding-left:12px">
+            <input type="checkbox" class="tsLevelOption" value="${lvl.id}" data-category-id="${g.catId}"
+                   onchange="handleLevelCategoryLock()"> ${lvl.name}
+          </label>`;
+      }
+      html += `</div>`;
+    }
+    list.innerHTML = html;
   } catch (e) {
     list.innerHTML = `<div class="w3-small w3-text-red">${e.message}</div>`;
   }
+}
+
+/**
+ * When a level checkbox is checked, disable all levels from OTHER categories.
+ * When all are unchecked, re-enable everything.
+ */
+function handleLevelCategoryLock() {
+  const allBoxes = document.querySelectorAll(".tsLevelOption");
+  const checked = [...allBoxes].filter((el) => el.checked);
+
+  if (checked.length === 0) {
+    // Nothing selected → enable all
+    allBoxes.forEach((el) => {
+      el.disabled = false;
+      el.closest("label").style.opacity = "1";
+    });
+    // Re-enable all category group headers
+    document.querySelectorAll("[data-cat-group]").forEach((g) => g.style.opacity = "1");
+    return;
+  }
+
+  // Get the category of the first checked level
+  const activeCatId = checked[0].dataset.categoryId;
+
+  allBoxes.forEach((el) => {
+    if (el.dataset.categoryId === activeCatId) {
+      el.disabled = false;
+      el.closest("label").style.opacity = "1";
+    } else {
+      el.disabled = true;
+      el.checked = false;
+      el.closest("label").style.opacity = "0.4";
+    }
+  });
+
+  // Dim entire category groups that are locked out
+  document.querySelectorAll("[data-cat-group]").forEach((g) => {
+    g.style.opacity = g.dataset.catGroup === activeCatId ? "1" : "0.5";
+  });
 }
 
 async function saveCreateSession() {
@@ -3252,7 +3440,7 @@ async function saveCreateSession() {
   const start = document.getElementById("tsStart").value;
   const end = document.getElementById("tsEnd").value;
   const notes = document.getElementById("tsNotes").value.trim();
-  const allLevels = document.getElementById("tsAllLevels").checked;
+  const allLevels = false; // levels are now restricted to one category
   const frequency = document.getElementById("tsFrequency").value;
   const until = document.getElementById("tsUntil").value;
 
@@ -3329,6 +3517,46 @@ async function cancelSession() {
     if (!res.ok) throw new Error(data.detail || "No se pudo cancelar la sesion");
     await loadAdminTrainingSessions();
     closeCreateSession();
+  } catch (e) {
+    if (msg) {
+      msg.className = "w3-small w3-text-red w3-center";
+      msg.textContent = e.message;
+    }
+  }
+}
+
+async function cancelSeries() {
+  if (!editingSessionId) return;
+  const session = sessionCache[editingSessionId];
+  if (!session || !session.series_id) return;
+
+  const ok = await showConfirmModal(
+    "¿Cancelar TODA la serie de sesiones?\n\n" +
+    "Las sesiones con asistencia registrada se protegerán por defecto."
+  );
+  if (!ok) return;
+
+  const msg = document.getElementById("tsMsg");
+  try {
+    setStatusMessage(msg, "Cancelando serie…", "w3-small w3-text-gray w3-center");
+    const res = await fetch(
+      `${API_URL}/training-sessions/series/${session.series_id}/cancel?cancel_with_attendance=false`,
+      { method: "PATCH", headers: authHeaders() }
+    );
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || "No se pudo cancelar la serie");
+
+    let summary = `✅ Serie cancelada: ${data.cancelled} cancelada(s)`;
+    if (data.skipped > 0) {
+      summary += `, ${data.skipped} protegida(s) (con asistencia)`;
+    }
+    if (data.already_cancelled > 0) {
+      summary += `, ${data.already_cancelled} ya cancelada(s)`;
+    }
+
+    setStatusMessage(msg, summary, "w3-small w3-text-green w3-center");
+    await loadAdminTrainingSessions();
+    setTimeout(closeCreateSession, 2500);
   } catch (e) {
     if (msg) {
       msg.className = "w3-small w3-text-red w3-center";
@@ -4282,13 +4510,16 @@ async function loadCoachAssignments(coachId) {
     const data = await res.json();
     if (!res.ok) throw new Error(data.detail || "No se pudieron cargar las asignaciones");
 
-    if (!data.length) {
+    // Solo mostrar asignaciones activas (sin end_date)
+    const activeAssignments = data.filter(a => !a.end_date);
+
+    if (!activeAssignments.length) {
       box.innerHTML =
-        `<div class="w3-text-gray w3-small">Este coach no tiene asignaciones.</div>`;
+        `<div class="w3-text-gray w3-small">Este coach no tiene asignaciones activas.</div>`;
       return;
     }
 
-    const pageItems = paginateList(data, "coachAssignments", "caList", () => loadCoachAssignments(coachId));
+    const pageItems = paginateList(activeAssignments, "coachAssignments", "caList", () => loadCoachAssignments(coachId));
 
     box.innerHTML = pageItems
       .map((a) => {
@@ -5147,6 +5378,7 @@ window.cancelInvoice = cancelInvoice;
 window.markInvoicePaid = markInvoicePaid;
 window.loadBillingReport = loadBillingReport;
 window.generateMonthlyInvoices = generateMonthlyInvoices;
+window.fixInvoicePeriods = fixInvoicePeriods;
 window.exportBillingCsv = exportBillingCsv;
 window.exportBillingPdf = exportBillingPdf;
 window.exportAthletesCsv = exportAthletesCsv;
@@ -5158,6 +5390,7 @@ window.openEditAnnouncement = openEditAnnouncement;
 window.retireAnnouncement = retireAnnouncement;
 window.deleteAnnouncementAttachment = deleteAnnouncementAttachment;
 window.cancelSession = cancelSession;
+window.cancelSeries = cancelSeries;
 window.resetUserPassword = resetUserPassword;
 window.reactivateAthlete = reactivateAthlete;
 
