@@ -1,4 +1,4 @@
-const API_URL = "https://deportivaback-eudyf4h6csdfevgz.canadacentral-01.azurewebsites.net";
+const API_URL = window.API_BASE;
 
 const token = localStorage.getItem("token");
 const role = localStorage.getItem("role") || "general";

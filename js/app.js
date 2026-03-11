@@ -1,4 +1,4 @@
-const API_BASE = "https://deportivaback-eudyf4h6csdfevgz.canadacentral-01.azurewebsites.net";
+const API_BASE = window.API_BASE;
 
 // --- Router de vistas ---
 function go(view) {

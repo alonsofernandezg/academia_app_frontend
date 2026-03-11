@@ -1,4 +1,4 @@
-const API_BASE = "https://deportivaback-eudyf4h6csdfevgz.canadacentral-01.azurewebsites.net";
+const API_BASE = window.API_BASE;
 
 // Obtener token desde la URL (?token=...)
 const urlParams = new URLSearchParams(window.location.search);
