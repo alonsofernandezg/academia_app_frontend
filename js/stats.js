@@ -1,7 +1,15 @@
 // ══════════════════════════════════════════════
 // CONFIG & STATE
 // ══════════════════════════════════════════════
-const API_URL = window.API_BASE;
+const API_URL = (() => {
+  const defaultBase = "http://127.0.0.1:8000";
+  const rawBase = String(window.API_BASE || defaultBase).trim().replace(/\/+$/, "");
+  if (window.location.protocol === "https:" && rawBase.startsWith("http://")) {
+    return `https://${rawBase.slice(7)}`;
+  }
+  return rawBase;
+})();
+window.API_BASE = API_URL;
 let token = localStorage.getItem("token");
 
 // Team tab state

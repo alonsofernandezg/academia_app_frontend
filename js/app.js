@@ -1,4 +1,12 @@
-const API_BASE = window.API_BASE;
+const API_BASE = (() => {
+  const defaultBase = "http://127.0.0.1:8000";
+  const rawBase = String(window.API_BASE || defaultBase).trim().replace(/\/+$/, "");
+  if (window.location.protocol === "https:" && rawBase.startsWith("http://")) {
+    return `https://${rawBase.slice(7)}`;
+  }
+  return rawBase;
+})();
+window.API_BASE = API_BASE;
 
 // --- Router de vistas ---
 function go(view) {
