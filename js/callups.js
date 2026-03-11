@@ -366,7 +366,7 @@ async function loadCallups() {
   list.innerHTML = `<div class="w3-center w3-text-gray w3-small">Cargando…</div>`;
 
   try {
-    let url = `${API_URL}/callups?academy_id=${academyId}`;
+    let url = `${API_URL}/callups/?academy_id=${academyId}`;
     if (status) url += `&status=${status}`;
 
     const res = await fetch(url, { headers: authHeaders() });

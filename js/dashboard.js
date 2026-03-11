@@ -553,7 +553,7 @@ async function loadCategoriesSelect(academyId, selectId) {
 
   try {
     const res = await fetch(
-      `${API_URL}/categories?academy_id=${academyId}`,
+      `${API_URL}/categories/?academy_id=${academyId}`,
       { headers: authHeaders() }
     );
     const data = await res.json();
@@ -580,7 +580,7 @@ async function loadLevelsSelect(categoryId, selectId) {
 
   try {
     const res = await fetch(
-      `${API_URL}/levels?category_id=${categoryId}`,
+      `${API_URL}/levels/?category_id=${categoryId}`,
       { headers: authHeaders() }
     );
     const data = await res.json();
@@ -901,7 +901,7 @@ async function loadAdminTrainingSessions() {
     adminCalendarMonth = adminCalendar.getDate();
     const { startDate, endDate } = getMonthRange(adminCalendarMonth);
     const res = await fetch(
-      `${API_URL}/training-sessions?start_date=${startDate}&end_date=${endDate}`,
+      `${API_URL}/training-sessions/?start_date=${startDate}&end_date=${endDate}`,
       { headers: authHeaders() }
     );
     const sessions = await res.json();
@@ -2393,7 +2393,7 @@ async function getLevelLabelMap() {
 
     for (const academy of academies) {
       const catRes = await fetch(
-        `${API_URL}/categories?academy_id=${academy.id}`,
+        `${API_URL}/categories/?academy_id=${academy.id}`,
         { headers: authHeaders() }
       );
       const categories = await catRes.json();
@@ -2408,7 +2408,7 @@ async function getLevelLabelMap() {
         const catColor = catColorMap[category.id].color;
 
         const lvlRes = await fetch(
-          `${API_URL}/levels?category_id=${category.id}`,
+          `${API_URL}/levels/?category_id=${category.id}`,
           { headers: authHeaders() }
         );
         const levels = await lvlRes.json();
@@ -3363,11 +3363,11 @@ async function loadAllActiveLevels() {
     // Build grouped structure: category → levels
     const groups = []; // { catId, catName, acadName, levels: [{id,name}] }
     for (const acad of academies) {
-      const resCat = await fetch(`${API_URL}/categories?academy_id=${acad.id}`, { headers: authHeaders() });
+      const resCat = await fetch(`${API_URL}/categories/?academy_id=${acad.id}`, { headers: authHeaders() });
       const categories = await resCat.json();
       if (!resCat.ok) throw new Error(categories.detail || "Error cargando categorías");
       for (const cat of categories) {
-        const resLvl = await fetch(`${API_URL}/levels?category_id=${cat.id}`, { headers: authHeaders() });
+        const resLvl = await fetch(`${API_URL}/levels/?category_id=${cat.id}`, { headers: authHeaders() });
         const levels = await resLvl.json();
         if (!resLvl.ok) throw new Error(levels.detail || "Error cargando niveles");
         if (levels.length) {
@@ -3489,7 +3489,7 @@ async function saveCreateSession() {
     setStatusMessage(msg, "Guardando...", "w3-small w3-text-gray w3-center");
     const url = editingSessionId
       ? `${API_URL}/training-sessions/${editingSessionId}`
-      : `${API_URL}/training-sessions`;
+      : `${API_URL}/training-sessions/`;
     const method = editingSessionId ? "PUT" : "POST";
     const res = await fetch(url, {
       method,
@@ -3985,7 +3985,7 @@ async function adminReloadCategoriesUI() {
 
   try {
     const resAll = await fetch(
-      `${API_URL}/categories?academy_id=${academyId}&include_inactive=true`,
+      `${API_URL}/categories/?academy_id=${academyId}&include_inactive=true`,
       { headers: authHeaders() }
     );
     const categories = await resAll.json();
@@ -4086,7 +4086,7 @@ async function adminCreateCategory() {
   try {
     setStatusMessage(msg, "Guardando...", "w3-small w3-text-gray w3-center");
     const isEdit = Boolean(editingCategoryId);
-    const url = isEdit ? `${API_URL}/categories/${editingCategoryId}` : `${API_URL}/categories`;
+    const url = isEdit ? `${API_URL}/categories/${editingCategoryId}` : `${API_URL}/categories/`;
     const method = isEdit ? "PUT" : "POST";
 
     const res = await fetch(url, {
@@ -4162,7 +4162,7 @@ async function adminReloadLevelsUI() {
 
   try {
     const res = await fetch(
-      `${API_URL}/levels?category_id=${categoryId}&include_inactive=true`,
+      `${API_URL}/levels/?category_id=${categoryId}&include_inactive=true`,
       { headers: authHeaders() }
     );
     const levels = await res.json();
@@ -4251,7 +4251,7 @@ async function adminCreateLevel() {
   try {
     setStatusMessage(msg, "Guardando...", "w3-small w3-text-gray w3-center");
     const isEdit = Boolean(editingLevelId);
-    const url = isEdit ? `${API_URL}/levels/${editingLevelId}` : `${API_URL}/levels`;
+    const url = isEdit ? `${API_URL}/levels/${editingLevelId}` : `${API_URL}/levels/`;
     const method = isEdit ? "PUT" : "POST";
 
     const res = await fetch(url, {
