@@ -90,6 +90,113 @@ body {
   color: var(--indigo) !important;
 }
 
+/* Shared topbar layout: brand (left), academy (center), actions (right) */
+.app-topbar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 58px;
+  padding: 8px 12px;
+}
+
+.app-topbar-left,
+.app-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 2;
+}
+
+.app-topbar-right {
+  margin-left: auto;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.app-brand {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.app-topbar-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 46%;
+  text-align: center;
+  pointer-events: none;
+}
+
+.app-academy-name {
+  display: inline-block;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.app-topbar-btn {
+  height: 34px;
+  min-height: 34px;
+  padding: 6px 12px !important;
+}
+
+.app-topbar-page-title {
+  font-weight: 600;
+}
+
+.app-user-badge .w3-tag {
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 860px) {
+  .app-topbar-center {
+    max-width: 36%;
+  }
+}
+
+@media (max-width: 680px) {
+  .app-topbar {
+    flex-wrap: wrap;
+    padding: 8px 10px;
+    min-height: auto;
+  }
+
+  .app-topbar-left {
+    order: 1;
+  }
+
+  .app-topbar-center {
+    order: 2;
+    position: static;
+    transform: none;
+    width: 100%;
+    max-width: 100%;
+    text-align: center;
+    pointer-events: auto;
+  }
+
+  .app-topbar-right {
+    order: 3;
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .app-user-badge {
+    width: 100%;
+    text-align: right;
+  }
+
+  .app-user-badge .w3-tag {
+    max-width: 100%;
+  }
+}
+
 .fc .fc-daygrid-event {
   border: none;
   border-radius: 12px;

@@ -26,10 +26,32 @@ function authHeaders() {
   return { "Content-Type": "application/json", "Authorization": `Bearer ${token}` };
 }
 
+async function setAcademyTopbarName() {
+  const titleEl = document.getElementById("academyTopbarName");
+  if (!titleEl) return;
+
+  let academyName = String(window.APP_ACADEMY_NAME || "").trim() || "Ginga Academy";
+
+  try {
+    const res = await fetch(`${API_URL}/auth/config`);
+    const data = await res.json();
+    const fromEnv = String(data?.academy_display_name || "").trim();
+    if (res.ok && fromEnv) {
+      academyName = fromEnv;
+      window.APP_ACADEMY_NAME = fromEnv;
+    }
+  } catch (e) {
+    // Keep local fallback when config endpoint is unavailable.
+  }
+
+  titleEl.textContent = academyName;
+}
+
 // ══════════════════════════════════════════════
 // INIT
 // ══════════════════════════════════════════════
 window.addEventListener("load", async () => {
+  await setAcademyTopbarName();
   if (!token) {
     window.location.href = "index.html";
     return;
@@ -316,6 +338,11 @@ function renderGoalsByPhase(g, containerId) {
 // RENDER: PLAYER SUMMARY
 // ══════════════════════════════════════════════
 function renderPlayerSummary(s) {
+  const mvpCard = s.mvp_count > 0
+    ? `<div class="scard" style="background:linear-gradient(135deg,#ffd700,#ffb300)">
+        <div class="scard-val">${s.mvp_count}</div><div class="scard-lbl">🏆 MVP</div>
+       </div>`
+    : '';
   document.getElementById("playerSummaryCards").innerHTML = `
     <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px;width:100%">
       <div class="scard blue"><div class="scard-val">${s.matches}</div><div class="scard-lbl">Partidos</div></div>
@@ -326,6 +353,7 @@ function renderPlayerSummary(s) {
         <div class="scard-val">${s.yellow_cards}</div><div class="scard-lbl">🟨 Amarillas</div>
       </div>
       <div class="scard orange"><div class="scard-val">${s.red_cards}</div><div class="scard-lbl">🟥 Rojas</div></div>
+      ${mvpCard}
     </div>`;
 }
 
@@ -341,7 +369,7 @@ function renderMatchHistory(history) {
   let html = `
     <div class="mh-row hdr">
       <div>Fecha</div><div>Partido / Equipo</div><div>Localía</div>
-      <div>⚽</div><div>🅰️</div><div>⏱️</div><div>🟨</div><div>🟥</div>
+      <div>⚽</div><div>🅰️</div><div>⏱️</div><div>🟨</div><div>🟥</div><div>🏆</div>
     </div>`;
   history.forEach(m => {
     const dateStr = m.date ? new Date(m.date).toLocaleDateString("es", { day: "2-digit", month: "short", year: "numeric" }) : "—";
@@ -359,6 +387,7 @@ function renderMatchHistory(history) {
         <div style="font-size:0.82em">${fmtMin(m.minutes)}</div>
         <div>${m.yellow_cards > 0 ? "🟨" : "-"}</div>
         <div>${m.red_card ? "🟥" : "-"}</div>
+        <div>${m.is_mvp ? "🏆" : "-"}</div>
       </div>`;
   });
   document.getElementById("playerHistoryContent").innerHTML = html;

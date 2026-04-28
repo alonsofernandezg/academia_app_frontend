@@ -1,7 +1,7 @@
 // Global frontend config: set the backend base URL in one place.
 // If the site is loaded over HTTPS, force API_BASE to HTTPS to avoid mixed content.
 (function configureApiBase() {
-	const defaultBase = "https://deportivaback-eudyf4h6csdfevgz.canadacentral-01.azurewebsites.net/";
+	const defaultBase = "http://127.0.0.1:8000";
 	const rawBase = String(window.API_BASE || defaultBase).trim();
 	const withoutTrailingSlash = rawBase.replace(/\/+$/, "");
 
@@ -12,6 +12,10 @@
 
 	window.API_BASE = withoutTrailingSlash;
 })();
+
+// Centralized academy display name for the topbar.
+// Change this value to rebrand per academy deployment.
+window.APP_ACADEMY_NAME = String(window.APP_ACADEMY_NAME || "Ginga Academy").trim() || "Ginga Academy";
 
 // Safety net: if any code still builds an insecure absolute HTTP URL while the
 // page is HTTPS, upgrade it to HTTPS (except localhost) before sending.

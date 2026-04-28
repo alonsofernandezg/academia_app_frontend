@@ -24,25 +24,34 @@
 <body class="w3-light-gray">
 
   <!-- Topbar -->
-  <div class="w3-bar w3-blue w3-card">
-    <span class="w3-bar-item w3-large"><b>DeportIvA</b></span>
-    <span id="userBadge" class="w3-bar-item w3-right w3-small"></span>
-    <button
-      class="w3-bar-item w3-button w3-right w3-white w3-round-xxlarge w3-small"
-      onclick="logout()">
-      Salir
-    </button>
-    <button
-      class="w3-bar-item w3-button w3-right w3-white w3-border w3-round-xxlarge w3-small"
-      onclick="openChangePassword()">
-      Cambiar contraseña
-    </button>
-    <button
-      class="w3-bar-item w3-button w3-right w3-light-blue w3-round-xxlarge w3-small"
-      onclick="window.location.href='stats.html'"
-      title="Ver estadísticas">
-      📊 Estadísticas
-    </button>
+  <div class="app-topbar w3-blue w3-card">
+    <div class="app-topbar-left">
+      <span class="app-brand"><b>DeportIvA</b></span>
+    </div>
+
+    <div class="app-topbar-center">
+      <span id="academyTopbarName" class="app-academy-name">Ginga Academy</span>
+    </div>
+
+    <div class="app-topbar-right">
+      <button
+        class="w3-button w3-light-blue w3-round-xxlarge w3-small app-topbar-btn"
+        onclick="window.location.href='stats.html'"
+        title="Ver estadísticas">
+        📊 Estadísticas
+      </button>
+      <button
+        class="w3-button w3-white w3-border w3-round-xxlarge w3-small app-topbar-btn"
+        onclick="openChangePassword()">
+        Cambiar contraseña
+      </button>
+      <button
+        class="w3-button w3-white w3-round-xxlarge w3-small app-topbar-btn"
+        onclick="logout()">
+        Salir
+      </button>
+      <span id="userBadge" class="w3-small app-user-badge"></span>
+    </div>
   </div>
 
   <!-- Content -->
@@ -281,7 +290,7 @@
               <button
                 id="caCreateBtn"
                 class="w3-button w3-blue w3-round-xxlarge w3-small w3-margin-top">
-                Guardar asignaci\u00f3n
+                Guardar asignación
               </button>
               <button
                 id="caCancelBtn"
@@ -1012,6 +1021,14 @@
             </p>
           </div>
           <div class="w3-col s12 m4 w3-right-align">
+            <a id="compraClickBtn"
+               href="#"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="w3-button w3-round-xxlarge w3-small"
+               style="background:#c62828;color:#ffffff;font-weight:700;letter-spacing:.5px;display:none">
+              🛒 CompraClick
+            </a>
             <button
               class="w3-button w3-white w3-border w3-round-xxlarge w3-small"
               data-collapsible="generalPaymentsContent">

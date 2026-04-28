@@ -1302,69 +1302,144 @@ function renderMatchStatsPanel() {
   const goalsFor = currentMatchStats?.goals_for ?? 0;
   const result = currentMatchStats?.result;
 
+  const canEdit = (role === "admin" || role === "coach");
+
   let headerHtml = `<h4 class="w3-text-purple" style="margin:4px 0">📊 Estadísticas del Partido</h4>`;
   if (currentMatchStats) {
+    const mvpLine = currentMatchStats.mvp_player_name
+      ? `<span class="w3-margin-left w3-small w3-text-amber">🏆 MVP: <b>${currentMatchStats.mvp_player_name}</b></span>`
+      : '';
     headerHtml += `
       <div class="w3-margin-bottom">
         <span class="w3-xlarge"><b>${goalsFor}</b></span>
         <span class="w3-text-gray">-</span>
         <span class="w3-xlarge"><b>${goalsAgainst}</b></span>
         <span class="w3-margin-left">${resultLabel(result)}</span>
+        ${mvpLine}
       </div>
     `;
   }
 
-  // Match info (goals against, notes)
-  let matchInfoHtml = `
-    <div class="w3-row-padding">
-      <div class="w3-col s6 m3">
-        <label class="w3-small w3-text-gray">Goles en Contra</label>
-        <input id="statsGoalsAgainst" type="number" min="0" max="99" 
-               class="w3-input w3-border w3-round-large" value="${goalsAgainst}">
-      </div>
-      <div class="w3-col s12 m9">
-        <label class="w3-small w3-text-gray">Notas</label>
-        <input id="statsNotes" type="text" maxlength="500" 
-               class="w3-input w3-border w3-round-large" value="${notes}" placeholder="Observaciones del partido...">
-      </div>
-    </div>
-  `;
+  let matchInfoHtml;
+  let playersHtml;
+  let buttonsHtml;
 
-  // Player stats table
-  let playersHtml = `
-    <div class="w3-margin-top">
-      <table class="w3-table w3-bordered w3-small" style="border-collapse:collapse">
-        <thead>
-          <tr class="w3-light-gray">
-            <th style="min-width:150px">Jugador</th>
-            <th style="width:60px;text-align:center">⏱️ Min</th>
-            <th style="width:60px;text-align:center">⚽ Goles</th>
-            <th style="width:60px;text-align:center">🅰️ Asist</th>
-            <th style="width:60px;text-align:center">🟨 TA</th>
-            <th style="width:50px;text-align:center">🟥 TR</th>
-          </tr>
-        </thead>
-        <tbody id="statsPlayersBody">
-        </tbody>
-      </table>
-    </div>
-  `;
-
-  // Buttons
-  let buttonsHtml = `
-    <div class="w3-row-padding w3-margin-top">
-      <div class="w3-col s12 w3-right-align">
-        <button class="w3-button w3-white w3-border w3-round-xxlarge w3-small" onclick="hideMatchStatsPanel()">Cerrar</button>
-        <button class="w3-button w3-purple w3-round-xxlarge w3-small w3-margin-left" onclick="saveMatchStats()">💾 Guardar Estadísticas</button>
+  if (canEdit) {
+    // Editable form for admin/coach
+    matchInfoHtml = `
+      <div class="w3-row-padding">
+        <div class="w3-col s6 m3">
+          <label class="w3-small w3-text-gray">Goles en Contra</label>
+          <input id="statsGoalsAgainst" type="number" min="0" max="99" 
+                 class="w3-input w3-border w3-round-large" value="${goalsAgainst}">
+        </div>
+        <div class="w3-col s12 m9">
+          <label class="w3-small w3-text-gray">Notas</label>
+          <input id="statsNotes" type="text" maxlength="500" 
+                 class="w3-input w3-border w3-round-large" value="${notes}" placeholder="Observaciones del partido...">
+        </div>
       </div>
-    </div>
-    <div id="statsMsg" class="w3-margin-top w3-small w3-center"></div>
-  `;
+      <div class="w3-row-padding w3-margin-top">
+        <div class="w3-col s12 m6">
+          <label class="w3-small w3-text-gray">🏆 MVP del Partido</label>
+          <select id="statsMvpPlayer" class="w3-select w3-border w3-round-large">
+            <option value="">— Sin MVP —</option>
+            ${currentStatsPlayers.map(p => {
+              const name = `${p.athlete_first_name || '?'} ${p.athlete_last_name || ''}`;
+              const isSel = currentMatchStats?.mvp_callup_player_id === p.id ? 'selected' : '';
+              return `<option value="${p.id}" ${isSel}>${name}</option>`;
+            }).join('')}
+          </select>
+        </div>
+      </div>
+    `;
+
+    playersHtml = `
+      <div class="w3-margin-top">
+        <table class="w3-table w3-bordered w3-small" style="border-collapse:collapse">
+          <thead>
+            <tr class="w3-light-gray">
+              <th style="min-width:150px">Jugador</th>
+              <th style="width:60px;text-align:center">⏱️ Min</th>
+              <th style="width:60px;text-align:center">⚽ Goles</th>
+              <th style="width:60px;text-align:center">🅰️ Asist</th>
+              <th style="width:60px;text-align:center">🟨 TA</th>
+              <th style="width:50px;text-align:center">🟥 TR</th>
+            </tr>
+          </thead>
+          <tbody id="statsPlayersBody">
+          </tbody>
+        </table>
+      </div>
+    `;
+
+    buttonsHtml = `
+      <div class="w3-row-padding w3-margin-top">
+        <div class="w3-col s12 w3-right-align">
+          <button class="w3-button w3-white w3-border w3-round-xxlarge w3-small" onclick="hideMatchStatsPanel()">Cerrar</button>
+          <button class="w3-button w3-purple w3-round-xxlarge w3-small w3-margin-left" onclick="saveMatchStats()">💾 Guardar Estadísticas</button>
+        </div>
+      </div>
+      <div id="statsMsg" class="w3-margin-top w3-small w3-center"></div>
+    `;
+  } else {
+    // Read-only view for athletes/parents
+    const notesDisplay = notes
+      ? `<p class="w3-small w3-text-gray" style="margin:4px 0"><em>${notes}</em></p>`
+      : '';
+
+    matchInfoHtml = notesDisplay;
+
+    const playerRows = currentStatsPlayers.map(p => {
+      const name = `${p.athlete_first_name || "?"} ${p.athlete_last_name || ""}`;
+      const ps = currentMatchStats?.player_stats?.find(s => s.callup_player_id === p.id);
+      const isMvp = currentMatchStats?.mvp_callup_player_id === p.id;
+      return `
+        <tr>
+          <td>${name}${isMvp ? ' <span class="w3-tag w3-amber w3-round w3-small">🏆 MVP</span>' : ''}</td>
+          <td style="text-align:center">${ps?.minutes_played ?? 0}</td>
+          <td style="text-align:center">${ps?.goals_count ?? 0}</td>
+          <td style="text-align:center">${ps?.assists ?? 0}</td>
+          <td style="text-align:center">${ps?.yellow_cards ?? 0}</td>
+          <td style="text-align:center">${ps?.red_card ? '🟥' : '-'}</td>
+        </tr>
+      `;
+    }).join('');
+
+    playersHtml = currentMatchStats ? `
+      <div class="w3-margin-top">
+        <table class="w3-table w3-bordered w3-small" style="border-collapse:collapse">
+          <thead>
+            <tr class="w3-light-gray">
+              <th style="min-width:150px">Jugador</th>
+              <th style="width:60px;text-align:center">⏱️ Min</th>
+              <th style="width:60px;text-align:center">⚽ Goles</th>
+              <th style="width:60px;text-align:center">🅰️ Asist</th>
+              <th style="width:60px;text-align:center">🟨 TA</th>
+              <th style="width:50px;text-align:center">🟥 TR</th>
+            </tr>
+          </thead>
+          <tbody>${playerRows}</tbody>
+        </table>
+      </div>
+    ` : `<p class="w3-small w3-text-gray">No hay estadísticas registradas para este partido.</p>`;
+
+    buttonsHtml = `
+      <div class="w3-row-padding w3-margin-top">
+        <div class="w3-col s12 w3-right-align">
+          <button class="w3-button w3-white w3-border w3-round-xxlarge w3-small" onclick="hideMatchStatsPanel()">Cerrar</button>
+        </div>
+      </div>
+    `;
+  }
 
   panel.innerHTML = headerHtml + matchInfoHtml + playersHtml + buttonsHtml;
 
-  // Populate player rows
-  renderStatsPlayerRows();
+  // Populate player rows (editable mode only)
+  if (canEdit) {
+    renderStatsPlayerRows();
+    initPlayerGoalsMap();
+  }
 }
 
 function renderStatsPlayerRows() {
@@ -1529,6 +1604,8 @@ function hideMatchStatsPanel() {
 async function saveMatchStats() {
   const goalsAgainst = parseInt(document.getElementById("statsGoalsAgainst").value) || 0;
   const notes = document.getElementById("statsNotes").value.trim() || null;
+  const mvpEl = document.getElementById("statsMvpPlayer");
+  const mvpCpId = mvpEl?.value ? parseInt(mvpEl.value) : null;
 
   // Collect player stats
   const playerStats = [];
@@ -1559,6 +1636,7 @@ async function saveMatchStats() {
   const payload = {
     goals_against: goalsAgainst,
     notes: notes,
+    mvp_callup_player_id: mvpCpId,
     player_stats: playerStats
   };
 

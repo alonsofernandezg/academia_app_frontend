@@ -63,6 +63,14 @@ function authHeaders() {
   };
 }
 
+function resolveFileUrl(pathOrUrl) {
+  if (!pathOrUrl) return "";
+  const value = String(pathOrUrl).trim();
+  if (!value) return "";
+  if (/^https?:\/\//i.test(value)) return value;
+  return `${API_URL}${value}`;
+}
+
 function initCollapsibles() {
   const buttons = document.querySelectorAll("[data-collapsible]");
   buttons.forEach((btn) => {
@@ -444,6 +452,27 @@ function setBadge() {
   }
 }
 
+async function setAcademyTopbarName() {
+  const titleEl = document.getElementById("academyTopbarName");
+  if (!titleEl) return;
+
+  let academyName = String(window.APP_ACADEMY_NAME || "").trim() || "Ginga Academy";
+
+  try {
+    const res = await fetch(`${API_URL}/auth/config`);
+    const data = await res.json();
+    const fromEnv = String(data?.academy_display_name || "").trim();
+    if (res.ok && fromEnv) {
+      academyName = fromEnv;
+      window.APP_ACADEMY_NAME = fromEnv;
+    }
+  } catch (e) {
+    // Keep local fallback when config endpoint is unavailable.
+  }
+
+  titleEl.textContent = academyName;
+}
+
 function logout() {
   localStorage.clear();
   window.location.href = "index.html";
@@ -623,6 +652,7 @@ async function loadCoachesSelect(selectId) {
 // --------------------------------------------------
 
 window.addEventListener("load", async () => {
+  await setAcademyTopbarName();
   setBadge();
   initCollapsibles();
   adminCalendarMonth = new Date();
@@ -1072,6 +1102,20 @@ async function loadGeneralPayments() {
   if (!box) return;
 
   box.innerHTML = `<div class="w3-center w3-text-gray w3-small">Cargando pagos...</div>`;
+
+  // Load CompraClick URL and show button
+  try {
+    const cfgRes = await fetch(`${API_URL}/auth/config`);
+    if (cfgRes.ok) {
+      const cfg = await cfgRes.json();
+      const btn = document.getElementById("compraClickBtn");
+      if (btn && cfg.compraclick_url) {
+        btn.href = cfg.compraclick_url;
+        btn.style.display = "inline-block";
+      }
+    }
+  } catch (_) { /* non-critical */ }
+
   try {
     const res = await fetch(`${API_URL}/billing/invoices/my`, { headers: authHeaders() });
     const data = await res.json();
@@ -1143,7 +1187,7 @@ function renderGeneralPayments() {
       const proofLink = inv.last_payment_proof_url
         ? `<div class="w3-small w3-text-gray">
             Ultimo comprobante:
-            <a href="${API_URL}${inv.last_payment_proof_url}" target="_blank">Ver</a>
+            <a href="${resolveFileUrl(inv.last_payment_proof_url)}" target="_blank">Ver</a>
           </div>`
         : "";
       return `
@@ -1738,7 +1782,7 @@ function renderAdminInvoices() {
       const proofLink = inv.last_payment_proof_url
         ? `<div class="w3-small w3-text-gray">
             Comprobante:
-            <a href="${API_URL}${inv.last_payment_proof_url}" target="_blank">Ver</a>
+            <a href="${resolveFileUrl(inv.last_payment_proof_url)}" target="_blank">Ver</a>
           </div>`
         : "";
       const markPaidButton =
@@ -2294,7 +2338,7 @@ function renderAnnouncements(listId) {
               </button>`
             : "";
           return `<span class="w3-margin-right">
-            <a href="${API_URL}${att.file_url}" target="_blank">${att.file_name}</a>${removeBtn}
+            <a href="${resolveFileUrl(att.file_url)}" target="_blank">${att.file_name}</a>${removeBtn}
           </span>`;
         })
         .join(" ");
@@ -4369,7 +4413,7 @@ function cancelEditCoachAssignment() {
   changingAssignmentCoachId = null;
   const btn = document.getElementById("caCreateBtn");
   const cancelBtn = document.getElementById("caCancelBtn");
-  if (btn) btn.textContent = "Guardar asignaci\u00f3n";
+  if (btn) btn.textContent = "Guardar asignación";
   if (cancelBtn) cancelBtn.style.display = "none";
 }
 
@@ -4379,7 +4423,7 @@ async function openEditCoachAssignment(a) {
   changingAssignmentCoachId = null;
   const btn = document.getElementById("caCreateBtn");
   const cancelBtn = document.getElementById("caCancelBtn");
-  if (btn) btn.textContent = "Actualizar asignaci\u00f3n";
+  if (btn) btn.textContent = "Actualizar asignación";
   if (cancelBtn) cancelBtn.style.display = "inline-block";
 
   const academySel = document.getElementById("caAcademy");
@@ -4726,7 +4770,7 @@ function renderAdminAthletes() {
         <div class="w3-col s3 m2">
           ${
             a.photo_url
-              ? `<img src="${API_URL}${a.photo_url}" class="w3-image w3-round-xxlarge" style="max-height:80px;">`
+              ? `<img src="${resolveFileUrl(a.photo_url)}" class="w3-image w3-round-xxlarge" style="max-height:80px;">`
               : `<div class="w3-gray w3-round-xxlarge" style="height:80px"></div>`
           }
         </div>
@@ -4925,7 +4969,7 @@ function renderCoachAllAthletes() {
         <div class="w3-col s3 m2">
           ${
             a.photo_url
-              ? `<img src="${API_URL}${a.photo_url}" class="w3-image w3-round-xxlarge" style="max-height:80px;">`
+              ? `<img src="${resolveFileUrl(a.photo_url)}" class="w3-image w3-round-xxlarge" style="max-height:80px;">`
               : `<div class="w3-gray w3-round-xxlarge" style="height:80px"></div>`
           }
         </div>

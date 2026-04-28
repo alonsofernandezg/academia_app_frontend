@@ -67,7 +67,7 @@
     /* ── Match history table ── */
     .mh-row {
       display:grid;
-      grid-template-columns: 90px 1fr 60px 50px 50px 50px 40px 40px;
+      grid-template-columns: 90px 1fr 60px 50px 50px 50px 40px 40px 36px;
       padding:9px 8px; border-bottom:1px solid #eee;
       align-items:center; font-size:0.83em;
     }
@@ -95,10 +95,20 @@
 <body class="w3-light-gray">
 
   <!-- Topbar -->
-  <div class="w3-bar w3-blue w3-card">
-    <a href="dashboard.html" class="w3-bar-item w3-button">← Volver</a>
-    <span class="w3-bar-item w3-large"><b>📊 Estadísticas</b></span>
-    <span id="userBadge" class="w3-bar-item w3-right w3-small"></span>
+  <div class="app-topbar w3-blue w3-card">
+    <div class="app-topbar-left">
+      <a href="dashboard.html" class="w3-button w3-white w3-round-xxlarge w3-small app-topbar-btn">← Volver</a>
+      <span class="app-brand"><b>DeportIvA</b></span>
+    </div>
+
+    <div class="app-topbar-center">
+      <span id="academyTopbarName" class="app-academy-name">Ginga Academy</span>
+    </div>
+
+    <div class="app-topbar-right">
+      <span class="w3-small app-topbar-page-title"><b>📊 Estadísticas</b></span>
+      <span id="userBadge" class="w3-small app-user-badge"></span>
+    </div>
   </div>
 
   <div class="w3-content" style="max-width:1200px; padding:16px;">
