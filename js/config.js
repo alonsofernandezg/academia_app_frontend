@@ -1,7 +1,12 @@
 // Global frontend config: set the backend base URL in one place.
 // If the site is loaded over HTTPS, force API_BASE to HTTPS to avoid mixed content.
 (function configureApiBase() {
-	const defaultBase = "http://127.0.0.1:8000";
+	const localBase = "http://127.0.0.1:8000";
+	const productionBase = "https://deportivaback-eudyf4h6csdfevgz.canadacentral-01.azurewebsites.net";
+	const host = String(window.location.hostname || "").toLowerCase();
+	const isLocalHost = host === "localhost" || host === "127.0.0.1" || host === "::1";
+
+	const defaultBase = isLocalHost ? localBase : productionBase;
 	const rawBase = String(window.API_BASE || defaultBase).trim();
 	const withoutTrailingSlash = rawBase.replace(/\/+$/, "");
 
