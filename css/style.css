@@ -172,62 +172,62 @@ svg {
 
 @media (max-width: 680px) {
   .app-topbar {
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      "left center"
+      "right right";
+    column-gap: 10px;
+    row-gap: 6px;
     padding: 8px 10px;
-      display: grid;
-      grid-template-columns: auto minmax(0, 1fr);
-      grid-template-areas:
-        "left center"
-        "right right";
-      column-gap: 10px;
-      row-gap: 6px;
+    min-height: auto;
   }
 
   .app-topbar-left {
-    order: 1;
+    grid-area: left;
+    min-width: 0;
   }
 
-      grid-area: left;
-      min-width: 0;
-    order: 2;
+  .app-topbar-center {
+    grid-area: center;
     position: static;
     transform: none;
-    width: 100%;
-      grid-area: center;
-    text-align: center;
+    width: auto;
+    max-width: none;
+    min-width: 0;
+    margin-left: auto;
+    text-align: right;
     pointer-events: auto;
-      width: auto;
-      max-width: none;
-      min-width: 0;
-      margin-left: auto;
-      text-align: right;
-    order: 3;
-    width: 100%;
-    justify-content: flex-end;
   }
 
-      grid-area: right;
+  .app-topbar-right {
+    grid-area: right;
     width: 100%;
-      margin-left: 0;
-      justify-content: flex-start;
-      row-gap: 6px;
+    margin-left: 0;
+    justify-content: flex-start;
+    row-gap: 6px;
   }
 
-    .app-academy-name {
-      max-width: 100%;
-      font-size: 0.96rem;
+  .app-academy-name {
+    max-width: 100%;
+    font-size: 0.96rem;
+  }
+
+  .app-user-badge {
+    flex: 1 1 100%;
+    min-width: 0;
+    text-align: left;
+  }
 
   .app-user-badge .w3-tag {
-    max-width: 100%;
-      flex: 1 1 100%;
-      min-width: 0;
-      text-align: left;
+    display: block;
+    width: 100%;
+    max-width: none;
+  }
+}
 
 .fc .fc-daygrid-event {
   border: none;
-      display: block;
-      width: 100%;
-      max-width: none;
   padding: 6px;
   margin: 4px 0;
   overflow: hidden;
