@@ -749,7 +749,7 @@ function renderActionButtons(data) {
   }
 
   container.innerHTML = `
-    <div class="w3-bar w3-margin-top">${buttons}</div>
+    <div class="callup-action-bar w3-margin-top">${buttons}</div>
     <div id="actionMsg" class="w3-margin-top"></div>
   `;
 }
@@ -1355,7 +1355,7 @@ function renderMatchStatsPanel() {
     `;
 
     playersHtml = `
-      <div class="w3-margin-top">
+      <div class="table-scroll w3-margin-top">
         <table class="w3-table w3-bordered w3-small" style="border-collapse:collapse">
           <thead>
             <tr class="w3-light-gray">
@@ -1407,7 +1407,7 @@ function renderMatchStatsPanel() {
     }).join('');
 
     playersHtml = currentMatchStats ? `
-      <div class="w3-margin-top">
+      <div class="table-scroll w3-margin-top">
         <table class="w3-table w3-bordered w3-small" style="border-collapse:collapse">
           <thead>
             <tr class="w3-light-gray">

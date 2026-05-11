@@ -24,6 +24,12 @@ body {
   background:var(--bg);
 }
 
+img,
+svg {
+  max-width: 100%;
+  height: auto;
+}
+
 /* ====================== */
 /*  L O G I N  &  C A R D */
 /* ====================== */
@@ -143,6 +149,10 @@ body {
   padding: 6px 12px !important;
 }
 
+.app-btn-label-short {
+  display: none;
+}
+
 .app-topbar-page-title {
   font-weight: 600;
 }
@@ -164,42 +174,60 @@ body {
   .app-topbar {
     flex-wrap: wrap;
     padding: 8px 10px;
-    min-height: auto;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      grid-template-areas:
+        "left center"
+        "right right";
+      column-gap: 10px;
+      row-gap: 6px;
   }
 
   .app-topbar-left {
     order: 1;
   }
 
-  .app-topbar-center {
+      grid-area: left;
+      min-width: 0;
     order: 2;
     position: static;
     transform: none;
     width: 100%;
-    max-width: 100%;
+      grid-area: center;
     text-align: center;
     pointer-events: auto;
-  }
-
-  .app-topbar-right {
+      width: auto;
+      max-width: none;
+      min-width: 0;
+      margin-left: auto;
+      text-align: right;
     order: 3;
     width: 100%;
     justify-content: flex-end;
   }
 
-  .app-user-badge {
+      grid-area: right;
     width: 100%;
-    text-align: right;
+      margin-left: 0;
+      justify-content: flex-start;
+      row-gap: 6px;
   }
+
+    .app-academy-name {
+      max-width: 100%;
+      font-size: 0.96rem;
 
   .app-user-badge .w3-tag {
     max-width: 100%;
-  }
-}
+      flex: 1 1 100%;
+      min-width: 0;
+      text-align: left;
 
 .fc .fc-daygrid-event {
   border: none;
-  border-radius: 12px;
+      display: block;
+      width: 100%;
+      max-width: none;
   padding: 6px;
   margin: 4px 0;
   overflow: hidden;
@@ -338,4 +366,248 @@ textarea.w3-input {
 @keyframes fade {
   from { opacity:0; transform:translateY(6px) }
   to { opacity:1; transform:none }
+}
+
+.no-left-right {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table-scroll > table {
+  min-width: 640px;
+}
+
+.callup-action-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.callup-action-bar .w3-button {
+  margin: 0 !important;
+}
+
+body .w3-content {
+  width: min(100%, calc(100% - 24px));
+  margin: 0 auto;
+}
+
+body .scope-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+body .scope-tabs .w3-button {
+  margin: 0 !important;
+  flex: 1 1 170px;
+}
+
+body .player-row {
+  gap: 12px;
+}
+
+body .player-row > div:first-child {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+body #teamSummaryCards,
+body #playerSummaryCards {
+  gap: 12px;
+}
+
+body .scard {
+  flex: 1 1 150px;
+  min-width: 140px;
+  max-width: 220px;
+  margin: 0;
+}
+
+body #teamTableContent,
+body #playerHistoryContent {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+body .team-row {
+  min-width: 720px;
+}
+
+body .mh-row {
+  min-width: 860px;
+}
+
+body .main-tab-btn {
+  margin-right: 0;
+}
+
+@media (max-width: 768px) {
+  body .w3-content {
+    width: calc(100% - 16px);
+  }
+
+  body .w3-card,
+  body .card {
+    border-radius: 18px !important;
+  }
+
+  body .w3-row > [class*="w3-col"],
+  body .w3-row-padding > [class*="w3-col"] {
+    margin-bottom: 10px;
+  }
+
+  body .w3-row > [class*="w3-col"].w3-right-align,
+  body .w3-row-padding > [class*="w3-col"].w3-right-align {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    text-align: left !important;
+    margin-top: 8px;
+  }
+
+  body .w3-row > [class*="w3-col"].w3-right-align .w3-button,
+  body .w3-row-padding > [class*="w3-col"].w3-right-align .w3-button {
+    margin: 0 !important;
+  }
+
+  body .w3-modal {
+    padding: 8px;
+  }
+
+  body .w3-modal-content {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 20px auto !important;
+  }
+
+  footer.w3-container.w3-padding.w3-right-align {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    text-align: left !important;
+  }
+
+  footer.w3-container.w3-padding.w3-right-align .w3-button {
+    flex: 1 1 calc(50% - 8px);
+    margin: 0 !important;
+  }
+
+  body input[type="month"][style*="max-width:180px"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    display: block !important;
+  }
+
+  body input[type="month"][style*="max-width:180px"] + .w3-button {
+    width: 100%;
+    margin-left: 0 !important;
+    margin-top: 8px !important;
+  }
+
+  body .callup-action-bar .w3-button,
+  body .scope-tabs .w3-button,
+  body .main-tab-btn {
+    flex: 1 1 calc(50% - 8px);
+  }
+
+  body .player-row {
+    flex-wrap: wrap;
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+  }
+
+  body .player-row > span {
+    width: 100%;
+    text-align: left;
+  }
+
+  body .w3-button {
+    height: auto;
+    min-height: 44px;
+  }
+
+  body .team-row {
+    min-width: 680px;
+    font-size: 0.82em;
+  }
+
+  body .mh-row {
+    min-width: 780px;
+    font-size: 0.78em;
+  }
+}
+
+@media (max-width: 540px) {
+  .app-topbar {
+    row-gap: 5px;
+  }
+
+  .app-topbar-left,
+  .app-topbar-right {
+    gap: 6px;
+  }
+
+  .app-brand {
+    font-size: 1.08rem;
+  }
+
+  .app-topbar-page-title {
+    font-size: 0.78rem;
+  }
+
+  .app-topbar-right .w3-button,
+  .app-topbar-btn {
+    width: auto;
+    flex: 0 1 auto;
+  }
+
+  .app-topbar-btn {
+    height: 32px;
+    min-height: 32px;
+    padding: 5px 10px !important;
+    font-size: 0.74rem;
+  }
+
+  .app-topbar-btn .app-btn-label-full {
+    display: none;
+  }
+
+  .app-topbar-btn .app-btn-label-short {
+    display: inline;
+  }
+
+  .app-user-badge {
+    text-align: left;
+  }
+
+  .app-user-badge .w3-tag {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+    text-align: center;
+  }
+
+  body .callup-action-bar .w3-button,
+  body .scope-tabs .w3-button,
+  body .main-tab-btn,
+  footer.w3-container.w3-padding.w3-right-align .w3-button,
+  body .w3-row > [class*="w3-col"].w3-right-align .w3-button,
+  body .w3-row-padding > [class*="w3-col"].w3-right-align .w3-button {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+
+  body .scard {
+    max-width: none;
+    flex: 1 1 100%;
+  }
 }

@@ -51,6 +51,75 @@
     }
     .team-row.hdr { background:#f5f5f5; font-weight:600; font-size:0.8em; }
 
+    .stats-mobile-card-list {
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .stats-mobile-card {
+      background:#fff;
+      border:1px solid #e6ebf5;
+      border-radius:16px;
+      padding:14px;
+      box-shadow:0 8px 24px rgba(15, 23, 42, 0.06);
+    }
+
+    .stats-mobile-card-head {
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:12px;
+    }
+
+    .stats-mobile-card-title {
+      font-size:0.98em;
+      font-weight:600;
+      color:#1f2937;
+    }
+
+    .stats-mobile-card-subtitle {
+      margin-top:3px;
+      font-size:0.78em;
+      color:#6b7280;
+      line-height:1.35;
+    }
+
+    .stats-mobile-card-badges {
+      display:flex;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      gap:6px;
+    }
+
+    .stats-mobile-metrics {
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+      gap:8px;
+    }
+
+    .stats-mobile-metric {
+      background:#f6f8fc;
+      border-radius:12px;
+      padding:9px 10px;
+      min-width:0;
+    }
+
+    .stats-mobile-metric-label {
+      font-size:0.68em;
+      color:#667085;
+      letter-spacing:0.04em;
+      text-transform:uppercase;
+    }
+
+    .stats-mobile-metric-value {
+      margin-top:3px;
+      font-size:1em;
+      font-weight:700;
+      color:#111827;
+    }
+
     /* ── Phase cards ── */
     .phase-card { text-align:center; padding:14px; background:#f8f9fa; border-radius:12px; margin:4px; }
     .phase-card .pval { font-size:1.8em; font-weight:700; }
@@ -89,6 +158,46 @@
       border:1px solid #ccc; border-radius:20px;
       padding:7px 14px; font-size:0.88em; cursor:pointer;
       background:#fff; outline:none;
+    }
+
+    #teamTableContent,
+    #playerHistoryContent {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    @media (max-width: 768px) {
+      .main-tab-btn {
+        flex: 1 1 calc(50% - 6px);
+        margin-right: 0;
+      }
+
+      .scard {
+        flex: 1 1 calc(50% - 12px);
+        min-width: 140px;
+        margin: 0;
+      }
+
+      .team-row {
+        min-width: 720px;
+      }
+
+      .mh-row {
+        min-width: 860px;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .main-tab-btn,
+      .scard,
+      .phase-card {
+        flex: 1 1 100% !important;
+        width: 100%;
+      }
+
+      .pill-btn {
+        margin-right: 0;
+      }
     }
   </style>
 </head>
@@ -270,6 +379,6 @@
   </div><!-- /content -->
 
 <script src="js/config.js?v=20260428a"></script>
-<script src="js/stats.js?v=20260311b"></script>
+<script src="js/stats.js?v=20260508a"></script>
 </body>
 </html>

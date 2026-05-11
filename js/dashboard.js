@@ -2514,6 +2514,7 @@ function renderReportWithFilters(scope, rows) {
 
 function renderReportTable(rows, scope) {
   const header = `
+    <div class="table-scroll report-table-scroll">
     <table class="w3-table-all w3-small w3-round-xxlarge">
       <thead>
         <tr class="w3-light-gray">
@@ -2545,7 +2546,7 @@ function renderReportTable(rows, scope) {
     `
     )
     .join("");
-  return header + body + "</tbody></table>";
+  return header + body + "</tbody></table></div>";
 }
 
 function getReportFilteredData(scope) {
@@ -4426,10 +4427,13 @@ async function openEditCoachAssignment(a) {
   if (btn) btn.textContent = "Actualizar asignación";
   if (cancelBtn) cancelBtn.style.display = "inline-block";
 
+  const coachSel = document.getElementById("caCoach");
   const academySel = document.getElementById("caAcademy");
   const categorySel = document.getElementById("caCategory");
   const levelSel = document.getElementById("caLevel");
 
+  await loadCoachesSelect("caCoach");
+  if (coachSel) coachSel.value = a.coach_user_id ? String(a.coach_user_id) : "";
   if (academySel) academySel.value = String(a.academy_id || "");
   await loadCategoriesSelect(a.academy_id, "caCategory");
   if (categorySel) categorySel.value = a.category_id ? String(a.category_id) : "";
@@ -5233,6 +5237,7 @@ async function removeAthleteAssignment(athleteId, assignmentId) {
 }
 
 function openCreateAthlete() {
+  const defaultDiscipline = "Fútbol";
   const ids = [
     "aFirst",
     "aLast",
@@ -5254,6 +5259,9 @@ function openCreateAthlete() {
 
   const selAcademy = document.getElementById("aAcademy");
   if (selAcademy) selAcademy.value = "";
+
+  const disciplineInput = document.getElementById("aDiscipline");
+  if (disciplineInput) disciplineInput.value = defaultDiscipline;
 
   document.getElementById("aMsg").textContent = "";
   document.getElementById("modalCreateAthlete").style.display = "block";

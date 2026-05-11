@@ -137,6 +137,8 @@ function openCreateCoach() {
   document.getElementById("coachEditId").value = "";
   document.getElementById("coachModalTitle").textContent = "Nuevo entrenador";
   document.getElementById("coachUserId").value = "";
+  document.getElementById("coachUserId").disabled = false;
+  document.getElementById("coachUserId").style.display = "";
   document.getElementById("coachUserIdHidden").value = "";
   document.getElementById("coachFullName").value = "";
   document.getElementById("coachIdNumber").value = "";
@@ -164,8 +166,10 @@ function closeCreateCoach() {
 function openEditCoach(coach) {
   document.getElementById("coachEditId").value = coach.id;
   document.getElementById("coachModalTitle").textContent = "Editar entrenador";
+  document.getElementById("coachUserId").style.display = "";
   document.getElementById("coachUserId").value = coach.user_id;
   document.getElementById("coachUserId").disabled = true; // No cambiar usuario en edición
+  document.getElementById("coachUserIdHidden").value = "";
   document.getElementById("coachFullName").value = coach.full_name;
   document.getElementById("coachIdNumber").value = coach.id_number || "";
   document.getElementById("coachPhone").value = coach.phone || "";
@@ -372,6 +376,8 @@ async function loadCoachProfile() {
         `;
         document.getElementById("btnCoachCreate").style.display = "block";
         document.getElementById("btnCoachEdit").style.display = "none";
+        window.currentCoachId = null;
+        window.currentCoachProfile = null;
         window.currentCoachUserId = userId;
         return;
       }
@@ -398,6 +404,7 @@ async function loadCoachProfile() {
       document.getElementById("btnCoachCreate").style.display = "none";
       document.getElementById("btnCoachEdit").style.display = "block";
       window.currentCoachId = coach.id;
+      window.currentCoachProfile = coach;
       window.currentCoachUserId = userId;
     } catch (e) {
       infoDiv.innerHTML = `<div class="w3-center w3-text-red w3-small">❌ Error: ${e.message}</div>`;
@@ -423,6 +430,7 @@ function openCreateCoachProfile() {
   document.getElementById("coachIdNumber").value = "";
   document.getElementById("coachPhone").value = "";
   document.getElementById("coachNotes").value = "";
+  document.getElementById("coachMsg").textContent = "";
 
   // For coaches: auto-populate user_id from token and use hidden input
   const token = localStorage.getItem("token");
@@ -433,10 +441,14 @@ function openCreateCoachProfile() {
       
       // Hide admin select, use hidden input instead
       const adminDiv = document.getElementById("coachUserIdAdmin");
+      const userIdSelect = document.getElementById("coachUserId");
       const hiddenInput = document.getElementById("coachUserIdHidden");
       
-      if (adminDiv && hiddenInput) {
+      if (adminDiv && hiddenInput && userIdSelect) {
         adminDiv.style.display = "none";
+        userIdSelect.disabled = false;
+        userIdSelect.style.display = "none";
+        userIdSelect.value = "";
         hiddenInput.value = userId;
         console.log("✅ Coach form - user_id set to:", userId);
       }
@@ -458,13 +470,31 @@ function openEditCoachProfile() {
   const modal = document.getElementById("modalCreateCoach");
   if (!modal) return;
 
+  const coach = window.currentCoachProfile;
+  if (!coach || !coach.id) {
+    console.error("❌ No current coach profile loaded for edit");
+    return;
+  }
+
   document.getElementById("coachModalTitle").textContent = "Editar mi Perfil";
-  document.getElementById("coachEditId").value = window.currentCoachId || "";
+  document.getElementById("coachEditId").value = coach.id;
+  document.getElementById("coachUserIdHidden").value = window.currentCoachUserId || coach.user_id || "";
+  document.getElementById("coachFullName").value = coach.full_name || "";
+  document.getElementById("coachIdNumber").value = coach.id_number || "";
+  document.getElementById("coachPhone").value = coach.phone || "";
+  document.getElementById("coachNotes").value = coach.notes || "";
+  document.getElementById("coachMsg").textContent = "";
 
   // Hide user select for coaches
+  const adminDiv = document.getElementById("coachUserIdAdmin");
   const userIdSelect = document.getElementById("coachUserId");
+  if (adminDiv) {
+    adminDiv.style.display = "none";
+  }
   if (userIdSelect) {
+    userIdSelect.disabled = false;
     userIdSelect.style.display = "none";
+    userIdSelect.value = "";
   }
 
   modal.style.display = "block";

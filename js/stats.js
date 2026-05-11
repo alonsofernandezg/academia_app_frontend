@@ -16,11 +16,38 @@ let token = localStorage.getItem("token");
 let teamPeriod = "all";
 let teamVenue = "all";
 let teamLevelId = null;
+let lastTeamStats = [];
 
 // Player tab state
 let playerPeriod = "all";
 let playerVenue = "all";
 let currentAthleteId = null;
+let lastMatchHistory = [];
+let responsiveStatsRerenderFrame = null;
+
+function isCompactStatsMobile() {
+  return window.matchMedia("(max-width: 540px)").matches;
+}
+
+function scheduleResponsiveStatsRerender() {
+  if (responsiveStatsRerenderFrame !== null) {
+    window.cancelAnimationFrame(responsiveStatsRerenderFrame);
+  }
+
+  responsiveStatsRerenderFrame = window.requestAnimationFrame(() => {
+    responsiveStatsRerenderFrame = null;
+
+    if (lastTeamStats.length) {
+      renderTeamTable(lastTeamStats);
+    }
+
+    if (lastMatchHistory.length) {
+      renderMatchHistory(lastMatchHistory);
+    }
+  });
+}
+
+window.addEventListener("resize", scheduleResponsiveStatsRerender);
 
 function authHeaders() {
   return { "Content-Type": "application/json", "Authorization": `Bearer ${token}` };
@@ -149,6 +176,7 @@ async function loadTeamStats() {
       return;
     }
 
+    lastTeamStats = data.team_stats;
     renderTeamSummaryCards(data.team_stats);
     renderTeamTable(data.team_stats);
     renderGoalsByPhase(data.goals_by_phase, "teamGoalsPhase");
@@ -232,6 +260,7 @@ async function loadPlayerStats() {
     }
 
     document.getElementById("playerNameHeader").textContent = `👤 ${data.name}`;
+  lastMatchHistory = data.match_history || [];
     renderPlayerSummary(data.summary);
     renderMatchHistory(data.match_history);
     document.getElementById("playerData").classList.remove("w3-hide");
@@ -274,11 +303,46 @@ function renderTeamSummaryCards(teams) {
 // ══════════════════════════════════════════════
 // RENDER: TEAM TABLE
 // ══════════════════════════════════════════════
+function renderTeamCards(teams) {
+  return `
+    <div class="stats-mobile-card-list">
+      ${teams.map((team) => {
+        const goalDiff = team.goals_for - team.goals_against;
+        const goalDiffColor = goalDiff > 0 ? "#2e7d32" : goalDiff < 0 ? "#c62828" : "#555";
+        const goalDiffLabel = `${goalDiff > 0 ? "+" : ""}${goalDiff}`;
+        return `
+          <article class="stats-mobile-card">
+            <div class="stats-mobile-card-head">
+              <div>
+                <div class="stats-mobile-card-title">${team.category_name}</div>
+                <div class="stats-mobile-card-subtitle">${team.level_name}</div>
+              </div>
+              <span class="badge" style="background:#eef4ff;color:${goalDiffColor}">Dif ${goalDiffLabel}</span>
+            </div>
+            <div class="stats-mobile-metrics">
+              <div class="stats-mobile-metric"><div class="stats-mobile-metric-label">Partidos</div><div class="stats-mobile-metric-value">${team.matches_played}</div></div>
+              <div class="stats-mobile-metric"><div class="stats-mobile-metric-label">Victorias</div><div class="stats-mobile-metric-value" style="color:#2e7d32">${team.won}</div></div>
+              <div class="stats-mobile-metric"><div class="stats-mobile-metric-label">Empates</div><div class="stats-mobile-metric-value" style="color:#f57f17">${team.drawn}</div></div>
+              <div class="stats-mobile-metric"><div class="stats-mobile-metric-label">Derrotas</div><div class="stats-mobile-metric-value" style="color:#c62828">${team.lost}</div></div>
+              <div class="stats-mobile-metric"><div class="stats-mobile-metric-label">Goles a favor</div><div class="stats-mobile-metric-value">${team.goals_for}</div></div>
+              <div class="stats-mobile-metric"><div class="stats-mobile-metric-label">Goles en contra</div><div class="stats-mobile-metric-value">${team.goals_against}</div></div>
+            </div>
+          </article>`;
+      }).join("")}
+    </div>`;
+}
+
 function renderTeamTable(teams) {
   if (!teams.length) {
     document.getElementById("teamTableContent").innerHTML = `<div class="w3-center w3-text-gray w3-small w3-padding">Sin datos.</div>`;
     return;
   }
+
+  if (isCompactStatsMobile()) {
+    document.getElementById("teamTableContent").innerHTML = renderTeamCards(teams);
+    return;
+  }
+
   let html = `
     <div class="team-row hdr">
       <div>Equipo</div><div>PJ</div><div>G</div><div>E</div><div>P</div>
@@ -360,12 +424,54 @@ function renderPlayerSummary(s) {
 // ══════════════════════════════════════════════
 // RENDER: MATCH HISTORY
 // ══════════════════════════════════════════════
+function renderMatchHistoryCards(history) {
+  return `
+    <div class="stats-mobile-card-list">
+      ${history.map((match) => {
+        const dateStr = match.date
+          ? new Date(match.date).toLocaleDateString("es", { day: "2-digit", month: "short", year: "numeric" })
+          : "—";
+        const venueLabel = match.venue === "visitante" ? "Visita" : "Local";
+        return `
+          <article class="stats-mobile-card">
+            <div class="stats-mobile-card-head">
+              <div>
+                <div class="stats-mobile-card-title">${match.title || "Partido"}</div>
+                <div class="stats-mobile-card-subtitle">
+                  ${dateStr}<br>
+                  ${match.team}${match.opponent ? ` · vs ${match.opponent}` : ""}
+                </div>
+              </div>
+              <div class="stats-mobile-card-badges">
+                <span class="badge ${match.venue === "visitante" ? "visitante" : "local"}">${venueLabel}</span>
+                ${match.is_mvp ? '<span class="badge won">MVP</span>' : ""}
+              </div>
+            </div>
+            <div class="stats-mobile-metrics">
+              <div class="stats-mobile-metric"><div class="stats-mobile-metric-label">Goles</div><div class="stats-mobile-metric-value" style="color:#1976d2">${match.goals || 0}</div></div>
+              <div class="stats-mobile-metric"><div class="stats-mobile-metric-label">Asistencias</div><div class="stats-mobile-metric-value">${match.assists || 0}</div></div>
+              <div class="stats-mobile-metric"><div class="stats-mobile-metric-label">Minutos</div><div class="stats-mobile-metric-value">${fmtMin(match.minutes)}</div></div>
+              <div class="stats-mobile-metric"><div class="stats-mobile-metric-label">Amarillas</div><div class="stats-mobile-metric-value">${match.yellow_cards || 0}</div></div>
+              <div class="stats-mobile-metric"><div class="stats-mobile-metric-label">Rojas</div><div class="stats-mobile-metric-value">${match.red_card ? 1 : 0}</div></div>
+              <div class="stats-mobile-metric"><div class="stats-mobile-metric-label">MVP</div><div class="stats-mobile-metric-value">${match.is_mvp ? "Si" : "No"}</div></div>
+            </div>
+          </article>`;
+      }).join("")}
+    </div>`;
+}
+
 function renderMatchHistory(history) {
   if (!history || history.length === 0) {
     document.getElementById("playerHistoryContent").innerHTML =
       `<div class="w3-center w3-text-gray w3-small w3-padding">Sin partidos registrados.</div>`;
     return;
   }
+
+  if (isCompactStatsMobile()) {
+    document.getElementById("playerHistoryContent").innerHTML = renderMatchHistoryCards(history);
+    return;
+  }
+
   let html = `
     <div class="mh-row hdr">
       <div>Fecha</div><div>Partido / Equipo</div><div>Localía</div>
