@@ -25,6 +25,14 @@ let currentAthleteId = null;
 let lastMatchHistory = [];
 let responsiveStatsRerenderFrame = null;
 
+function normalizeVenue(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function isAwayVenue(value) {
+  return normalizeVenue(value) === "visita";
+}
+
 function isCompactStatsMobile() {
   return window.matchMedia("(max-width: 540px)").matches;
 }
@@ -150,7 +158,7 @@ function setTeamPeriod(p) {
 
 function setTeamVenue(v) {
   teamVenue = v;
-  ["all", "local", "visitante"].forEach(k =>
+  ["all", "local", "visita"].forEach(k =>
     document.getElementById(`tv-${k}`).classList.toggle("active-venue", k === v)
   );
   loadTeamStats();
@@ -233,7 +241,7 @@ function setPlayerPeriod(p) {
 
 function setPlayerVenue(v) {
   playerVenue = v;
-  ["all", "local", "visitante"].forEach(k =>
+  ["all", "local", "visita"].forEach(k =>
     document.getElementById(`pv-${k}`).classList.toggle("active-venue", k === v)
   );
   if (currentAthleteId) loadPlayerStats();
@@ -431,7 +439,8 @@ function renderMatchHistoryCards(history) {
         const dateStr = match.date
           ? new Date(match.date).toLocaleDateString("es", { day: "2-digit", month: "short", year: "numeric" })
           : "—";
-        const venueLabel = match.venue === "visitante" ? "Visita" : "Local";
+        const awayVenue = isAwayVenue(match.venue);
+        const venueLabel = awayVenue ? "Visita" : "Local";
         return `
           <article class="stats-mobile-card">
             <div class="stats-mobile-card-head">
@@ -443,7 +452,7 @@ function renderMatchHistoryCards(history) {
                 </div>
               </div>
               <div class="stats-mobile-card-badges">
-                <span class="badge ${match.venue === "visitante" ? "visitante" : "local"}">${venueLabel}</span>
+                <span class="badge ${awayVenue ? "visita" : "local"}">${venueLabel}</span>
                 ${match.is_mvp ? '<span class="badge won">MVP</span>' : ""}
               </div>
             </div>
@@ -487,7 +496,7 @@ function renderMatchHistory(history) {
           ${m.opponent ? `<span style="font-size:0.78em;color:#777"> vs ${m.opponent}</span>` : ""}
           <br><span style="font-size:0.74em;color:#999">${m.team}</span>
         </div>
-        <div><span class="badge ${m.venue === "visitante" ? "visitante" : "local"}">${m.venue === "visitante" ? "Visita" : "Local"}</span></div>
+        <div><span class="badge ${isAwayVenue(m.venue) ? "visita" : "local"}">${isAwayVenue(m.venue) ? "Visita" : "Local"}</span></div>
         <div style="font-weight:600;color:#1976d2">${m.goals}</div>
         <div>${m.assists}</div>
         <div style="font-size:0.82em">${fmtMin(m.minutes)}</div>
