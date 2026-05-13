@@ -1234,6 +1234,70 @@ function halfLabel(half) {
   return map[half] || half;
 }
 
+function normalizeGoalHalf(half) {
+  const normalized = String(half || "").trim().toLowerCase();
+  const map = {
+    first: "first",
+    "1t": "first",
+    second: "second",
+    "2t": "second",
+    extra_first: "extra_first",
+    te1: "extra_first",
+    extra_second: "extra_second",
+    te2: "extra_second",
+  };
+  return map[normalized] || null;
+}
+
+function normalizeGoalEntry(goal) {
+  if (!goal) return null;
+
+  const half = normalizeGoalHalf(goal.half);
+  if (!half) return null;
+
+  const rawMinute = goal.minute;
+  if (rawMinute === null || rawMinute === undefined || rawMinute === "") {
+    return { half, minute: null };
+  }
+
+  const minute = parseInt(rawMinute, 10);
+  if (!Number.isInteger(minute) || minute < 1 || minute > 120) {
+    return null;
+  }
+
+  return { half, minute };
+}
+
+function buildApiErrorMessage(payload, fallback) {
+  if (!payload) return fallback;
+
+  if (typeof payload.detail === "string" && payload.detail.trim()) {
+    return payload.detail;
+  }
+
+  if (Array.isArray(payload.detail) && payload.detail.length > 0) {
+    const messages = payload.detail
+      .map(item => {
+        if (typeof item === "string") return item;
+        if (!item || typeof item !== "object") return null;
+
+        const location = Array.isArray(item.loc)
+          ? item.loc.slice(1).join(" > ")
+          : "";
+
+        if (location && item.msg) return `${location}: ${item.msg}`;
+        return item.msg || null;
+      })
+      .filter(Boolean);
+
+    if (messages.length > 0) {
+      return messages.join(" | ");
+    }
+  }
+
+  return fallback;
+}
+
 function resultLabel(result) {
   const map = {
     won: { text: "Victoria", color: "w3-green", icon: "🏆" },
@@ -1517,7 +1581,9 @@ function initPlayerGoalsMap() {
   currentStatsPlayers.forEach(p => {
     const cpId = p.id;
     const existingPs = currentMatchStats?.player_stats?.find(ps => ps.callup_player_id === cpId);
-    playerGoalsMap[cpId] = (existingPs?.goals || []).map(g => ({ half: g.half, minute: g.minute }));
+    playerGoalsMap[cpId] = (existingPs?.goals || [])
+      .map(normalizeGoalEntry)
+      .filter(Boolean);
   });
 }
 
@@ -1609,6 +1675,7 @@ async function saveMatchStats() {
 
   // Collect player stats
   const playerStats = [];
+  let hasInvalidGoals = false;
 
   currentStatsPlayers.forEach(p => {
     const cpId = p.id;
@@ -1621,7 +1688,13 @@ async function saveMatchStats() {
     const assists = parseInt(assistsInput?.value) || 0;
     const yellowCards = parseInt(yellowSelect?.value) || 0;
     const redCard = redCheckbox?.checked || false;
-    const goals = playerGoalsMap[cpId] || [];
+    const goals = (playerGoalsMap[cpId] || []).map(goal => {
+      const normalizedGoal = normalizeGoalEntry(goal);
+      if (!normalizedGoal) {
+        hasInvalidGoals = true;
+      }
+      return normalizedGoal;
+    }).filter(Boolean);
 
     playerStats.push({
       callup_player_id: cpId,
@@ -1643,25 +1716,37 @@ async function saveMatchStats() {
   const msgEl = document.getElementById("statsMsg");
 
   try {
+    if (hasInvalidGoals) {
+      throw new Error("Hay goles con tiempo o minuto invalido. Revise los goles y vuelva a guardar.");
+    }
+
     const res = await fetch(`${API_URL}/callups/${currentStatsCallupId}/stats/players`, {
       method: "PUT",
       headers: authHeaders(),
       body: JSON.stringify(payload)
     });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.detail || "Error al guardar");
+    const contentType = res.headers.get("content-type") || "";
+    const data = contentType.includes("application/json")
+      ? await res.json()
+      : { detail: await res.text() };
+
+    if (!res.ok) {
+      throw new Error(buildApiErrorMessage(data, "Error al guardar"));
+    }
 
     // Update current stats and re-render
     currentMatchStats = data;
     initPlayerGoalsMap(); // Reset from saved data
     renderMatchStatsPanel();
 
-    if (msgEl) {
-      msgEl.innerHTML = `<div class="w3-text-green">✅ Estadísticas guardadas correctamente.</div>`;
+    const currentMsgEl = document.getElementById("statsMsg") || msgEl;
+    if (currentMsgEl) {
+      currentMsgEl.innerHTML = `<div class="w3-text-green">✅ Estadísticas guardadas correctamente.</div>`;
     }
   } catch (err) {
-    if (msgEl) {
-      msgEl.innerHTML = `<div class="w3-text-red">❌ ${err.message}</div>`;
+    const currentMsgEl = document.getElementById("statsMsg") || msgEl;
+    if (currentMsgEl) {
+      currentMsgEl.innerHTML = `<div class="w3-text-red">❌ ${err.message}</div>`;
     }
   }
 }
