@@ -8,6 +8,60 @@ const API_BASE = (() => {
 })();
 window.API_BASE = API_BASE;
 
+const AUTH_MESSAGES = ["logMsg", "regMsg", "verMsg", "fpMsg", "cpMsg"];
+
+function setMessage(box, kind, text) {
+  if (!box) return;
+  box.className = "auth-message w3-center w3-small w3-margin-top";
+  if (kind === "success") box.classList.add("ok");
+  if (kind === "error") box.classList.add("err");
+  box.textContent = text || "";
+}
+
+function setButtonPending(button, pending, loadingText) {
+  if (!button) return;
+  if (!button.dataset.defaultText) {
+    button.dataset.defaultText = button.textContent.trim();
+  }
+  button.disabled = pending;
+  button.setAttribute("aria-busy", pending ? "true" : "false");
+  button.textContent = pending ? loadingText : button.dataset.defaultText;
+}
+
+function focusFirstField(view) {
+  const target = document.getElementById(`view-${view}`);
+  if (!target) return;
+  const firstField = target.querySelector("input, select, textarea, button");
+  if (firstField) firstField.focus();
+}
+
+function bindAuthNavigation() {
+  document.querySelectorAll("[data-go-view]").forEach((button) => {
+    button.addEventListener("click", () => go(button.dataset.goView));
+  });
+  document.querySelectorAll("[data-auth-logout]").forEach((button) => {
+    button.addEventListener("click", onLogout);
+  });
+}
+
+function bindAuthForms() {
+  const bindings = [
+    ["loginForm", onLogin],
+    ["registerForm", onRegister],
+    ["verifyForm", onVerify],
+    ["forgotForm", onForgot],
+    ["changePasswordForm", onChangePassword],
+  ];
+  bindings.forEach(([formId, handler]) => {
+    const form = document.getElementById(formId);
+    if (!form) return;
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      await handler();
+    });
+  });
+}
+
 // --- Router de vistas ---
 function go(view) {
   document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
@@ -15,10 +69,12 @@ function go(view) {
   if (target) target.classList.add("active");
 
   // limpiar mensajes
-  ["logMsg","regMsg","verMsg","fpMsg","cpMsg"].forEach(id=>{
-    const el = document.getElementById(id); if (el) el.textContent="";
+  AUTH_MESSAGES.forEach((id) => {
+    const el = document.getElementById(id);
+    setMessage(el, null, "");
   });
   setAuthStatus();
+  focusFirstField(view);
 }
 
 // --- Estado de sesión en encabezado ---
@@ -34,11 +90,12 @@ function setAuthStatus() {
     const payload = JSON.parse(atob(token.split(".")[1]));
     const email = payload.sub || "";
     const role = localStorage.getItem("role") || "general";
-    el.innerHTML = `✅ Sesión activa: <b>${email}</b> · Rol: <b>${role}</b> 
-      <br><a href="#" class="link" onclick="onLogout()">Cerrar sesión</a>`;
+    el.innerHTML = `✅ Sesión activa: <b>${email}</b> · Rol: <b>${role}</b>
+      <br><button type="button" class="link-button" id="authStatusLogout">Cerrar sesión</button>`;
   } catch {
-    el.innerHTML = `✅ Sesión activa · <a href="#" class="link" onclick="onLogout()">Cerrar sesión</a>`;
+    el.innerHTML = `✅ Sesión activa · <button type="button" class="link-button" id="authStatusLogout">Cerrar sesión</button>`;
   }
+  document.getElementById("authStatusLogout")?.addEventListener("click", onLogout);
 }
 
 // --- LOGIN ---
@@ -46,9 +103,11 @@ async function onLogin() {
   const email = document.getElementById("logEmail").value.trim();
   const password = document.getElementById("logPass").value;
   const box = document.getElementById("logMsg");
-  box.textContent = "";
+  const submitBtn = document.getElementById("logSubmitBtn");
+  setMessage(box, null, "");
 
   try {
+    setButtonPending(submitBtn, true, "Ingresando...");
     const res = await fetch(`${API_BASE}/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -60,15 +119,15 @@ async function onLogin() {
     localStorage.setItem("token", data.access_token);
     localStorage.setItem("role", data.role || "general");
 
-    box.className = "ok w3-small w3-center";
-    box.textContent = "✅ Login exitoso, redirigiendo...";
+    setMessage(box, "success", "Inicio de sesión exitoso. Redirigiendo...");
 
     setTimeout(() => {
       window.location.href = "dashboard.html";
     }, 1000);
   } catch (err) {
-    box.className = "err w3-small w3-center";
-    box.textContent = err.message;
+    setMessage(box, "error", err.message);
+  } finally {
+    setButtonPending(submitBtn, false, "Ingresando...");
   }
 }
 
@@ -78,15 +137,16 @@ async function onRegister() {
   const password = document.getElementById("regPass").value;
   const confirm = document.getElementById("regConfirm").value;
   const box = document.getElementById("regMsg");
-  box.textContent = "";
+  const submitBtn = document.getElementById("regSubmitBtn");
+  setMessage(box, null, "");
 
   if (password !== confirm) {
-    box.className = "err w3-small w3-center";
-    box.textContent = "Las contraseñas no coinciden";
+    setMessage(box, "error", "Las contraseñas no coinciden.");
     return;
   }
 
   try {
+    setButtonPending(submitBtn, true, "Creando cuenta...");
     const res = await fetch(`${API_BASE}/auth/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -95,13 +155,13 @@ async function onRegister() {
     const data = await res.json();
     if (!res.ok) throw new Error(data.detail || "Error al registrar");
 
-    box.className = "ok w3-small w3-center";
-    box.textContent = "✅ Cuenta creada. Revisa tu correo para verificar.";
+    setMessage(box, "success", "Cuenta creada. Revisa tu correo para verificarla.");
     document.getElementById("verEmail").value = email;
     setTimeout(() => go("verify"), 800);
   } catch (err) {
-    box.className = "err w3-small w3-center";
-    box.textContent = err.message;
+    setMessage(box, "error", err.message);
+  } finally {
+    setButtonPending(submitBtn, false, "Creando cuenta...");
   }
 }
 
@@ -110,9 +170,11 @@ async function onVerify() {
   const email = document.getElementById("verEmail").value.trim();
   const code = document.getElementById("verCode").value.trim();
   const box = document.getElementById("verMsg");
-  box.textContent = "";
+  const submitBtn = document.getElementById("verSubmitBtn");
+  setMessage(box, null, "");
 
   try {
+    setButtonPending(submitBtn, true, "Verificando...");
     const url = new URL(`${API_BASE}/auth/verify`);
     url.searchParams.set("email", email);
     url.searchParams.set("code", code);
@@ -120,12 +182,12 @@ async function onVerify() {
     const data = await res.json();
     if (!res.ok) throw new Error(data.detail || "Error de verificación");
 
-    box.className = "ok w3-small w3-center";
-    box.textContent = "OK. " + data.message + " Redirigiendo al inicio de sesiA3n...";
+    setMessage(box, "success", `${data.message} Redirigiendo al inicio de sesión...`);
     setTimeout(() => go("login"), 800);
   } catch (err) {
-    box.className = "err w3-small w3-center";
-    box.textContent = err.message;
+    setMessage(box, "error", err.message);
+  } finally {
+    setButtonPending(submitBtn, false, "Verificando...");
   }
 }
 
@@ -133,9 +195,11 @@ async function onVerify() {
 async function onForgot() {
   const email = document.getElementById("fpEmail").value.trim();
   const box = document.getElementById("fpMsg");
-  box.textContent = "";
+  const submitBtn = document.getElementById("fpSubmitBtn");
+  setMessage(box, null, "");
 
   try {
+    setButtonPending(submitBtn, true, "Enviando enlace...");
     const res = await fetch(`${API_BASE}/auth/forgot-password`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -144,11 +208,11 @@ async function onForgot() {
     const data = await res.json();
     if (!res.ok) throw new Error(data.detail || "Error al enviar correo");
 
-    box.className = "ok w3-small w3-center";
-    box.textContent = "📩 Correo enviado. Revisa tu bandeja.";
+    setMessage(box, "success", "Correo enviado. Revisa tu bandeja.");
   } catch (err) {
-    box.className = "err w3-small w3-center";
-    box.textContent = err.message;
+    setMessage(box, "error", err.message);
+  } finally {
+    setButtonPending(submitBtn, false, "Enviando enlace...");
   }
 }
 
@@ -156,11 +220,11 @@ async function onForgot() {
 async function onChangePassword() {
   const token = localStorage.getItem("token");
   const box = document.getElementById("cpMsg");
-  box.textContent = "";
+  const submitBtn = document.getElementById("cpSubmitBtn");
+  setMessage(box, null, "");
 
   if (!token) {
-    box.className = "err w3-small w3-center";
-    box.textContent = "Debes iniciar sesión primero.";
+    setMessage(box, "error", "Debes iniciar sesión primero.");
     return;
   }
 
@@ -169,12 +233,12 @@ async function onChangePassword() {
   const confirm = document.getElementById("cpConfirm").value;
 
   if (new_password !== confirm) {
-    box.className = "err w3-small w3-center";
-    box.textContent = "Las contraseñas nuevas no coinciden";
+    setMessage(box, "error", "Las contraseñas nuevas no coinciden.");
     return;
   }
 
   try {
+    setButtonPending(submitBtn, true, "Actualizando...");
     const res = await fetch(`${API_BASE}/auth/change-password`, {
       method: "POST",
       headers: {
@@ -186,12 +250,12 @@ async function onChangePassword() {
     const data = await res.json();
     if (!res.ok) throw new Error(data.detail || "Error al cambiar contraseña");
 
-    box.className = "ok w3-small w3-center";
-    box.textContent = "OK. " + data.message + " Redirigiendo al inicio de sesiA3n...";
+    setMessage(box, "success", `${data.message} Redirigiendo al inicio de sesión...`);
     setTimeout(() => go("login"), 800);
   } catch (err) {
-    box.className = "err w3-small w3-center";
-    box.textContent = err.message;
+    setMessage(box, "error", err.message);
+  } finally {
+    setButtonPending(submitBtn, false, "Actualizando...");
   }
 }
 
@@ -204,6 +268,8 @@ function onLogout() {
 
 // Entrada inicial
 document.addEventListener("DOMContentLoaded", () => {
+  bindAuthNavigation();
+  bindAuthForms();
   setAuthStatus();
   go("login");
 });

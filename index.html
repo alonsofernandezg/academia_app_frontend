@@ -13,7 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 
   <!-- Estilos propios -->
-  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="css/style.css?v=20260515a"/>
 </head>
 <body class="bg">
 
@@ -30,7 +30,7 @@
             class="logo-image">
         </div>
         <!-- Logo already includes the brand text -->
-        <div id="authStatus" class="w3-small w3-margin-top w3-text-grey"></div>
+        <div id="authStatus" class="w3-small w3-margin-top w3-text-grey" role="status" aria-live="polite"></div>
       </div>
 
       <!-- Contenido intercambiable -->
@@ -39,54 +39,58 @@
         <!-- LOGIN (vista por defecto) -->
         <div id="view-login" class="view active">
           <h4 class="w3-text-dark-gray w3-margin-top-0">Iniciar sesión</h4>
-          <label class="w3-small w3-text-grey">Correo</label>
-          <input id="logEmail" class="w3-input w3-border w3-margin-bottom"
-                 type="email" placeholder="correo@ejemplo.com">
-          <label class="w3-small w3-text-grey">Contraseña</label>
-          <input id="logPass" class="w3-input w3-border"
-                 type="password" placeholder="••••••••">
+          <form id="loginForm" novalidate>
+            <label for="logEmail" class="w3-small w3-text-grey">Correo</label>
+            <input id="logEmail" class="w3-input w3-border w3-margin-bottom"
+                   type="email" placeholder="correo@ejemplo.com" autocomplete="email" aria-describedby="logMsg" required>
+            <label for="logPass" class="w3-small w3-text-grey">Contraseña</label>
+            <input id="logPass" class="w3-input w3-border"
+                   type="password" placeholder="••••••••" autocomplete="current-password" aria-describedby="logMsg" required>
 
-          <button class="w3-button w3-indigo w3-margin-top w3-block"
-                  onclick="onLogin()">Ingresar</button>
-          <div id="logMsg" class="w3-center w3-small w3-margin-top"></div>
+            <button id="logSubmitBtn" class="w3-button w3-indigo w3-margin-top w3-block"
+                    type="submit">Ingresar</button>
+            <div id="logMsg" class="auth-message w3-center w3-small w3-margin-top" role="status" aria-live="polite"></div>
+          </form>
 
           <div class="w3-center w3-margin-top w3-small">
             ¿No tienes cuenta?
-            <a href="#" class="link" onclick="go('register')">Crear una cuenta</a><br>
+            <button type="button" class="link-button" data-go-view="register">Crear una cuenta</button><br>
             ¿Olvidaste tu contraseña?
-            <a href="#" class="link" onclick="go('forgot')">Recuperarla</a><br>
+            <button type="button" class="link-button" data-go-view="forgot">Recuperarla</button><br>
             ¿Ya te registraste?
-            <a href="#" class="link" onclick="go('verify')">Verificar cuenta</a>
+            <button type="button" class="link-button" data-go-view="verify">Verificar cuenta</button>
           </div>
         </div>
 
         <!-- REGISTRO -->
         <div id="view-register" class="view">
           <h4 class="w3-text-dark-gray w3-margin-top-0">Crear cuenta</h4>
-          <label class="w3-small w3-text-grey">Correo</label>
-          <input id="regEmail" class="w3-input w3-border w3-margin-bottom"
-                 type="email" placeholder="correo@ejemplo.com">
+          <form id="registerForm" novalidate>
+            <label for="regEmail" class="w3-small w3-text-grey">Correo</label>
+            <input id="regEmail" class="w3-input w3-border w3-margin-bottom"
+                   type="email" placeholder="correo@ejemplo.com" autocomplete="email" aria-describedby="regMsg" required>
 
-          <div class="w3-row-padding no-left-right">
-            <div class="w3-half s12">
-              <label class="w3-small w3-text-grey">Contraseña</label>
-              <input id="regPass" class="w3-input w3-border"
-                     type="password" placeholder="Mín. 8 caracteres">
+            <div class="w3-row-padding no-left-right">
+              <div class="w3-half s12">
+                <label for="regPass" class="w3-small w3-text-grey">Contraseña</label>
+                <input id="regPass" class="w3-input w3-border"
+                       type="password" placeholder="Mín. 8 caracteres" autocomplete="new-password" aria-describedby="regMsg" required>
+              </div>
+              <div class="w3-half s12">
+                <label for="regConfirm" class="w3-small w3-text-grey">Confirmar contraseña</label>
+                <input id="regConfirm" class="w3-input w3-border"
+                       type="password" placeholder="Repite tu contraseña" autocomplete="new-password" aria-describedby="regMsg" required>
+              </div>
             </div>
-            <div class="w3-half s12">
-              <label class="w3-small w3-text-grey">Confirmar contraseña</label>
-              <input id="regConfirm" class="w3-input w3-border"
-                     type="password" placeholder="Repite tu contraseña">
-            </div>
-          </div>
 
-          <button class="w3-button w3-blue w3-margin-top w3-block"
-                  onclick="onRegister()">Crear cuenta</button>
-          <div id="regMsg" class="w3-center w3-small w3-margin-top"></div>
+            <button id="regSubmitBtn" class="w3-button w3-blue w3-margin-top w3-block"
+                    type="submit">Crear cuenta</button>
+            <div id="regMsg" class="auth-message w3-center w3-small w3-margin-top" role="status" aria-live="polite"></div>
+          </form>
 
           <div class="w3-center w3-small w3-margin-top">
             ¿Ya tienes cuenta?
-            <a href="#" class="link" onclick="go('login')">Ingresar</a>
+            <button type="button" class="link-button" data-go-view="login">Ingresar</button>
           </div>
         </div>
 
@@ -96,37 +100,41 @@
           <p class="w3-small w3-text-grey">
             Te enviamos un código a tu correo. Ingrésalo para activar tu cuenta.
           </p>
-          <label class="w3-small w3-text-grey">Correo</label>
-          <input id="verEmail" class="w3-input w3-border w3-margin-bottom"
-                 type="email" placeholder="correo@ejemplo.com">
-          <label class="w3-small w3-text-grey">Código de verificación</label>
-          <input id="verCode" class="w3-input w3-border"
-                 type="text" placeholder="p. ej. CwN0_H0F...">
+          <form id="verifyForm" novalidate>
+            <label for="verEmail" class="w3-small w3-text-grey">Correo</label>
+            <input id="verEmail" class="w3-input w3-border w3-margin-bottom"
+                   type="email" placeholder="correo@ejemplo.com" autocomplete="email" aria-describedby="verMsg" required>
+            <label for="verCode" class="w3-small w3-text-grey">Código de verificación</label>
+            <input id="verCode" class="w3-input w3-border"
+                   type="text" placeholder="p. ej. CwN0_H0F..." aria-describedby="verMsg" required>
 
-          <button class="w3-button w3-blue w3-margin-top w3-block"
-                  onclick="onVerify()">Verificar</button>
-          <div id="verMsg" class="w3-center w3-small w3-margin-top"></div>
+            <button id="verSubmitBtn" class="w3-button w3-blue w3-margin-top w3-block"
+                    type="submit">Verificar</button>
+            <div id="verMsg" class="auth-message w3-center w3-small w3-margin-top" role="status" aria-live="polite"></div>
+          </form>
 
           <div class="w3-center w3-small w3-margin-top">
             ¿Aún no tienes cuenta?
-            <a href="#" class="link" onclick="go('register')">Crear cuenta</a> ·
-            <a href="#" class="link" onclick="go('login')">Volver a ingresar</a>
+            <button type="button" class="link-button" data-go-view="register">Crear cuenta</button> ·
+            <button type="button" class="link-button" data-go-view="login">Volver a ingresar</button>
           </div>
         </div>
 
         <!-- OLVIDÉ MI CONTRASEÑA -->
         <div id="view-forgot" class="view">
           <h4 class="w3-text-dark-gray w3-margin-top-0">Recuperar contraseña</h4>
-          <label class="w3-small w3-text-grey">Correo</label>
-          <input id="fpEmail" class="w3-input w3-border"
-                 type="email" placeholder="correo@ejemplo.com">
+          <form id="forgotForm" novalidate>
+            <label for="fpEmail" class="w3-small w3-text-grey">Correo</label>
+            <input id="fpEmail" class="w3-input w3-border"
+                   type="email" placeholder="correo@ejemplo.com" autocomplete="email" aria-describedby="fpMsg" required>
 
-          <button class="w3-button w3-indigo w3-margin-top w3-block"
-                  onclick="onForgot()">Enviar enlace</button>
-          <div id="fpMsg" class="w3-center w3-small w3-margin-top"></div>
+            <button id="fpSubmitBtn" class="w3-button w3-indigo w3-margin-top w3-block"
+                    type="submit">Enviar enlace</button>
+            <div id="fpMsg" class="auth-message w3-center w3-small w3-margin-top" role="status" aria-live="polite"></div>
+          </form>
 
           <div class="w3-center w3-small w3-margin-top">
-            <a href="#" class="link" onclick="go('login')">Volver a ingresar</a>
+            <button type="button" class="link-button" data-go-view="login">Volver a ingresar</button>
           </div>
         </div>
 
@@ -136,28 +144,30 @@
             Cambiar contraseña
           </div>
 
-          <label class="w3-small w3-text-grey">Contraseña actual</label>
-          <input id="cpCurrent" class="w3-input w3-border"
-                 type="password" placeholder="••••••••">
+          <form id="changePasswordForm" novalidate>
+            <label for="cpCurrent" class="w3-small w3-text-grey">Contraseña actual</label>
+            <input id="cpCurrent" class="w3-input w3-border"
+                   type="password" placeholder="••••••••" autocomplete="current-password" aria-describedby="cpMsg" required>
 
-          <div class="w3-row-padding no-left-right">
-            <div class="w3-half s12">
-              <label class="w3-small w3-text-grey">Nueva contraseña</label>
-              <input id="cpNew" class="w3-input w3-border" type="password">
+            <div class="w3-row-padding no-left-right">
+              <div class="w3-half s12">
+                <label for="cpNew" class="w3-small w3-text-grey">Nueva contraseña</label>
+                <input id="cpNew" class="w3-input w3-border" type="password" autocomplete="new-password" aria-describedby="cpMsg" required>
+              </div>
+              <div class="w3-half s12">
+                <label for="cpConfirm" class="w3-small w3-text-grey">Confirmar nueva</label>
+                <input id="cpConfirm" class="w3-input w3-border" type="password" autocomplete="new-password" aria-describedby="cpMsg" required>
+              </div>
             </div>
-            <div class="w3-half s12">
-              <label class="w3-small w3-text-grey">Confirmar nueva</label>
-              <input id="cpConfirm" class="w3-input w3-border" type="password">
-            </div>
-          </div>
 
-          <button class="w3-button w3-teal w3-margin-top w3-block"
-                  onclick="onChangePassword()">Cambiar</button>
-          <div id="cpMsg" class="w3-center w3-small w3-margin-top"></div>
+            <button id="cpSubmitBtn" class="w3-button w3-teal w3-margin-top w3-block"
+                    type="submit">Cambiar</button>
+            <div id="cpMsg" class="auth-message w3-center w3-small w3-margin-top" role="status" aria-live="polite"></div>
+          </form>
 
           <div class="w3-center w3-small w3-margin-top">
-            <a href="#" class="link" onclick="go('login')">Volver a ingresar</a> ·
-            <a href="#" class="link" onclick="onLogout()">Cerrar sesión</a>
+            <button type="button" class="link-button" data-go-view="login">Volver a ingresar</button> ·
+            <button type="button" class="link-button" data-auth-logout="true">Cerrar sesión</button>
           </div>
         </div>
 
@@ -166,8 +176,8 @@
     </div>
   </div>
 
-  <script src="js/config.js?v=20260428a"></script>
-  <script src="js/app.js?v=20260311b"></script>
+  <script src="js/config.js?v=20260513a"></script>
+  <script src="js/app.js?v=20260516a"></script>
 </body>
 </html>
 

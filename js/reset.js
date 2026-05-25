@@ -12,28 +12,51 @@ window.API_BASE = API_BASE;
 const urlParams = new URLSearchParams(window.location.search);
 const token = urlParams.get("token");
 
+function setFeedback(element, kind, text) {
+  if (!element) return;
+  element.className = "feedback w3-small w3-margin-top";
+  if (kind === "success") element.classList.add("ok");
+  if (kind === "error") element.classList.add("err");
+  if (kind === "muted") element.classList.add("w3-text-grey");
+  element.textContent = text || "";
+}
+
+function setPending(button, pending) {
+  if (!button) return;
+  if (!button.dataset.defaultText) {
+    button.dataset.defaultText = button.textContent.trim();
+  }
+  button.disabled = pending;
+  button.textContent = pending ? "Actualizando..." : button.dataset.defaultText;
+}
+
 async function resetPassword() {
   const pass = document.getElementById("newPass").value;
   const confirm = document.getElementById("confirmPass").value;
   const msg = document.getElementById("msg");
   const redirect = document.getElementById("redirect");
+  const submitBtn = document.getElementById("resetSubmitBtn");
 
-  msg.textContent = "";
-  redirect.textContent = "";
+  setFeedback(msg, null, "");
+  setFeedback(redirect, "muted", "");
+
+  if (!token) {
+    setFeedback(msg, "error", "El enlace de restablecimiento no es válido o ya expiró.");
+    return;
+  }
 
   if (pass.trim().length < 8) {
-    msg.className = "err";
-    msg.textContent = "La contraseña debe tener al menos 8 caracteres.";
+    setFeedback(msg, "error", "La contraseña debe tener al menos 8 caracteres.");
     return;
   }
 
   if (pass !== confirm) {
-    msg.className = "err";
-    msg.textContent = "Las contraseñas no coinciden.";
+    setFeedback(msg, "error", "Las contraseñas no coinciden.");
     return;
   }
 
   try {
+    setPending(submitBtn, true);
     const res = await fetch(`${API_BASE}/auth/reset-password`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -43,11 +66,10 @@ async function resetPassword() {
     const data = await res.json();
     if (!res.ok) throw new Error(data.detail || "Error al restablecer contraseña");
 
-    msg.className = "ok";
-    msg.textContent = "✅ Contraseña actualizada correctamente.";
+    setFeedback(msg, "success", "Contraseña actualizada correctamente.");
 
     // Mostrar indicador de redirección
-    redirect.textContent = "Redirigiendo al inicio de sesión...";
+    setFeedback(redirect, "muted", "Redirigiendo al inicio de sesión...");
     redirect.classList.add("fade");
 
     // Redirección automática después de 3 segundos
@@ -56,7 +78,16 @@ async function resetPassword() {
     }, 3000);
 
   } catch (err) {
-    msg.className = "err";
-    msg.textContent = err.message;
+    setFeedback(msg, "error", err.message);
+  } finally {
+    setPending(submitBtn, false);
   }
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("newPass")?.focus();
+  document.getElementById("resetForm")?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    resetPassword();
+  });
+});

@@ -1,8 +1,25 @@
+(function () {
+  const dashboardCommon = window.DashboardCommon;
+
+  if (!dashboardCommon) {
+    throw new Error("DashboardCommon no esta disponible para callups.");
+  }
+
+  const {
+    authHeaders,
+    getApiBase,
+    getCurrentRole,
+    getUserId,
+    showConfirmModal,
+    showAlertModal,
+  } = dashboardCommon;
+
+  const API_URL = getApiBase();
+
 // =====================================================
 // ⚽ CONVOCATORIAS (CALLUPS) — Dashboard-integrated
 // =====================================================
-// Depends on dashboard.js globals: API_URL, token, role, authHeaders(),
-// showConfirmModal(), showAlertModal()
+// Uses DashboardCommon for auth, session context and shared modals.
 
 // State
 let currentCallupId = null;
@@ -53,7 +70,7 @@ function venueLabel(venue) {
 
 async function initCallups() {
   // If coach role, move callup content from hidden adminPanel into coachPanel
-  if (role === "coach") {
+  if (getCurrentRole() === "coach") {
     const source = document.getElementById("adminCallupsContent");
     const target = document.getElementById("coachCallupsContent");
     if (source && target) {
@@ -67,7 +84,7 @@ async function initCallups() {
   await loadCallupsAcademies();
 
   // If coach, pre-load their active assignments for auto-fill
-  if (role === "coach") {
+  if (getCurrentRole() === "coach") {
     await loadCoachActiveAssignments();
     // Auto-select academy in filter and load callups list
     if (coachActiveAssignments.length > 0) {
@@ -269,7 +286,7 @@ function showCreateForm() {
   document.getElementById("createMsg").textContent = "";
 
   // If coach, auto-fill from their active assignment
-  if (role === "coach" && coachActiveAssignments.length > 0) {
+  if (getCurrentRole() === "coach" && coachActiveAssignments.length > 0) {
     autoFillCoachCreateForm();
   }
 }
@@ -381,7 +398,7 @@ async function loadCallups() {
 
     list.innerHTML = items.map(c => `
       <div class="w3-card w3-round-xlarge w3-padding w3-margin-bottom w3-hover-shadow"
-           style="cursor:pointer" onclick="loadCallupDetail(${c.id})">
+           style="cursor:pointer" onclick="window.DashboardCallups.loadCallupDetail(${c.id})">
         <div class="w3-row">
           <div class="w3-col s8">
             <b>${c.title}</b> ${statusLabel(c.status)}
@@ -564,7 +581,7 @@ function renderPlayers(players, callupCategoryId) {
         <div>
           <b>${name}</b> ${badge}
         </div>
-        ${canRemove ? `<button class="w3-button w3-tiny w3-red w3-round" onclick="removePlayer(${p.id})">✕</button>` : ""}
+        ${canRemove ? `<button class="w3-button w3-tiny w3-red w3-round" onclick="window.DashboardCallups.removePlayer(${p.id})">✕</button>` : ""}
       </div>
     `;
   }).join("");
@@ -715,16 +732,16 @@ function renderActionButtons(data) {
   if (isEditable) {
     buttons += `
       <button class="w3-button w3-blue w3-round w3-margin-right"
-              onclick="showEditForm(${data.id})">
+              onclick="window.DashboardCallups.showEditForm(${data.id})">
         ✏️ Editar
       </button>
       <button class="w3-button w3-green w3-round w3-margin-right"
-              onclick="sendCallup(${data.id})"
+              onclick="window.DashboardCallups.sendCallup(${data.id})"
               ${data.players_count === 0 ? 'disabled title="Agrega al menos un jugador"' : ''}>
         ${sendIcon} ${sendLabel}
       </button>
       <button class="w3-button w3-red w3-round w3-margin-right"
-              onclick="cancelCallup(${data.id})">
+              onclick="window.DashboardCallups.cancelCallup(${data.id})">
         ❌ Cancelar
       </button>
     `;
@@ -733,7 +750,7 @@ function renderActionButtons(data) {
   if (isSent) {
     buttons += `
       <button class="w3-button w3-teal w3-round"
-              onclick="completeCallup(${data.id})">
+              onclick="window.DashboardCallups.completeCallup(${data.id})">
         ✅ Completar
       </button>
     `;
@@ -742,7 +759,7 @@ function renderActionButtons(data) {
   if (isCompleted) {
     buttons += `
       <button class="w3-button w3-purple w3-round"
-              onclick="showMatchStatsPanel(${data.id})">
+              onclick="window.DashboardCallups.showMatchStatsPanel(${data.id})">
         📊 Estadísticas
       </button>
     `;
@@ -928,8 +945,8 @@ async function showEditForm(callupId) {
     </div>
     <div class="w3-row-padding w3-margin-top">
       <div class="w3-col s12 w3-right-align">
-        <button class="w3-button w3-white w3-border w3-round-xxlarge w3-small" onclick="hideEditForm()">Cancelar</button>
-        <button class="w3-button w3-blue w3-round-xxlarge w3-small w3-margin-left" onclick="updateCallup(${currentEditData.id})">Guardar Cambios</button>
+        <button class="w3-button w3-white w3-border w3-round-xxlarge w3-small" onclick="window.DashboardCallups.hideEditForm()">Cancelar</button>
+        <button class="w3-button w3-blue w3-round-xxlarge w3-small w3-margin-left" onclick="window.DashboardCallups.updateCallup(${currentEditData.id})">Guardar Cambios</button>
       </div>
     </div>
   `;
@@ -1142,7 +1159,7 @@ async function renderInvoiceSection(callupData) {
         </div>
         <div class="w3-col s6 m4" style="padding-top:18px">
           <button class="w3-button w3-teal w3-round w3-small"
-                  onclick="generateCallupInvoices(${callupData.id})">
+                  onclick="window.DashboardCallups.generateCallupInvoices(${callupData.id})">
             🧾 Generar Facturas
           </button>
         </div>
@@ -1366,7 +1383,8 @@ function renderMatchStatsPanel() {
   const goalsFor = currentMatchStats?.goals_for ?? 0;
   const result = currentMatchStats?.result;
 
-  const canEdit = (role === "admin" || role === "coach");
+  const roleName = getCurrentRole();
+  const canEdit = roleName === "admin" || roleName === "coach";
 
   let headerHtml = `<h4 class="w3-text-purple" style="margin:4px 0">📊 Estadísticas del Partido</h4>`;
   if (currentMatchStats) {
@@ -1440,8 +1458,8 @@ function renderMatchStatsPanel() {
     buttonsHtml = `
       <div class="w3-row-padding w3-margin-top">
         <div class="w3-col s12 w3-right-align">
-          <button class="w3-button w3-white w3-border w3-round-xxlarge w3-small" onclick="hideMatchStatsPanel()">Cerrar</button>
-          <button class="w3-button w3-purple w3-round-xxlarge w3-small w3-margin-left" onclick="saveMatchStats()">💾 Guardar Estadísticas</button>
+          <button class="w3-button w3-white w3-border w3-round-xxlarge w3-small" onclick="window.DashboardCallups.hideMatchStatsPanel()">Cerrar</button>
+          <button class="w3-button w3-purple w3-round-xxlarge w3-small w3-margin-left" onclick="window.DashboardCallups.saveMatchStats()">💾 Guardar Estadísticas</button>
         </div>
       </div>
       <div id="statsMsg" class="w3-margin-top w3-small w3-center"></div>
@@ -1491,7 +1509,7 @@ function renderMatchStatsPanel() {
     buttonsHtml = `
       <div class="w3-row-padding w3-margin-top">
         <div class="w3-col s12 w3-right-align">
-          <button class="w3-button w3-white w3-border w3-round-xxlarge w3-small" onclick="hideMatchStatsPanel()">Cerrar</button>
+          <button class="w3-button w3-white w3-border w3-round-xxlarge w3-small" onclick="window.DashboardCallups.hideMatchStatsPanel()">Cerrar</button>
         </div>
       </div>
     `;
@@ -1537,7 +1555,7 @@ function renderStatsPlayerRows() {
         <td style="text-align:center">
           <div class="w3-bar">
             <span id="goalsCount_${cpId}" class="w3-margin-right">${goals.length}</span>
-            <button class="w3-button w3-tiny w3-green w3-round" onclick="addGoalToPlayer(${cpId})" title="Agregar gol">+</button>
+            <button class="w3-button w3-tiny w3-green w3-round" onclick="window.DashboardCallups.addGoalToPlayer(${cpId})" title="Agregar gol">+</button>
           </div>
         </td>
         <td style="text-align:center">
@@ -1568,7 +1586,7 @@ function renderPlayerGoals(cpId, goals) {
           data-half="${g.half}" data-minute="${g.minute || ''}">
       ⚽ ${halfLabel(g.half)}${g.minute ? " " + g.minute + "'" : ""}
       <span class="w3-hover-red" style="cursor:pointer;margin-left:4px" 
-            onclick="removeGoalFromPlayer(${cpId}, ${idx})">✕</span>
+            onclick="window.DashboardCallups.removeGoalFromPlayer(${cpId}, ${idx})">✕</span>
     </span>
   `).join("");
 }
@@ -1609,8 +1627,8 @@ function addGoalToPlayer(cpId) {
           <input id="goalMinute" type="number" min="1" max="120" class="w3-input w3-border w3-round" placeholder="Ej: 45">
         </div>
         <footer class="w3-container w3-padding">
-          <button class="w3-button w3-white w3-border w3-round w3-small" onclick="closeGoalModal()">Cancelar</button>
-          <button class="w3-button w3-purple w3-round w3-small w3-right" onclick="confirmAddGoal(${cpId})">Agregar</button>
+          <button class="w3-button w3-white w3-border w3-round w3-small" onclick="window.DashboardCallups.closeGoalModal()">Cancelar</button>
+          <button class="w3-button w3-purple w3-round w3-small w3-right" onclick="window.DashboardCallups.confirmAddGoal(${cpId})">Agregar</button>
         </footer>
       </div>
     </div>
@@ -1757,3 +1775,37 @@ showMatchStatsPanel = async function(callupId) {
   await originalShowMatchStatsPanel(callupId);
   initPlayerGoalsMap();
 };
+
+window.DashboardCallups = {
+  initCallups,
+  showCreateForm,
+  hideCreateForm,
+  backToList,
+  loadCallups,
+  createCallup,
+  onAcademyChange,
+  onCategoryChange,
+  autoResolveCoach,
+  changeScope,
+  addSelectedPlayers,
+  loadCallupDetail,
+  removePlayer,
+  sendCallup,
+  cancelCallup,
+  completeCallup,
+  showEditForm,
+  hideEditForm,
+  updateCallup,
+  editCheckConflict,
+  createCheckConflict,
+  generateCallupInvoices,
+  showMatchStatsPanel,
+  hideMatchStatsPanel,
+  saveMatchStats,
+  addGoalToPlayer,
+  closeGoalModal,
+  confirmAddGoal,
+  removeGoalFromPlayer,
+};
+
+})();

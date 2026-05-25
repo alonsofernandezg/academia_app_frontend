@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
   <!-- Fuente y estilo propio (mismo que index) -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css?v=20260515a">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css">
   <style>
     .badge { display:inline-block; padding:2px 8px; border-radius:12px; font-size:11px; margin-left:4px; }
@@ -62,13 +62,34 @@
     <!-- Admin panel -->
     <section id="adminPanel" class="w3-margin-top w3-hide">
 
+      <div class="w3-card w3-white w3-round-xxlarge w3-padding dashboard-workspace-card">
+        <div class="dashboard-workspace-header">
+          <div>
+            <div class="dashboard-workspace-kicker">Panel administrador</div>
+            <h2 id="adminWorkspaceTitle" class="dashboard-workspace-title">Usuarios y accesos</h2>
+            <p id="adminWorkspaceDescription" class="dashboard-workspace-description">
+              Gestiona cuentas administrativas y de entrenadores.
+            </p>
+          </div>
+        </div>
+        <div class="dashboard-workspace-nav" aria-label="Secciones principales del panel administrador">
+          <button type="button" class="dashboard-workspace-pill" data-dashboard-nav-role="admin" data-dashboard-module-target="users">Usuarios</button>
+          <button type="button" class="dashboard-workspace-pill" data-dashboard-nav-role="admin" data-dashboard-module-target="sports">Academias</button>
+          <button type="button" class="dashboard-workspace-pill" data-dashboard-nav-role="admin" data-dashboard-module-target="coaches">Entrenadores</button>
+          <button type="button" class="dashboard-workspace-pill" data-dashboard-nav-role="admin" data-dashboard-module-target="athletes">Deportistas</button>
+          <button type="button" class="dashboard-workspace-pill" data-dashboard-nav-role="admin" data-dashboard-module-target="operations">Operación diaria</button>
+          <button type="button" class="dashboard-workspace-pill" data-dashboard-nav-role="admin" data-dashboard-module-target="billing">Facturación</button>
+          <button type="button" class="dashboard-workspace-pill" data-dashboard-nav-role="admin" data-dashboard-module-target="communications">Comunicaciones</button>
+        </div>
+      </div>
+
       <!-- Card: Administración de usuarios -->
-      <div class="w3-card w3-white w3-round-xxlarge w3-padding">
+      <div class="w3-card w3-white w3-round-xxlarge w3-padding dashboard-module-card" data-dashboard-roles="admin" data-dashboard-module="users">
         <div class="w3-row w3-margin-bottom">
           <div class="w3-col s12 m8">
             <h3 class="w3-text-blue" style="margin:8px 0">Panel de Administración</h3>
             <p class="w3-small w3-text-gray">
-              Crea usuarios <b>admin</b> o <b>coach</b>, lista y activa/inactiva cuentas.
+              Crea usuarios <b>admin</b> o <b>entrenador</b>, lista y activa/inactiva cuentas.
             </p>
           </div>
           <div class="w3-col s12 m4 w3-right-align">
@@ -93,10 +114,10 @@
       </div>
 
       <!-- Card: Configuración deportiva (academias, categorías, niveles) -->
-      <div class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top">
+      <div class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top dashboard-module-card" data-dashboard-roles="admin" data-dashboard-module="sports">
         <div class="w3-row w3-margin-bottom">
           <div class="w3-col s12">
-            <h3 class="w3-text-blue" style="margin:8px 0">Configuración deportiva</h3>
+            <h3 class="w3-text-blue" style="margin:8px 0">Academias, categorías y niveles</h3>
             <p class="w3-small w3-text-gray">
               Administra las <b>Academias</b>, sus <b>Categorías</b> y los <b>Niveles</b>.
             </p>
@@ -217,12 +238,12 @@
       </div>
 
       <!-- Card: Gestión de Entrenadores (Coaches) -->
-      <div class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top">
+      <div class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top dashboard-module-card" data-dashboard-roles="admin" data-dashboard-module="coaches">
         <div class="w3-row w3-margin-bottom">
           <div class="w3-col s12 m8">
             <h3 class="w3-text-blue" style="margin:8px 0">Gestión de Entrenadores</h3>
             <p class="w3-small w3-text-gray">
-              Registra información de los <b>coaches</b>: identificación, teléfono, notas y más.
+              Registra información de los <b>entrenadores</b>: identificación, teléfono, notas y más.
             </p>
           </div>
           <div class="w3-col s12 m4 w3-right-align">
@@ -247,12 +268,12 @@
       </div>
 
       <!-- Card: Asignación de entrenadores -->
-      <div class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top">
+      <div class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top dashboard-module-card" data-dashboard-roles="admin" data-dashboard-module="coaches">
         <div class="w3-row w3-margin-bottom">
           <div class="w3-col s12">
             <h3 class="w3-text-blue" style="margin:8px 0">Asignación de entrenadores</h3>
             <p class="w3-small w3-text-gray">
-              Vincula <b>coaches</b> con <b>academias</b>, <b>categorías</b> y <b>niveles</b>.
+              Vincula <b>entrenadores</b> con <b>academias</b>, <b>categorías</b> y <b>niveles</b>.
               Solo las asignaciones <b>activas</b> se usarán al momento de trabajar con los deportistas.
             </p>
           </div>
@@ -269,9 +290,9 @@
           <div class="w3-row-padding" style="margin:0 -8px">
           <div class="w3-col s12 m5">
             <div class="w3-small">
-              <label class="w3-small w3-text-gray">Entrenador (coach)</label>
+              <label class="w3-small w3-text-gray">Entrenador</label>
               <select id="caCoach" class="w3-select w3-border w3-round-large w3-margin-bottom">
-                <option value="">Seleccione un coach…</option>
+                <option value="">Seleccione un entrenador…</option>
               </select>
 
               <label class="w3-small w3-text-gray">Academia</label>
@@ -308,7 +329,7 @@
             <div class="w3-small">
               <h5 class="w3-text-indigo" style="margin:4px 0">Asignaciones actuales</h5>
               <p class="w3-small w3-text-gray">
-                Se muestran las asignaciones activas e históricas del coach seleccionado. Puedes eliminar (inactivar) una asignaci\u00f3n para que deje de estar activa.
+                Se muestran las asignaciones activas e históricas del entrenador seleccionado. Puedes eliminar (inactivar) una asignaci\u00f3n para que deje de estar activa.
               </p>
               <div id="caList">
                 <!-- Lista de asignaciones del coach -->
@@ -319,7 +340,7 @@
         </div>
       </div>
 
-      <div class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top">
+      <div class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top dashboard-module-card" data-dashboard-roles="admin" data-dashboard-module="operations">
         <div class="w3-row w3-margin-bottom">
           <div class="w3-col s12 m8">
             <h3 class="w3-text-blue" style="margin:8px 0">Sesiones de entrenamiento</h3>
@@ -382,7 +403,7 @@
         </div>
       </div>
 
-      <div class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top">
+      <div class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top dashboard-module-card" data-dashboard-roles="admin" data-dashboard-module="billing">
         <div class="w3-row w3-margin-bottom">
           <div class="w3-col s12 m8">
             <h3 class="w3-text-blue" style="margin:8px 0">Facturacion</h3>
@@ -549,7 +570,7 @@
         </div>
       </div>
 
-      <div class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top">
+      <div class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top dashboard-module-card" data-dashboard-roles="admin" data-dashboard-module="communications">
         <div class="w3-row w3-margin-bottom">
           <div class="w3-col s12 m8">
             <h3 class="w3-text-blue" style="margin:8px 0">Comunicaciones</h3>
@@ -589,7 +610,7 @@
                   <option value="academy">Academia</option>
                   <option value="category">Categoria</option>
                   <option value="level">Nivel</option>
-                  <option value="team">Equipo (nivel + coach)</option>
+                  <option value="team">Equipo (nivel + entrenador)</option>
                 </select>
 
                 <div id="adminAnnAcademyWrap" class="w3-margin-bottom">
@@ -614,11 +635,11 @@
                 </div>
 
                 <div id="adminAnnTeamWrap" class="w3-margin-bottom w3-hide">
-                  <label class="w3-small w3-text-gray">Coach</label>
+                  <label class="w3-small w3-text-gray">Entrenador</label>
                   <select id="adminAnnCoach" class="w3-select w3-border w3-round-large w3-margin-bottom">
-                    <option value="">Seleccione un coach...</option>
+                    <option value="">Seleccione un entrenador...</option>
                   </select>
-                  <label class="w3-small w3-text-gray">Nivel del coach</label>
+                  <label class="w3-small w3-text-gray">Nivel del entrenador</label>
                   <select id="adminAnnTeamLevel" class="w3-select w3-border w3-round-large">
                     <option value="">Seleccione un nivel...</option>
                   </select>
@@ -649,7 +670,7 @@
       </div>
 
       <!-- Card: Convocatorias (admin) -->
-      <div id="adminCallupsCard" class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top">
+      <div id="adminCallupsCard" class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top dashboard-module-card" data-dashboard-roles="admin" data-dashboard-module="operations">
         <div class="w3-row w3-margin-bottom">
           <div class="w3-col s12 m8">
             <h3 class="w3-text-blue" style="margin:8px 0">Convocatorias</h3>
@@ -846,7 +867,26 @@
 
     <!-- Panel General (deportistas) -->
     <section id="generalPanel" class="w3-margin-top w3-hide">
-      <div class="w3-card w3-white w3-round-xxlarge w3-padding">
+      <div class="w3-card w3-white w3-round-xxlarge w3-padding dashboard-workspace-card" data-dashboard-shell-role="general">
+        <div class="dashboard-workspace-header">
+          <div>
+            <div class="dashboard-workspace-kicker">Área familiar</div>
+            <h2 id="generalWorkspaceTitle" class="dashboard-workspace-title">Mis deportistas</h2>
+            <p id="generalWorkspaceDescription" class="dashboard-workspace-description">
+              Consulta y gestiona la información principal de tus atletas.
+            </p>
+          </div>
+        </div>
+        <div class="dashboard-workspace-nav" aria-label="Secciones principales del panel familiar">
+          <button type="button" class="dashboard-workspace-pill" data-dashboard-nav-role="general" data-dashboard-module-target="athletes">Deportistas</button>
+          <button type="button" class="dashboard-workspace-pill" data-dashboard-nav-role="general" data-dashboard-module-target="reports">Reportes</button>
+          <button type="button" class="dashboard-workspace-pill" data-dashboard-nav-role="general" data-dashboard-module-target="plans">Planes</button>
+          <button type="button" class="dashboard-workspace-pill" data-dashboard-nav-role="general" data-dashboard-module-target="payments">Pagos</button>
+          <button type="button" class="dashboard-workspace-pill" data-dashboard-nav-role="general" data-dashboard-module-target="communications">Comunicaciones</button>
+        </div>
+      </div>
+
+      <div class="w3-card w3-white w3-round-xxlarge w3-padding dashboard-module-card" data-dashboard-roles="admin general" data-dashboard-module="athletes">
         <div class="w3-row w3-margin-bottom">
           <div class="w3-col s12 m8">
             <h3 class="w3-text-blue" style="margin:8px 0">Mis Deportistas</h3>
@@ -924,7 +964,7 @@
           </div>
         </div>
       </div>
-      <div id="generalReportSection" class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top">
+      <div id="generalReportSection" class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top dashboard-module-card" data-dashboard-roles="general" data-dashboard-module="reports">
         <div class="w3-row w3-margin-bottom">
           <div class="w3-col s12 m8">
             <h3 class="w3-text-blue" style="margin:8px 0">Reporte de asistencia</h3>
@@ -965,7 +1005,7 @@
         </div>
       </div>
 
-      <div id="generalPlansSection" class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top">
+      <div id="generalPlansSection" class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top dashboard-module-card" data-dashboard-roles="general" data-dashboard-module="plans">
         <div class="w3-row w3-margin-bottom">
           <div class="w3-col s12 m8">
             <h3 class="w3-text-blue" style="margin:8px 0">Planes de facturacion</h3>
@@ -1014,7 +1054,7 @@
           </div>
         </div>
       </div>
-      <div id="generalPaymentsSection" class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top">
+      <div id="generalPaymentsSection" class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top dashboard-module-card" data-dashboard-roles="general" data-dashboard-module="payments">
         <div class="w3-row w3-margin-bottom">
           <div class="w3-col s12 m8">
             <h3 class="w3-text-blue" style="margin:8px 0">Pagos</h3>
@@ -1076,7 +1116,7 @@
         </div>
       </div>
 
-      <div id="generalAnnouncementsSection" class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top">
+      <div id="generalAnnouncementsSection" class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top dashboard-module-card" data-dashboard-roles="general" data-dashboard-module="communications">
         <div class="w3-row w3-margin-bottom">
           <div class="w3-col s12 m8">
             <h3 class="w3-text-blue" style="margin:8px 0">Comunicaciones</h3>
@@ -1100,7 +1140,25 @@
 
     <!-- Panel Coach (Entrenadores) -->
     <section id="coachPanel" class="w3-margin-top w3-hide">
-      <div class="w3-card w3-white w3-round-xxlarge w3-padding">
+      <div class="w3-card w3-white w3-round-xxlarge w3-padding dashboard-workspace-card">
+        <div class="dashboard-workspace-header">
+          <div>
+            <div class="dashboard-workspace-kicker">Área de entrenador</div>
+            <h2 id="coachWorkspaceTitle" class="dashboard-workspace-title">Mi perfil</h2>
+            <p id="coachWorkspaceDescription" class="dashboard-workspace-description">
+              Mantén tu perfil actualizado y accede a tus tareas principales.
+            </p>
+          </div>
+        </div>
+        <div class="dashboard-workspace-nav" aria-label="Secciones principales del panel de entrenador">
+          <button type="button" class="dashboard-workspace-pill" data-dashboard-nav-role="coach" data-dashboard-module-target="profile">Perfil</button>
+          <button type="button" class="dashboard-workspace-pill" data-dashboard-nav-role="coach" data-dashboard-module-target="athletes">Deportistas</button>
+          <button type="button" class="dashboard-workspace-pill" data-dashboard-nav-role="coach" data-dashboard-module-target="operations">Operación diaria</button>
+          <button type="button" class="dashboard-workspace-pill" data-dashboard-nav-role="coach" data-dashboard-module-target="communications">Comunicaciones</button>
+        </div>
+      </div>
+
+      <div class="w3-card w3-white w3-round-xxlarge w3-padding dashboard-module-card" data-dashboard-roles="coach" data-dashboard-module="profile">
         <div class="w3-row w3-margin-bottom">
           <div class="w3-col s12 m8">
             <h3 class="w3-text-blue" style="margin:8px 0">Mi Perfil de Entrenador</h3>
@@ -1138,7 +1196,7 @@
         </div>
       </div>
 
-      <div class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top">
+      <div class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top dashboard-module-card" data-dashboard-roles="coach" data-dashboard-module="athletes">
         <div class="w3-row w3-margin-bottom">
           <div class="w3-col s12 m8">
             <h3 class="w3-text-blue" style="margin:8px 0">Todos los deportistas</h3>
@@ -1212,7 +1270,7 @@
         </div>
       </div>
 
-      <div class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top">
+      <div class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top dashboard-module-card" data-dashboard-roles="coach" data-dashboard-module="athletes">
         <div class="w3-row w3-margin-bottom">
           <div class="w3-col s12 m8">
             <h3 class="w3-text-blue" style="margin:8px 0">Mis deportistas por nivel</h3>
@@ -1236,7 +1294,7 @@
         </div>
       </div>
 
-      <div class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top">
+      <div class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top dashboard-module-card" data-dashboard-roles="coach" data-dashboard-module="communications">
         <div class="w3-row w3-margin-bottom">
           <div class="w3-col s12 m8">
             <h3 class="w3-text-blue" style="margin:8px 0">Comunicaciones</h3>
@@ -1274,7 +1332,7 @@
                 <label class="w3-small w3-text-gray">Destino</label>
                 <select id="coachAnnScope" class="w3-select w3-border w3-round-large w3-margin-bottom">
                   <option value="level">Nivel</option>
-                  <option value="team">Equipo (nivel + coach)</option>
+                  <option value="team">Equipo (nivel + entrenador)</option>
                 </select>
 
                 <div id="coachAnnLevelWrap" class="w3-margin-bottom">
@@ -1285,7 +1343,7 @@
                 </div>
 
                 <div id="coachAnnTeamWrap" class="w3-margin-bottom w3-hide">
-                  <label class="w3-small w3-text-gray">Nivel del coach</label>
+                  <label class="w3-small w3-text-gray">Nivel del entrenador</label>
                   <select id="coachAnnTeamLevel" class="w3-select w3-border w3-round-large">
                     <option value="">Seleccione un nivel...</option>
                   </select>
@@ -1315,7 +1373,7 @@
         </div>
       </div>
 
-      <div class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top">
+      <div class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top dashboard-module-card" data-dashboard-roles="coach" data-dashboard-module="operations">
         <div class="w3-row w3-margin-bottom">
           <div class="w3-col s12 m8">
             <h3 class="w3-text-blue" style="margin:8px 0">Asistencia</h3>
@@ -1376,7 +1434,7 @@
       </div>
 
       <!-- Card: Convocatorias (coach) -->
-      <div id="coachCallupsCard" class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top">
+      <div id="coachCallupsCard" class="w3-card w3-white w3-round-xxlarge w3-padding w3-margin-top dashboard-module-card" data-dashboard-roles="coach" data-dashboard-module="operations">
         <div class="w3-row w3-margin-bottom">
           <div class="w3-col s12 m8">
             <h3 class="w3-text-blue" style="margin:8px 0">Mis Convocatorias</h3>
@@ -1419,7 +1477,7 @@
 
         <label class="w3-small w3-text-gray">Rol</label>
         <select id="cuRole" class="w3-select w3-border w3-round-large">
-          <option value="coach">Coach</option>
+          <option value="coach">Entrenador</option>
           <option value="admin">Admin</option>
         </select>
         <div id="cuMsg" class="w3-small w3-center w3-margin-top"></div>
@@ -1457,7 +1515,7 @@
         <label class="w3-small w3-text-gray">Rol</label>
         <select id="euRole" class="w3-select w3-border w3-round-large w3-margin-bottom">
           <option value="general">General</option>
-          <option value="coach">Coach</option>
+          <option value="coach">Entrenador</option>
           <option value="admin">Admin</option>
         </select>
 
@@ -1654,9 +1712,9 @@
         <input type="hidden" id="assignAthleteId">
 
         <div id="assignCoachWrap" style="display:none;">
-          <label class="w3-small w3-text-gray">Coach</label>
+          <label class="w3-small w3-text-gray">Entrenador</label>
           <select id="assignCoachUserId" class="w3-select w3-border w3-round-large w3-margin-bottom">
-            <option value="">Seleccione un coach…</option>
+            <option value="">Seleccione un entrenador…</option>
           </select>
         </div>
 
@@ -1809,12 +1867,12 @@
         
         <!-- Para admin: mostrar select con usuarios; para coach: usar input hidden -->
         <div id="coachUserIdAdmin" style="display:none;">
-          <label class="w3-small w3-text-gray">Seleccionar usuario (Coach)</label>
+          <label class="w3-small w3-text-gray">Seleccionar usuario (Entrenador)</label>
           <select id="coachUserId" class="w3-select w3-border w3-round-large w3-margin-bottom">
-            <option value="">Seleccione un coach…</option>
+            <option value="">Seleccione un entrenador…</option>
           </select>
           <p class="w3-small w3-text-gray" style="margin-top:-8px">
-            Los usuarios con rol "coach" aparecen aquí. Crea usuarios desde "Panel de Administración".
+            Los usuarios con rol "Entrenador" aparecen aquí. Crea usuarios desde "Panel de Administración".
           </p>
         </div>
         
@@ -1984,6 +2042,15 @@
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/locales-all.global.min.js"></script>
   <script src="js/config.js?v=20260428a"></script>
-  <script src="js/dashboard.js?v=20260311b"></script>
-  <script src="js/coaches.js?v=20260311b"></script>
-  <script src="js/callups.js?v=20260311b"></script>
+  <script src="js/dashboard-common.js?v=20260518l"></script>
+  <script src="js/dashboard.js?v=20260518j"></script>
+  <script src="js/dashboard-users.js?v=20260518k"></script>
+  <script src="js/dashboard-coach-assignments.js?v=20260518i"></script>
+  <script src="js/dashboard-athletes.js?v=20260518k"></script>
+  <script src="js/dashboard-maintenance.js?v=20260518c"></script>
+  <script src="js/dashboard-operations.js?v=20260518e"></script>
+  <script src="js/dashboard-reports.js?v=20260518i"></script>
+  <script src="js/dashboard-billing.js?v=20260518h"></script>
+  <script src="js/dashboard-communications.js?v=20260518a"></script>
+  <script src="js/coaches.js?v=20260518i"></script>
+  <script src="js/callups.js?v=20260518h"></script>

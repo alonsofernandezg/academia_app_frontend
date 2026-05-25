@@ -1,3 +1,4 @@
+(function () {
 // =====================================================
 // 🏃 COACHES (ENTRENADORES)
 // =====================================================
@@ -12,24 +13,24 @@ var API_BASE = (() => {
 })();
 window.API_BASE = API_BASE;
 const roleName = window.role || localStorage.getItem("role") || "general";
+const coachDashboardCommon = window.DashboardCommon || {};
+const coachAuthHeaders = coachDashboardCommon.authHeaders || (() => {
+  const token = localStorage.getItem("token");
+  return {
+    Authorization: "Bearer " + token,
+    "Content-Type": "application/json",
+  };
+});
+const coachSetStatusMessage = coachDashboardCommon.setStatusMessage || ((msgEl, text, className) => {
+  if (!msgEl) return;
+  msgEl.className = className || "w3-small w3-text-gray w3-center";
+  msgEl.textContent = text;
+});
+const coachPaginateList = coachDashboardCommon.paginateList || ((items) => items);
 
 // --------------------------------------------------
 // Funciones auxiliares
 // --------------------------------------------------
-
-function authHeaders() {
-  const token = localStorage.getItem("token");
-  return {
-    "Authorization": "Bearer " + token,
-    "Content-Type": "application/json",
-  };
-}
-
-function setStatusMessage(msgEl, text, className) {
-  if (!msgEl) return;
-  msgEl.className = className || "w3-small w3-text-gray w3-center";
-  msgEl.textContent = text;
-}
 
 // --------------------------------------------------
 // CRUD: CARGAR COACHES
@@ -42,7 +43,7 @@ async function loadCoaches() {
   list.innerHTML = `<div class="w3-center w3-text-gray w3-small">Cargando entrenadores…</div>`;
 
   try {
-    const res = await fetch(`${API_BASE}/coaches/`, { headers: authHeaders() });
+    const res = await fetch(`${API_BASE}/coaches/`, { headers: coachAuthHeaders() });
     const coaches = await res.json();
 
     if (!res.ok) {
@@ -54,9 +55,7 @@ async function loadCoaches() {
       return;
     }
 
-    const pageItems = typeof paginateList === "function"
-      ? paginateList(coaches, "coaches", "coachesList", loadCoaches)
-      : coaches;
+    const pageItems = coachPaginateList(coaches, "coaches", "coachesList", loadCoaches);
 
     list.innerHTML = pageItems
       .map((c) => {
@@ -109,23 +108,23 @@ async function loadCoachUsersSelect() {
 
   try {
     // Obtener lista de usuarios con rol "coach"
-    const res = await fetch(`${API_BASE}/admin/coaches`, { headers: authHeaders() });
+    const res = await fetch(`${API_BASE}/admin/coaches`, { headers: coachAuthHeaders() });
     const coaches = await res.json();
 
     if (!res.ok) {
-      throw new Error(coaches.detail || "No se pudieron cargar los coaches");
+      throw new Error(coaches.detail || "No se pudieron cargar los entrenadores");
     }
 
     // Filtrar solo usuarios que no tengan registro de coach ya creado
     // (opcional: para simplicidad, mostramos todos los del rol coach)
     sel.innerHTML =
-      `<option value="">Seleccione un coach…</option>` +
+      `<option value="">Seleccione un entrenador…</option>` +
       coaches
         .map((u) => `<option value="${u.id}">${u.email}</option>`)
         .join("");
   } catch (e) {
     console.error("Error cargando usuarios coaches:", e);
-    sel.innerHTML = `<option value="">Error cargando coaches</option>`;
+    sel.innerHTML = `<option value="">Error cargando entrenadores</option>`;
   }
 }
 
@@ -207,13 +206,13 @@ async function saveCoach() {
 
   if (!coachId && !userId) {
     msg.className = "w3-small w3-text-red w3-center";
-    msg.textContent = "Debe seleccionar un usuario (coach).";
+    msg.textContent = "Debe seleccionar un usuario (entrenador).";
     console.error("❌ userId is missing (coachId:", coachId, "userId:", userId, ")");
     return;
   }
 
   try {
-    setStatusMessage(msg, "Guardando...", "w3-small w3-text-gray w3-center");
+    coachSetStatusMessage(msg, "Guardando...", "w3-small w3-text-gray w3-center");
     let url = `${API_BASE}/coaches/`;
     let method = "POST";
     let body = {
@@ -236,7 +235,7 @@ async function saveCoach() {
 
     const res = await fetch(url, {
       method: method,
-      headers: authHeaders(),
+      headers: coachAuthHeaders(),
       body: JSON.stringify(body),
     });
 
@@ -287,7 +286,7 @@ async function deleteCoach(coachId) {
   try {
     const res = await fetch(`${API_BASE}/coaches/${coachId}`, {
       method: "DELETE",
-      headers: authHeaders(),
+      headers: coachAuthHeaders(),
     });
 
     if (!res.ok) {
@@ -307,14 +306,7 @@ async function deleteCoach(coachId) {
 // Init
 // --------------------------------------------------
 
-// Cargar coaches cuando el panel admin se inicializa
-window.addEventListener("load", async () => {
-  if (roleName === "admin") {
-    await loadCoaches();
-  } else if (roleName === "coach") {
-    await loadCoachProfile();
-  }
-});
+// La carga inicial de coaches y perfil ahora la orquesta dashboard.js por módulo.
 
 // =====================================================
 // 🏃 COACH PROFILE (for coaches to see/edit their own)
@@ -360,7 +352,7 @@ async function loadCoachProfile() {
       console.log("📡 Fetching:", url);
       
       const res = await fetch(url, { 
-        headers: authHeaders() 
+        headers: coachAuthHeaders() 
       });
 
       console.log("📥 Response status:", res.status);
@@ -499,4 +491,19 @@ function openEditCoachProfile() {
 
   modal.style.display = "block";
 }
+
+window.DashboardCoaches = {
+  loadCoaches,
+  loadCoachUsersSelect,
+  openCreateCoach,
+  closeCreateCoach,
+  openEditCoach,
+  saveCoach,
+  deleteCoach,
+  loadCoachProfile,
+  openCreateCoachProfile,
+  openEditCoachProfile,
+};
+
+})();
 
