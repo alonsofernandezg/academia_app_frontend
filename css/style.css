@@ -92,23 +92,50 @@ svg {
   color: var(--indigo);
 }
 
-.w3-blue {
-  background-color: var(--indigo) !important;
+.w3-blue,
+.w3-indigo,
+.w3-purple {
+  background: linear-gradient(135deg, var(--indigo), #2d67da) !important;
+  border-color: transparent !important;
+  color: #fff !important;
 }
-.w3-indigo {
-  background-color: var(--indigo) !important;
+
+.w3-light-blue,
+.w3-teal {
+  background: linear-gradient(135deg, var(--aqua), var(--blue)) !important;
+  border-color: transparent !important;
+  color: var(--navy) !important;
 }
+
 .w3-green {
-  background-color: var(--success) !important;
+  background: linear-gradient(135deg, var(--success), var(--success-dark)) !important;
+  border-color: transparent !important;
+  color: #0F2644 !important;
+}
+
+.w3-red {
+  background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+  border-color: transparent !important;
+  color: #fff !important;
+}
+
+.w3-orange {
+  background: linear-gradient(135deg, #f59e0b, #fb923c) !important;
+  border-color: transparent !important;
   color: #1B1F28 !important;
 }
+
 .w3-blue:hover,
-.w3-indigo:hover {
-  background-color: var(--blue) !important;
+.w3-indigo:hover,
+.w3-purple:hover,
+.w3-light-blue:hover,
+.w3-teal:hover,
+.w3-green:hover,
+.w3-red:hover,
+.w3-orange:hover {
+  filter: brightness(1.03);
 }
-.w3-green:hover {
-  background-color: var(--success-dark) !important;
-}
+
 .w3-text-blue,
 .w3-text-indigo {
   color: var(--indigo) !important;
@@ -837,15 +864,59 @@ textarea.w3-input {
 
 /* Buttons */
 .w3-button {
-  border-radius: var(--radius-xl) !important;
-  font-weight:600;
-  height:44px;
-  transition:0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  height: auto;
+  padding: 9px 16px !important;
+  border: 1px solid transparent;
+  border-radius: 999px !important;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  box-shadow: 0 12px 24px rgba(15,38,68,.10);
+  transition: transform .15s ease, box-shadow .15s ease, filter .15s ease, background .15s ease, border-color .15s ease, color .15s ease;
 }
 
 .w3-button:hover {
   transform: translateY(-1px);
-  box-shadow:0 8px 20px rgba(0,0,0,.08);
+  box-shadow: 0 14px 28px rgba(15,38,68,.14);
+}
+
+.w3-button:active {
+  transform: translateY(0);
+  box-shadow: 0 8px 18px rgba(15,38,68,.10);
+}
+
+.w3-button.w3-small {
+  min-height: 36px;
+  padding: 7px 14px !important;
+}
+
+.w3-button.w3-tiny {
+  min-height: 30px;
+  padding: 5px 10px !important;
+  box-shadow: 0 8px 18px rgba(15,38,68,.08);
+}
+
+.w3-button.w3-block {
+  display: flex;
+  width: 100%;
+}
+
+.w3-button.w3-white,
+.w3-button.w3-border:not(.w3-blue):not(.w3-indigo):not(.w3-purple):not(.w3-light-blue):not(.w3-teal):not(.w3-green):not(.w3-red):not(.w3-orange) {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%) !important;
+  border-color: #dbe7f5 !important;
+  color: var(--navy) !important;
+}
+
+.w3-button.active:not(.w3-blue):not(.w3-indigo):not(.w3-purple):not(.w3-light-blue):not(.w3-teal):not(.w3-green):not(.w3-red):not(.w3-orange) {
+  background: linear-gradient(135deg, var(--indigo), #2d67da) !important;
+  border-color: transparent !important;
+  color: #fff !important;
 }
 
 .w3-button[disabled] {
@@ -860,6 +931,11 @@ textarea.w3-input {
 }
 
 /* Modals */
+.w3-modal {
+  background-color: rgba(15,38,68,.18) !important;
+  backdrop-filter: blur(2px);
+}
+
 .w3-modal-content {
   border-radius: var(--radius-xl) !important;
   box-shadow: var(--shadow-card);

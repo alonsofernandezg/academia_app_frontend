@@ -6,26 +6,53 @@
   <title>DeportIvA — Estadísticas</title>
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap">
-  <link rel="stylesheet" href="css/style.css?v=20260526f">
+  <link rel="stylesheet" href="css/style.css?v=20260526h">
   <style>
     body { font-family: 'Poppins', sans-serif; }
 
     /* ── Main tabs ── */
     .main-tab-btn {
-      border: 1px solid #cfe0f2; background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
-      padding: 10px 24px; margin-right: 6px;
-      border-radius: 24px; cursor: pointer;
-      font-size: 0.95em; font-weight: 600;
-      color: #223047;
-      transition: background .2s, border-color .2s, color .2s;
+      border: 1px solid #dbe7f5;
+      background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+      box-shadow: 0 12px 24px rgba(15,38,68,.10);
+      padding: 10px 24px;
+      margin-right: 6px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 0.95em;
+      font-weight: 700;
+      color: #0F2644;
+      transition: transform .15s ease, box-shadow .15s ease, background .15s ease, border-color .15s ease, color .15s ease;
     }
-    .main-tab-btn.active { background: linear-gradient(135deg,#1F4AA8,#2d67da); color: #fff; border-color: transparent; box-shadow: 0 12px 24px rgba(31,74,168,.18); }
+    .main-tab-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 28px rgba(15,38,68,.14);
+    }
+    .main-tab-btn.active {
+      background: linear-gradient(135deg,#1F4AA8,#2d67da);
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 14px 28px rgba(31,74,168,.20);
+    }
 
     /* ── Filter pills ── */
     .pill-btn {
-      border: 1px solid #d7e4f3; background: #fff;
-      padding: 6px 14px; margin-right: 4px; margin-bottom: 4px;
-      border-radius: 20px; cursor: pointer; font-size: 0.82em; font-weight: 600; color:#223047;
+      border: 1px solid #dbe7f5;
+      background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+      box-shadow: 0 10px 22px rgba(15,38,68,.08);
+      padding: 6px 14px;
+      margin-right: 4px;
+      margin-bottom: 4px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 0.82em;
+      font-weight: 700;
+      color:#0F2644;
+      transition: transform .15s ease, box-shadow .15s ease, background .15s ease, border-color .15s ease, color .15s ease;
+    }
+    .pill-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 24px rgba(15,38,68,.12);
     }
     .pill-btn.active-period { background: linear-gradient(135deg,#1F4AA8,#2d67da); color: #fff; border-color: transparent; }
     .pill-btn.active-venue  { background: linear-gradient(135deg,#9BE000,#6FB300); color: #0F2644; border-color: transparent; }
