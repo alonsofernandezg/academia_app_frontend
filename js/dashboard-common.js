@@ -76,10 +76,29 @@
     });
   }
 
+  function parseDateValue(dateInput) {
+    if (!dateInput) return null;
+    if (dateInput instanceof Date) {
+      return Number.isNaN(dateInput.getTime()) ? null : new Date(dateInput.getTime());
+    }
+
+    const rawValue = String(dateInput).trim();
+    if (!rawValue) return null;
+
+    const dateOnlyMatch = rawValue.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (dateOnlyMatch) {
+      const [, year, month, day] = dateOnlyMatch;
+      return new Date(Number(year), Number(month) - 1, Number(day), 12);
+    }
+
+    const parsed = new Date(rawValue);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  }
+
   function computeAge(dateStr) {
     if (!dateStr) return null;
-    const birth = new Date(dateStr);
-    if (Number.isNaN(birth.getTime())) return null;
+    const birth = parseDateValue(dateStr);
+    if (!birth) return null;
     const today = new Date();
     let age = today.getFullYear() - birth.getFullYear();
     const monthDelta = today.getMonth() - birth.getMonth();
@@ -91,8 +110,8 @@
 
   function formatBirth(dateStr) {
     if (!dateStr) return "-";
-    const dateValue = new Date(dateStr);
-    if (Number.isNaN(dateValue.getTime())) return "-";
+    const dateValue = parseDateValue(dateStr);
+    if (!dateValue) return "-";
     return dateValue.toLocaleDateString("es-ES");
   }
 
@@ -211,14 +230,16 @@
 
     if (filters.birthFrom || filters.birthTo) {
       if (!athlete.birth_date) return false;
-      const birth = new Date(athlete.birth_date);
-      if (Number.isNaN(birth.getTime())) return false;
+      const birth = parseDateValue(athlete.birth_date);
+      if (!birth) return false;
       if (filters.birthFrom) {
-        const from = new Date(filters.birthFrom);
+        const from = parseDateValue(filters.birthFrom);
+        if (!from) return false;
         if (birth < from) return false;
       }
       if (filters.birthTo) {
-        const to = new Date(filters.birthTo);
+        const to = parseDateValue(filters.birthTo);
+        if (!to) return false;
         if (birth > to) return false;
       }
     }
