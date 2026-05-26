@@ -410,7 +410,7 @@ function renderGoalsByPhase(g, containerId) {
 // ══════════════════════════════════════════════
 function renderPlayerSummary(s) {
   const mvpCard = s.mvp_count > 0
-    ? `<div class="scard" style="background:linear-gradient(135deg,#ffd700,#ffb300)">
+    ? `<div class="scard blue">
         <div class="scard-val">${s.mvp_count}</div><div class="scard-lbl">🏆 MVP</div>
        </div>`
     : '';
@@ -420,7 +420,7 @@ function renderPlayerSummary(s) {
       <div class="scard green"><div class="scard-val">${s.goals}</div><div class="scard-lbl">⚽ Goles</div></div>
       <div class="scard"><div class="scard-val">${s.assists}</div><div class="scard-lbl">🅰️ Asistencias</div></div>
       <div class="scard gray"><div class="scard-val">${fmtMin(s.minutes)}</div><div class="scard-lbl">⏱️ Minutos</div></div>
-      <div class="scard" style="background:linear-gradient(135deg,#f6d365,#fda085)">
+      <div class="scard gray">
         <div class="scard-val">${s.yellow_cards}</div><div class="scard-lbl">🟨 Amarillas</div>
       </div>
       <div class="scard orange"><div class="scard-val">${s.red_cards}</div><div class="scard-lbl">🟥 Rojas</div></div>
