@@ -10,6 +10,8 @@
     resolveFileUrl,
     computeAge,
     formatBirth,
+    countActiveFilters,
+    renderStateBlock,
     setStatusMessage,
     getFilterValues,
     athleteMatchesFilters,
@@ -62,6 +64,28 @@
     if (value === "M") return "Masculino";
     if (value === "F") return "Femenino";
     return value || "-";
+  }
+
+  function setAthleteWorkspaceSummary(roleName, filtered, allItems, filters) {
+    if (!window.DashboardShell?.setWorkspaceModuleSummary) return;
+
+    const activeCount = filtered.filter((athlete) => athlete.is_active !== false).length;
+    const inactiveCount = allItems.filter((athlete) => athlete.is_active === false).length;
+    const filterCount = countActiveFilters(filters);
+    const metrics =
+      roleName === "admin"
+        ? [
+            { label: "Visibles", value: String(filtered.length) },
+            { label: "Filtros", value: String(filterCount) },
+            { label: "Inactivos", value: String(inactiveCount) },
+          ]
+        : [
+            { label: "Atletas", value: String(filtered.length) },
+            { label: "Filtros", value: String(filterCount) },
+            { label: "Activos", value: String(activeCount) },
+          ];
+
+    window.DashboardShell.setWorkspaceModuleSummary(roleName, "athletes", { metrics });
   }
 
   function getFilteredAthletesForExport(scope) {
@@ -431,9 +455,23 @@
     const currentRole = getRole();
     const filters = getFilterValues("admin");
     const filtered = adminAthletesCache.filter((athlete) => athleteMatchesFilters(athlete, filters));
+    setAthleteWorkspaceSummary(currentRole === "admin" ? "admin" : "general", filtered, adminAthletesCache, filters);
 
     if (!filtered.length) {
-      box.innerHTML = `<div class="w3-center w3-text-gray w3-small">No hay atletas registrados.</div>`;
+      const hasFilters = countActiveFilters(filters) > 0;
+      box.innerHTML = renderStateBlock(
+        "empty",
+        hasFilters
+          ? "No encontramos deportistas con esos filtros"
+          : currentRole === "admin"
+          ? "Todavía no hay deportistas registrados"
+          : "Todavía no hay deportistas vinculados a esta cuenta",
+        hasFilters
+          ? "Prueba con otro nombre, nivel o rango de fechas para ampliar la búsqueda."
+          : currentRole === "admin"
+          ? "Agrega el primer atleta para empezar a construir el padrón."
+          : "Cuando registres atletas aquí podrás seguir su avance, pagos y asistencia."
+      );
       return;
     }
 
@@ -533,7 +571,11 @@
   async function loadAthletes() {
     const box = document.getElementById("athleteList");
     if (!box) return;
-    box.innerHTML = `<div class="w3-center w3-text-gray w3-small">Cargando atletas...</div>`;
+    box.innerHTML = renderStateBlock(
+      "loading",
+      "Estamos cargando el padrón de deportistas",
+      "Preparamos filtros, equipos y accesos rápidos para que no pierdas contexto."
+    );
     try {
       const currentRole = getRole();
       const url =
@@ -560,7 +602,11 @@
         filtersBox.style.display = "none";
       }
     } catch (error) {
-      box.innerHTML = `<div class="w3-center w3-text-red w3-small">${error.message}</div>`;
+      box.innerHTML = renderStateBlock(
+        "error",
+        "No pudimos cargar los deportistas",
+        error.message || "Intenta actualizar la vista en unos segundos."
+      );
     }
   }
 
@@ -569,13 +615,29 @@
     const teamsList = document.getElementById("coachTeamsList");
     if (!allList || !teamsList) return;
 
-    allList.innerHTML = `<div class="w3-center w3-text-gray w3-small">Cargando atletas...</div>`;
-    teamsList.innerHTML = `<div class="w3-center w3-text-gray w3-small">Cargando equipos...</div>`;
+    allList.innerHTML = renderStateBlock(
+      "loading",
+      "Estamos preparando tus deportistas",
+      "Traemos la lista completa y la agrupación por equipos."
+    );
+    teamsList.innerHTML = renderStateBlock(
+      "loading",
+      "Estamos organizando tus equipos",
+      "En breve verás los niveles y categorías asignadas."
+    );
 
     const coachUserId = getUserId();
     if (!coachUserId) {
-      allList.innerHTML = `<div class="w3-center w3-text-red w3-small">No se pudo leer el usuario.</div>`;
-      teamsList.innerHTML = `<div class="w3-center w3-text-red w3-small">No se pudo leer el usuario.</div>`;
+      allList.innerHTML = renderStateBlock(
+        "error",
+        "No pudimos identificar la sesión",
+        "Vuelve a cargar el panel para recuperar tu contexto."
+      );
+      teamsList.innerHTML = renderStateBlock(
+        "error",
+        "No pudimos identificar la sesión",
+        "Vuelve a cargar el panel para recuperar tu contexto."
+      );
       return;
     }
 
@@ -598,7 +660,11 @@
       }
 
       if (!coachAthletesCache.length) {
-        teamsList.innerHTML = `<div class="w3-center w3-text-gray w3-small">Sin equipos asignados.</div>`;
+        teamsList.innerHTML = renderStateBlock(
+          "empty",
+          "Todavía no hay equipos asignados",
+          "Cuando se asignen niveles y categorías aparecerán aquí agrupados por equipo."
+        );
         return;
       }
 
@@ -624,7 +690,11 @@
 
       const teamKeys = Object.keys(teams);
       if (!teamKeys.length) {
-        teamsList.innerHTML = `<div class="w3-center w3-text-gray w3-small">No tienes deportistas asignados a tus niveles.</div>`;
+        teamsList.innerHTML = renderStateBlock(
+          "empty",
+          "Aún no hay deportistas en tus niveles",
+          "Cuando recibas asignaciones activas verás aquí cada equipo con sus integrantes."
+        );
         return;
       }
 
@@ -657,8 +727,16 @@
         })
         .join("");
     } catch (error) {
-      allList.innerHTML = `<div class="w3-center w3-text-red w3-small">${error.message}</div>`;
-      teamsList.innerHTML = `<div class="w3-center w3-text-red w3-small">${error.message}</div>`;
+      allList.innerHTML = renderStateBlock(
+        "error",
+        "No pudimos cargar tus deportistas",
+        error.message || "Intenta de nuevo en unos segundos."
+      );
+      teamsList.innerHTML = renderStateBlock(
+        "error",
+        "No pudimos cargar tus equipos",
+        error.message || "Intenta de nuevo en unos segundos."
+      );
     }
   }
 
@@ -666,10 +744,19 @@
     const allList = document.getElementById("coachAllAthletesList");
     if (!allList) return;
 
-    const filtered = coachAthletesCache.filter((athlete) => athleteMatchesFilters(athlete, getFilterValues("coach")));
+    const filters = getFilterValues("coach");
+    const filtered = coachAthletesCache.filter((athlete) => athleteMatchesFilters(athlete, filters));
+    setAthleteWorkspaceSummary("coach", filtered, coachAthletesCache, filters);
 
     if (!filtered.length) {
-      allList.innerHTML = `<div class="w3-center w3-text-gray w3-small">No hay atletas registrados.</div>`;
+      const hasFilters = countActiveFilters(filters) > 0;
+      allList.innerHTML = renderStateBlock(
+        "empty",
+        hasFilters ? "No encontramos deportistas con esos filtros" : "Todavía no tienes deportistas asignados",
+        hasFilters
+          ? "Prueba otro nivel, entrenador o criterio de búsqueda para ampliar la lista."
+          : "Cuando recibas asignaciones activas verás aquí el roster completo de tus equipos."
+      );
       return;
     }
 

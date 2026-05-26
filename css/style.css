@@ -232,6 +232,150 @@ svg {
   margin-bottom: 14px;
 }
 
+.dashboard-workspace-summary {
+  display: grid;
+  gap: 10px;
+  justify-items: end;
+  margin-left: auto;
+  min-width: min(100%, 360px);
+}
+
+.dashboard-workspace-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.dashboard-workspace-stat {
+  min-width: 108px;
+  padding: 10px 12px;
+  border-radius: 18px;
+  border: 1px solid #dbe7f5;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  box-shadow: 0 12px 28px rgba(15,38,68,.06);
+}
+
+.dashboard-workspace-stat-label {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.dashboard-workspace-stat-value {
+  display: block;
+  color: var(--navy);
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.dashboard-workspace-action {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 9px 16px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--indigo), #2d67da);
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  box-shadow: 0 12px 24px rgba(31,74,168,.16);
+  cursor: pointer;
+}
+
+.dashboard-workspace-action.is-visible {
+  display: inline-flex;
+}
+
+.ux-state {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: 22px;
+  border: 1px solid #dbe7f5;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  box-shadow: 0 14px 30px rgba(15,38,68,.07);
+}
+
+.ux-state-badge {
+  flex: 0 0 auto;
+  width: 42px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.ux-state-copy {
+  min-width: 0;
+}
+
+.ux-state-title {
+  margin: 0;
+  color: var(--navy);
+  font-size: 0.98rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.ux-state-body {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.ux-state--loading .ux-state-badge {
+  background: rgba(88,214,232,.16);
+  color: var(--indigo);
+}
+
+.ux-state--empty .ux-state-badge {
+  background: rgba(79,163,247,.14);
+  color: var(--indigo);
+}
+
+.ux-state--success .ux-state-badge {
+  background: rgba(155,224,0,.16);
+  color: #486b00;
+}
+
+.ux-state--error .ux-state-badge {
+  background: rgba(220,38,38,.12);
+  color: #b42318;
+}
+
+.ux-inline-feedback {
+  display: block;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid #dbe7f5;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  box-shadow: 0 10px 24px rgba(15,38,68,.05);
+}
+
+.ux-inline-feedback.w3-text-red {
+  border-color: rgba(220,38,38,.24);
+  background: rgba(255,244,244,.9);
+}
+
+.ux-inline-feedback.w3-text-green {
+  border-color: rgba(155,224,0,.28);
+  background: rgba(247,253,234,.95);
+}
+
 .dashboard-workspace-kicker {
   display: inline-block;
   margin-bottom: 6px;
@@ -303,6 +447,137 @@ svg {
 
 .dashboard-module-card {
   animation: fade .2s ease;
+}
+
+.dashboard-module-card .billing-report-primary-actions,
+.dashboard-module-card .billing-report-secondary-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.dashboard-module-card .billing-report-primary-actions .w3-button,
+.dashboard-module-card .billing-report-secondary-actions .w3-button {
+  margin: 0 !important;
+}
+
+.dashboard-module-card .billing-report-primary-actions input[type="month"] {
+  flex: 0 1 180px;
+}
+
+.billing-report-results {
+  margin-top: 4px;
+}
+
+.billing-report-cards {
+  display: grid;
+  gap: 12px;
+}
+
+.billing-report-table {
+  width: 100%;
+}
+
+.billing-report-card {
+  border: 1px solid #dbe7f5;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  box-shadow: 0 14px 30px rgba(15,38,68,.08);
+  padding: 14px 16px;
+}
+
+.billing-report-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.billing-report-card-number {
+  margin: 0 0 4px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.billing-report-card-title {
+  margin: 0;
+  color: var(--navy);
+  font-size: 1rem;
+  line-height: 1.25;
+}
+
+.billing-report-card-status {
+  flex: 0 0 auto;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 10px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.billing-report-card-status--paid {
+  background: rgba(155,224,0,.16);
+  color: #486b00;
+  border-color: rgba(155,224,0,.32);
+}
+
+.billing-report-card-status--submitted {
+  background: rgba(88,214,232,.16);
+  color: #0b6e8d;
+  border-color: rgba(88,214,232,.28);
+}
+
+.billing-report-card-status--cancelled {
+  background: rgba(220,38,38,.12);
+  color: #b42318;
+  border-color: rgba(220,38,38,.2);
+}
+
+.billing-report-card-status--pending {
+  background: rgba(79,163,247,.14);
+  color: #1F4AA8;
+  border-color: rgba(79,163,247,.28);
+}
+
+.billing-report-card-meta {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  margin: 0;
+}
+
+.billing-report-card-meta > div {
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(255,255,255,.92);
+  border: 1px solid #e4edf7;
+}
+
+.billing-report-card-meta dt {
+  margin: 0 0 4px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.billing-report-card-meta dd {
+  margin: 0;
+  color: var(--navy);
+  font-size: 0.86rem;
+  font-weight: 700;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
 }
 
 @media (max-width: 980px) {
@@ -636,6 +911,31 @@ body .main-tab-btn {
     width: calc(100% - 16px);
   }
 
+  .dashboard-workspace-header {
+    flex-direction: column;
+  }
+
+  .dashboard-workspace-summary {
+    width: 100%;
+    justify-items: stretch;
+    min-width: 0;
+    margin-left: 0;
+  }
+
+  .dashboard-workspace-stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    justify-content: stretch;
+  }
+
+  .dashboard-workspace-stat {
+    min-width: 0;
+  }
+
+  .dashboard-workspace-action {
+    width: 100%;
+  }
+
   body .w3-card,
   body .card {
     border-radius: 18px !important;
@@ -702,6 +1002,24 @@ body .main-tab-btn {
     flex: 1 1 calc(50% - 8px);
   }
 
+  .dashboard-module-card .billing-report-primary-actions,
+  .dashboard-module-card .billing-report-secondary-actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .dashboard-module-card .billing-report-primary-actions input[type="month"] {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .dashboard-module-card .billing-report-primary-actions .w3-button,
+  .dashboard-module-card .billing-report-secondary-actions .w3-button {
+    width: 100%;
+  }
+
   body .player-row {
     flex-wrap: wrap;
     align-items: flex-start !important;
@@ -716,6 +1034,10 @@ body .main-tab-btn {
   body .w3-button {
     height: auto;
     min-height: 44px;
+  }
+
+  .ux-state {
+    padding: 14px 15px;
   }
 
   body .team-row {

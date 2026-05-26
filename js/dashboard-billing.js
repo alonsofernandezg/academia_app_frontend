@@ -8,6 +8,7 @@
   const {
     authHeaders,
     getApiBase,
+    renderStateBlock,
     resolveFileUrl,
     formatBirth,
     formatMoney,
@@ -34,6 +35,42 @@
 
   function getApiUrl() {
     return getApiBase();
+  }
+
+  function updateBillingWorkspaceSummary(visibleInvoices = adminInvoicesCache) {
+    if (!window.DashboardShell?.setWorkspaceModuleSummary) return;
+
+    const pendingCount = visibleInvoices.filter((invoice) => {
+      const status = String(invoice.status || "").toLowerCase();
+      return status === "pending" || status === "submitted";
+    }).length;
+    const activePlans = billingPlansCache.filter((plan) => plan.is_active).length;
+
+    window.DashboardShell.setWorkspaceModuleSummary("admin", "billing", {
+      metrics: [
+        { label: "Facturas", value: String(visibleInvoices.length) },
+        { label: "Pendientes", value: String(pendingCount) },
+        { label: "Planes", value: String(activePlans) },
+      ],
+    });
+  }
+
+  function updateGeneralPaymentsWorkspaceSummary(filtered = generalInvoicesCache) {
+    if (!window.DashboardShell?.setWorkspaceModuleSummary) return;
+
+    const pendingCount = filtered.filter((invoice) => {
+      const status = String(invoice.status || "").toLowerCase();
+      return status === "pending" || status === "submitted";
+    }).length;
+    const proofCount = filtered.filter((invoice) => Boolean(invoice.last_payment_proof_url)).length;
+
+    window.DashboardShell.setWorkspaceModuleSummary("general", "payments", {
+      metrics: [
+        { label: "Pagos", value: String(filtered.length) },
+        { label: "Pendientes", value: String(pendingCount) },
+        { label: "Comprobantes", value: String(proofCount) },
+      ],
+    });
   }
 
   function getRoleName() {
@@ -106,7 +143,11 @@
     const box = document.getElementById("generalPaymentsList");
     if (!box) return;
 
-    box.innerHTML = `<div class="w3-center w3-text-gray w3-small">Cargando pagos...</div>`;
+    box.innerHTML = renderStateBlock(
+      "loading",
+      "Estamos reuniendo tus pagos",
+      "Verás estado, periodo y comprobantes en una sola vista."
+    );
 
     try {
       const cfgRes = await fetch(`${getApiUrl()}/auth/config`);
@@ -132,7 +173,11 @@
       }
       renderGeneralPayments();
     } catch (error) {
-      box.innerHTML = `<div class="w3-center w3-text-red w3-small">${error.message}</div>`;
+      box.innerHTML = renderStateBlock(
+        "error",
+        "No pudimos cargar tus pagos",
+        error.message || "Intenta actualizar esta vista en unos segundos."
+      );
     }
   }
 
@@ -141,12 +186,18 @@
     if (!box) return;
 
     if (!generalInvoicesCache.length) {
-      box.innerHTML = `<div class="w3-center w3-text-gray w3-small">No hay facturas registradas.</div>`;
+      updateGeneralPaymentsWorkspaceSummary([]);
+      box.innerHTML = renderStateBlock(
+        "empty",
+        "Todavía no hay pagos registrados",
+        "Cuando tengas facturas activas podrás seguir aquí su estado y comprobantes."
+      );
       return;
     }
 
     const filters = getGeneralPaymentsFilters();
     const filtered = applyGeneralPaymentsFilters(generalInvoicesCache, filters);
+    updateGeneralPaymentsWorkspaceSummary(filtered);
     if (!filtered.length) {
       const pageInfo = document.getElementById("generalPaymentsPageInfo");
       const prevBtn = document.getElementById("generalPaymentsPrev");
@@ -154,7 +205,11 @@
       if (pageInfo) pageInfo.textContent = "P\u00e1gina 0 de 0";
       if (prevBtn) prevBtn.disabled = true;
       if (nextBtn) nextBtn.disabled = true;
-      box.innerHTML = `<div class="w3-center w3-text-gray w3-small">No hay facturas para mostrar.</div>`;
+      box.innerHTML = renderStateBlock(
+        "empty",
+        "No encontramos pagos con esos filtros",
+        "Prueba con otro estado o término de búsqueda para ampliar la lista."
+      );
       return;
     }
 
@@ -487,7 +542,11 @@
     const planSelect = document.getElementById("billInvoicePlan");
     if (!list || !planSelect) return;
 
-    list.innerHTML = `<div class="w3-center w3-text-gray w3-small">Cargando planes...</div>`;
+    list.innerHTML = renderStateBlock(
+      "loading",
+      "Estamos actualizando los planes",
+      "Preparamos los montos activos y las opciones disponibles para facturación."
+    );
     try {
       const res = await fetch(`${getApiUrl()}/billing/plans?active_only=false`, {
         headers: authHeaders(),
@@ -497,7 +556,11 @@
       billingPlansCache = data;
       renderBillingPlans();
     } catch (error) {
-      list.innerHTML = `<div class="w3-center w3-text-red w3-small">${error.message}</div>`;
+      list.innerHTML = renderStateBlock(
+        "error",
+        "No pudimos cargar los planes",
+        error.message || "Intenta actualizar esta sección en unos segundos."
+      );
     }
   }
 
@@ -507,8 +570,13 @@
     if (!list || !planSelect) return;
 
     if (!billingPlansCache.length) {
-      list.innerHTML = `<div class="w3-center w3-text-gray w3-small">No hay planes registrados.</div>`;
+      list.innerHTML = renderStateBlock(
+        "empty",
+        "Todavía no hay planes creados",
+        "Configura el primer plan para agilizar la generación de facturas y reportes."
+      );
       planSelect.innerHTML = `<option value="">Manual</option>`;
+      updateBillingWorkspaceSummary();
       return;
     }
 
@@ -548,6 +616,8 @@
         .filter((plan) => plan.is_active)
         .map((plan) => `<option value="${plan.id}">${plan.name}</option>`)
         .join("");
+
+    updateBillingWorkspaceSummary();
   }
 
   async function loadAdminAthleteOptions() {
@@ -588,7 +658,7 @@
     }
 
     try {
-      setStatusMessage(msg, "Guardando...", "w3-small w3-text-gray w3-center");
+      setStatusMessage(msg, "Guardando cambios...", "w3-small w3-text-gray w3-center");
       const isEdit = Boolean(editingPlanId);
       const url = isEdit ? `${getApiUrl()}/billing/plans/${editingPlanId}` : `${getApiUrl()}/billing/plans`;
       const method = isEdit ? "PATCH" : "POST";
@@ -607,7 +677,7 @@
       if (!res.ok) throw new Error(data.detail || "No se pudo guardar el plan");
       if (msg) {
         msg.className = "w3-small w3-text-green w3-center";
-        msg.textContent = isEdit ? "Plan actualizado correctamente." : "Plan creado correctamente.";
+        msg.textContent = isEdit ? "Plan actualizado correctamente." : "Plan listo para usarse en nuevas facturas.";
       }
       cancelEditBillingPlan();
       await loadBillingPlans();
@@ -691,7 +761,7 @@
     if (notes) payload.notes = notes;
 
     try {
-      setStatusMessage(msg, "Guardando...", "w3-small w3-text-gray w3-center");
+      setStatusMessage(msg, "Guardando cambios...", "w3-small w3-text-gray w3-center");
       const url = editingInvoiceId
         ? `${getApiUrl()}/billing/invoices/${editingInvoiceId}`
         : `${getApiUrl()}/billing/invoices`;
@@ -707,7 +777,7 @@
         msg.className = "w3-small w3-text-green w3-center";
         msg.textContent = editingInvoiceId
           ? "Factura actualizada correctamente."
-          : "Factura creada correctamente.";
+          : "Factura creada y lista para seguimiento.";
       }
       resetInvoiceForm();
       await loadAdminInvoices();
@@ -743,7 +813,11 @@
     const box = document.getElementById("billInvoiceList");
     if (!box) return;
 
-    box.innerHTML = `<div class="w3-center w3-text-gray w3-small">Cargando facturas...</div>`;
+    box.innerHTML = renderStateBlock(
+      "loading",
+      "Estamos reuniendo las facturas",
+      "Incluimos estado, plan y acciones rápidas para revisar el periodo."
+    );
     try {
       const res = await fetch(`${getApiUrl()}/billing/invoices`, { headers: authHeaders() });
       const data = await res.json();
@@ -751,7 +825,11 @@
       adminInvoicesCache = data;
       renderAdminInvoices();
     } catch (error) {
-      box.innerHTML = `<div class="w3-center w3-text-red w3-small">${error.message}</div>`;
+      box.innerHTML = renderStateBlock(
+        "error",
+        "No pudimos cargar las facturas",
+        error.message || "Intenta actualizar esta sección nuevamente."
+      );
     }
   }
 
@@ -772,8 +850,16 @@
       return athlete.includes(search) || plan.includes(search);
     });
 
+    updateBillingWorkspaceSummary(filtered);
+
     if (!filtered.length) {
-      box.innerHTML = `<div class="w3-center w3-text-gray w3-small">No hay facturas registradas.</div>`;
+      box.innerHTML = renderStateBlock(
+        "empty",
+        search || status ? "No encontramos facturas con esos filtros" : "Todavía no hay facturas generadas",
+        search || status
+          ? "Prueba con otro nombre, plan o estado para ampliar la búsqueda."
+          : "Genera el primer lote mensual o crea una factura manual para empezar."
+      );
       return;
     }
 
@@ -879,11 +965,19 @@
 
     const month = monthInput.value;
     if (!month) {
-      box.innerHTML = `<div class="w3-center w3-text-red w3-small">Selecciona un mes.</div>`;
+      box.innerHTML = renderStateBlock(
+        "empty",
+        "Elige un mes para ver el resumen",
+        "Desde aquí también podrás exportar el reporte o generar nuevas facturas."
+      );
       return;
     }
 
-    box.innerHTML = `<div class="w3-center w3-text-gray w3-small">Generando reporte...</div>`;
+    box.innerHTML = renderStateBlock(
+      "loading",
+      "Estamos preparando el reporte mensual",
+      "Calculamos estado, periodo y monto para que lo revises en una sola vista."
+    );
     try {
       const res = await fetch(`${getApiUrl()}/billing/report?month=${month}`, {
         headers: authHeaders(),
@@ -892,12 +986,20 @@
       if (!res.ok) throw new Error(data.detail || "No se pudo generar el reporte");
       billingReportCache = data;
       if (!data.length) {
-        box.innerHTML = `<div class="w3-center w3-text-gray w3-small">Sin registros para el mes.</div>`;
+        box.innerHTML = renderStateBlock(
+          "empty",
+          "Todavía no hay movimientos para ese mes",
+          "Prueba con otro periodo o genera las facturas pendientes antes de exportar."
+        );
         return;
       }
-      box.innerHTML = renderBillingReportTable(data);
+      box.innerHTML = renderBillingReportResults(data, getBillingReportContainerWidth(box));
     } catch (error) {
-      box.innerHTML = `<div class="w3-center w3-text-red w3-small">${error.message}</div>`;
+      box.innerHTML = renderStateBlock(
+        "error",
+        "No pudimos generar el reporte",
+        error.message || "Intenta nuevamente con el mismo mes en unos segundos."
+      );
     }
   }
 
@@ -908,7 +1010,11 @@
     const month = monthInput.value;
     if (!month) {
       if (msgBox) {
-        msgBox.innerHTML = `<div class="w3-center w3-text-red w3-small">Selecciona un mes.</div>`;
+        msgBox.innerHTML = renderStateBlock(
+          "empty",
+          "Elige un mes antes de generar facturas",
+          "Así evitamos crear movimientos fuera del periodo que quieres revisar."
+        );
       }
       return;
     }
@@ -916,7 +1022,11 @@
     if (!ok) return;
     try {
       if (msgBox) {
-        msgBox.innerHTML = `<div class="w3-center w3-text-gray w3-small">Generando facturas...</div>`;
+        msgBox.innerHTML = renderStateBlock(
+          "loading",
+          "Estamos generando las facturas del mes",
+          "En cuanto termine podrás revisarlas y exportar el resumen actualizado."
+        );
       }
       const res = await fetch(`${getApiUrl()}/billing/subscriptions/generate-monthly?month=${month}`, {
         method: "POST",
@@ -925,12 +1035,20 @@
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail || "No se pudieron generar las facturas");
       if (msgBox) {
-        msgBox.innerHTML = `<div class="w3-center w3-text-green w3-small">Facturas generadas: ${data.created || 0}</div>`;
+        msgBox.innerHTML = renderStateBlock(
+          "success",
+          "Facturas generadas correctamente",
+          `${data.created || 0} factura(s) quedaron listas para revisar o exportar.`
+        );
       }
       await loadAdminInvoices();
     } catch (error) {
       if (msgBox) {
-        msgBox.innerHTML = `<div class="w3-center w3-text-red w3-small">${error.message}</div>`;
+        msgBox.innerHTML = renderStateBlock(
+          "error",
+          "No pudimos generar las facturas",
+          error.message || "Intenta nuevamente con el mismo mes."
+        );
       }
     }
   }
@@ -954,6 +1072,79 @@
     }
   }
 
+  function formatBillingReportPeriod(row) {
+    const periodStart = row.period_start ? formatBirth(row.period_start) : "-";
+    const periodEnd = row.period_end ? formatBirth(row.period_end) : "-";
+    return row.period_start || row.period_end ? `${periodStart} - ${periodEnd}` : "Sin periodo";
+  }
+
+  function getBillingReportStatusClass(status) {
+    switch (String(status || "").toLowerCase()) {
+      case "paid":
+        return "billing-report-card-status--paid";
+      case "submitted":
+        return "billing-report-card-status--submitted";
+      case "cancelled":
+        return "billing-report-card-status--cancelled";
+      default:
+        return "billing-report-card-status--pending";
+    }
+  }
+
+  function getBillingReportContainerWidth(box) {
+    if (!box) return window.innerWidth || 0;
+    return box.clientWidth || box.parentElement?.clientWidth || window.innerWidth || 0;
+  }
+
+  function shouldUseBillingReportCards(containerWidth) {
+    return Number(containerWidth || 0) < 620;
+  }
+
+  function rerenderBillingReport() {
+    const box = document.getElementById("billingReportList");
+    if (!box || !billingReportCache.length) return;
+    box.innerHTML = renderBillingReportResults(billingReportCache, getBillingReportContainerWidth(box));
+  }
+
+  function renderBillingReportResults(rows, containerWidth) {
+    return shouldUseBillingReportCards(containerWidth)
+      ? `<div class="billing-report-results"><div class="billing-report-cards">${renderBillingReportCards(rows)}</div></div>`
+      : `<div class="billing-report-results"><div class="billing-report-table table-scroll">${renderBillingReportTable(rows)}</div></div>`;
+  }
+
+  function renderBillingReportCards(rows) {
+    return rows
+      .map((row) => {
+        const periodText = formatBillingReportPeriod(row);
+        return `
+          <article class="billing-report-card">
+            <div class="billing-report-card-head">
+              <div>
+                <div class="billing-report-card-number">Factura #${row.invoice_id}</div>
+                <h5 class="billing-report-card-title">${row.athlete_name || "-"}</h5>
+              </div>
+              <span class="billing-report-card-status ${getBillingReportStatusClass(row.status)}">${formatInvoiceStatus(row.status)}</span>
+            </div>
+            <dl class="billing-report-card-meta">
+              <div>
+                <dt>Plan</dt>
+                <dd>${row.plan_name || "Manual"}</dd>
+              </div>
+              <div>
+                <dt>Periodo</dt>
+                <dd>${periodText}</dd>
+              </div>
+              <div>
+                <dt>Monto</dt>
+                <dd>${formatMoney(row.total_amount, row.currency)}</dd>
+              </div>
+            </dl>
+          </article>
+        `;
+      })
+      .join("");
+  }
+
   function renderBillingReportTable(rows) {
     const header = `
       <table class="w3-table-all w3-small w3-round-xxlarge">
@@ -971,10 +1162,7 @@
     `;
     const body = rows
       .map((row) => {
-        const periodStart = row.period_start ? formatBirth(row.period_start) : "-";
-        const periodEnd = row.period_end ? formatBirth(row.period_end) : "-";
-        const periodText =
-          row.period_start || row.period_end ? `${periodStart} - ${periodEnd}` : "Sin periodo";
+        const periodText = formatBillingReportPeriod(row);
         return `
         <tr>
           <td>${row.invoice_id}</td>
@@ -1058,6 +1246,8 @@
     win.focus();
     win.print();
   }
+
+  window.addEventListener("resize", rerenderBillingReport);
 
   window.DashboardBilling = {
     fillGeneralPlanAthleteSelect,

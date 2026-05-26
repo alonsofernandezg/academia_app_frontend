@@ -156,9 +156,37 @@
     const withMargin = baseClass.includes("w3-margin-top")
       ? baseClass
       : `${baseClass} w3-margin-top`;
-    msgEl.className = withMargin;
+    msgEl.className = `ux-inline-feedback ${withMargin}`;
     msgEl.textContent = text;
     msgEl.style.display = "block";
+  }
+
+  function renderStateBlock(type, title, body) {
+    const icons = {
+      loading: "…",
+      empty: "○",
+      success: "✓",
+      error: "!",
+    };
+    const safeType = icons[type] ? type : "empty";
+    const safeTitle = title || "Estado";
+    const safeBody = body ? `<div class="ux-state-body">${body}</div>` : "";
+    return `
+      <div class="ux-state ux-state--${safeType}">
+        <div class="ux-state-badge">${icons[safeType]}</div>
+        <div class="ux-state-copy">
+          <div class="ux-state-title">${safeTitle}</div>
+          ${safeBody}
+        </div>
+      </div>
+    `;
+  }
+
+  function countActiveFilters(values) {
+    return Object.values(values || {}).filter((value) => {
+      if (Array.isArray(value)) return value.length > 0;
+      return value !== null && value !== undefined && String(value).trim() !== "";
+    }).length;
   }
 
   function getFilterValues(prefix) {
@@ -674,6 +702,8 @@
     formatAnnouncementPriority,
     formatAnnouncementTarget,
     setStatusMessage,
+    renderStateBlock,
+    countActiveFilters,
     getFilterValues,
     athleteMatchesFilters,
     setSelectOptions,

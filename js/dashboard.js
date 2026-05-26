@@ -113,6 +113,141 @@ const DASHBOARD_WORKSPACE_CONFIG = {
   },
 };
 
+const DASHBOARD_WORKSPACE_SUMMARY_STATE = {
+  admin: {},
+  general: {},
+  coach: {},
+};
+
+const DASHBOARD_WORKSPACE_SUMMARY_CONFIG = {
+  admin: {
+    users: {
+      metrics: [
+        { label: "Cuentas", value: "—" },
+        { label: "Activas", value: "—" },
+        { label: "Foco", value: "Accesos" },
+      ],
+      action: { label: "Crear usuario", handler: openCreateUser },
+    },
+    sports: {
+      metrics: [
+        { label: "Control", value: "Academias" },
+        { label: "Estructura", value: "Categorías" },
+        { label: "Vista", value: "Configuración" },
+      ],
+    },
+    coaches: {
+      metrics: [
+        { label: "Cobertura", value: "Perfiles" },
+        { label: "Asignación", value: "Niveles" },
+        { label: "Estado", value: "Operativo" },
+      ],
+      action: { label: "Nuevo entrenador", handler: openCreateCoach },
+    },
+    athletes: {
+      metrics: [
+        { label: "Visibles", value: "—" },
+        { label: "Filtros", value: "0" },
+        { label: "Inactivos", value: "—" },
+      ],
+      action: { label: "Agregar atleta", handler: openCreateAthlete },
+    },
+    operations: {
+      metrics: [
+        { label: "Ritmo", value: "Sesiones" },
+        { label: "Agenda", value: "Convocatorias" },
+        { label: "Vista", value: "Hoy" },
+      ],
+    },
+    billing: {
+      metrics: [
+        { label: "Facturas", value: "—" },
+        { label: "Pendientes", value: "—" },
+        { label: "Planes", value: "—" },
+      ],
+      action: { label: "Ver reporte mensual", selector: "#billingReportMonth" },
+    },
+    communications: {
+      metrics: [
+        { label: "Canal", value: "Avisos" },
+        { label: "Destino", value: "Segmentado" },
+        { label: "Adjuntos", value: "Opcionales" },
+      ],
+    },
+  },
+  general: {
+    athletes: {
+      metrics: [
+        { label: "Atletas", value: "—" },
+        { label: "Filtros", value: "0" },
+        { label: "Vista", value: "Familia" },
+      ],
+      action: { label: "Agregar atleta", handler: openCreateAthlete },
+    },
+    reports: {
+      metrics: [
+        { label: "Cobertura", value: "Asistencia" },
+        { label: "Exporta", value: "CSV y PDF" },
+        { label: "Vista", value: "Mensual" },
+      ],
+      action: { label: "Elegir mes", selector: "#generalReportMonth" },
+    },
+    plans: {
+      metrics: [
+        { label: "Seguimiento", value: "Planes" },
+        { label: "Cambio", value: "Próximo periodo" },
+        { label: "Vista", value: "Por atleta" },
+      ],
+      action: { label: "Seleccionar atleta", selector: "#generalPlanAthlete" },
+    },
+    payments: {
+      metrics: [
+        { label: "Comprobantes", value: "Seguimiento" },
+        { label: "Estado", value: "Pendiente" },
+        { label: "Vista", value: "Historial" },
+      ],
+      action: { label: "Buscar pagos", selector: "#generalPaymentsSearch" },
+    },
+    communications: {
+      metrics: [
+        { label: "Canal", value: "Avisos" },
+        { label: "Destino", value: "Tus deportistas" },
+        { label: "Vista", value: "Historial" },
+      ],
+    },
+  },
+  coach: {
+    profile: {
+      metrics: [
+        { label: "Identidad", value: "Perfil" },
+        { label: "Rol", value: "Entrenador" },
+        { label: "Vista", value: "Resumen" },
+      ],
+    },
+    athletes: {
+      metrics: [
+        { label: "Equipos", value: "Consulta" },
+        { label: "Filtros", value: "Rápidos" },
+        { label: "Vista", value: "Entrenador" },
+      ],
+    },
+    operations: {
+      metrics: [
+        { label: "Asistencia", value: "Diaria" },
+        { label: "Convocatoria", value: "Activa" },
+        { label: "Vista", value: "Operación" },
+      ],
+    },
+    communications: {
+      metrics: [
+        { label: "Canal", value: "Avisos" },
+        { label: "Destino", value: "Tus niveles" },
+        { label: "Vista", value: "Historial" },
+      ],
+    },
+  },
+};
+
 const DASHBOARD_MODULE_LOADERS = {
   admin: {
     users: [() => loadUsers()],
@@ -339,6 +474,82 @@ function updateWorkspaceCopy(roleName, moduleName) {
   if (description) description.textContent = moduleConfig.description;
 }
 
+function getWorkspaceSummaryElements(roleName) {
+  return {
+    stats: document.getElementById(`${roleName}WorkspaceStats`),
+    action: document.getElementById(`${roleName}WorkspaceAction`),
+  };
+}
+
+function focusWorkspaceTarget(selector) {
+  const target = document.querySelector(selector);
+  if (!target) return;
+  target.scrollIntoView({ behavior: "smooth", block: "center" });
+  if (typeof target.focus === "function") {
+    target.focus({ preventScroll: true });
+  }
+}
+
+function getWorkspaceSummary(roleName, moduleName) {
+  const config = DASHBOARD_WORKSPACE_SUMMARY_CONFIG[roleName]?.[moduleName] || {};
+  const runtime = DASHBOARD_WORKSPACE_SUMMARY_STATE[roleName]?.[moduleName] || {};
+  return {
+    metrics: runtime.metrics || config.metrics || [],
+    action: runtime.action || config.action || null,
+  };
+}
+
+function renderWorkspaceSummary(roleName, moduleName) {
+  const { stats, action } = getWorkspaceSummaryElements(roleName);
+  if (!stats || !action) return;
+
+  const summary = getWorkspaceSummary(roleName, moduleName);
+  stats.innerHTML = summary.metrics
+    .map(
+      (item) => `
+        <div class="dashboard-workspace-stat">
+          <span class="dashboard-workspace-stat-label">${item.label}</span>
+          <span class="dashboard-workspace-stat-value">${item.value}</span>
+        </div>
+      `
+    )
+    .join("");
+
+  if (!summary.action) {
+    action.classList.remove("is-visible");
+    action.textContent = "";
+    action.onclick = null;
+    return;
+  }
+
+  action.textContent = summary.action.label;
+  action.classList.add("is-visible");
+  action.onclick = async () => {
+    if (typeof summary.action.handler === "function") {
+      await summary.action.handler();
+      return;
+    }
+    if (summary.action.selector) {
+      focusWorkspaceTarget(summary.action.selector);
+    }
+  };
+}
+
+function setWorkspaceModuleSummary(roleName, moduleName, summary) {
+  if (!DASHBOARD_WORKSPACE_SUMMARY_STATE[roleName]) {
+    DASHBOARD_WORKSPACE_SUMMARY_STATE[roleName] = {};
+  }
+
+  DASHBOARD_WORKSPACE_SUMMARY_STATE[roleName][moduleName] = {
+    ...(DASHBOARD_WORKSPACE_SUMMARY_STATE[roleName][moduleName] || {}),
+    ...(summary || {}),
+  };
+
+  if (role === roleName && activeDashboardModule === moduleName) {
+    renderWorkspaceSummary(roleName, moduleName);
+  }
+}
+
 function syncDashboardNavState(roleName, moduleName) {
   document
     .querySelectorAll(`[data-dashboard-nav-role="${roleName}"]`)
@@ -358,6 +569,14 @@ function syncAdminAuxPanels(moduleName) {
   }
 }
 
+function syncDashboardShellState(roleName) {
+  const generalShell = document.querySelector('[data-dashboard-shell-role="general"]');
+  if (!generalShell) return;
+
+  if (roleName === "general") show(generalShell);
+  else hide(generalShell);
+}
+
 async function activateDashboardModule(roleName, moduleName) {
   const config = DASHBOARD_WORKSPACE_CONFIG[roleName];
   if (!config || !config.modules[moduleName]) return;
@@ -370,7 +589,9 @@ async function activateDashboardModule(roleName, moduleName) {
 
   syncDashboardNavState(roleName, moduleName);
   updateWorkspaceCopy(roleName, moduleName);
+  renderWorkspaceSummary(roleName, moduleName);
   syncAdminAuxPanels(moduleName);
+  syncDashboardShellState(roleName);
   await ensureDashboardModuleLoaded(roleName, moduleName);
 }
 
@@ -615,7 +836,7 @@ window.addEventListener("load", async () => {
 
   if (role === "admin") {
     show(adminPanel);
-    show(generalPanel);
+    hide(generalPanel);
     hide(coachPanel);
     await initDashboardWorkspace("admin");
     const generalReport = document.getElementById("generalReportSection");
@@ -638,6 +859,10 @@ window.addEventListener("load", async () => {
     await initDashboardWorkspace("general");
   }
 });
+
+window.DashboardShell = {
+  setWorkspaceModuleSummary,
+};
 
 // --------------------------------------------------
 // ADMIN: Usuarios

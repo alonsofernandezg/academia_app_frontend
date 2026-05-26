@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
   <!-- Fuente y estilo propio (mismo que index) -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap">
-  <link rel="stylesheet" href="css/style.css?v=20260526b">
+  <link rel="stylesheet" href="css/style.css?v=20260526d">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css">
   <style>
     .badge { display:inline-block; padding:4px 10px; border-radius:999px; font-size:11px; font-weight:700; margin-left:4px; border:1px solid transparent; }
@@ -69,6 +69,10 @@
             <p id="adminWorkspaceDescription" class="dashboard-workspace-description">
               Gestiona cuentas administrativas y de entrenadores.
             </p>
+          </div>
+          <div class="dashboard-workspace-summary">
+            <div id="adminWorkspaceStats" class="dashboard-workspace-stats" aria-label="Resumen rapido del panel administrador"></div>
+            <button type="button" id="adminWorkspaceAction" class="dashboard-workspace-action"></button>
           </div>
         </div>
         <div class="dashboard-workspace-nav" aria-label="Secciones principales del panel administrador">
@@ -529,35 +533,44 @@
                 <h4 class="w3-text-indigo" style="margin-top:0">Reporte mensual</h4>
                 <div class="w3-row w3-margin-bottom">
                   <div class="w3-col s12 m6">
-                    <input id="billingReportMonth" type="month" class="w3-input w3-border w3-round-large" style="max-width:180px; display:inline-block;">
-                    <button
-                      class="w3-button w3-blue w3-round-xxlarge w3-small w3-margin-left"
-                      onclick="loadBillingReport()">
-                    <button
-                      class="w3-button w3-white w3-border w3-round-xxlarge w3-small w3-margin-left"
-                      onclick="generateMonthlyInvoices()">
-                      Generar facturas
-                    </button>
-                      Generar
-                    </button>
+                    <div class="billing-report-primary-actions">
+                      <input id="billingReportMonth" type="month" class="w3-input w3-border w3-round-large" style="max-width:180px; display:inline-block;">
+                      <button
+                        type="button"
+                        class="w3-button w3-blue w3-round-xxlarge w3-small"
+                        onclick="loadBillingReport()">
+                        Generar
+                      </button>
+                      <button
+                        type="button"
+                        class="w3-button w3-white w3-border w3-round-xxlarge w3-small"
+                        onclick="generateMonthlyInvoices()">
+                        Generar facturas
+                      </button>
+                    </div>
                   </div>
                   <div class="w3-col s12 m6 w3-right-align">
-                    <button
-                      class="w3-button w3-white w3-border w3-round-xxlarge w3-small"
-                      onclick="exportBillingCsv()">
-                      Exportar CSV
-                    </button>
-                    <button
-                      class="w3-button w3-white w3-border w3-round-xxlarge w3-small w3-margin-left"
-                      onclick="exportBillingPdf()">
-                      Exportar PDF
-                    </button>
-                    <button
-                      class="w3-button w3-orange w3-round-xxlarge w3-small w3-margin-left"
-                      title="Corrige facturas con fechas de inicio/fin fuera del 1\u00ba y \u00faltimo d\u00eda del mes"
-                      onclick="fixInvoicePeriods()">
-                      Corregir fechas
-                    </button>
+                    <div class="billing-report-secondary-actions">
+                      <button
+                        type="button"
+                        class="w3-button w3-white w3-border w3-round-xxlarge w3-small"
+                        onclick="exportBillingCsv()">
+                        Exportar CSV
+                      </button>
+                      <button
+                        type="button"
+                        class="w3-button w3-white w3-border w3-round-xxlarge w3-small"
+                        onclick="exportBillingPdf()">
+                        Exportar PDF
+                      </button>
+                      <button
+                        type="button"
+                        class="w3-button w3-orange w3-round-xxlarge w3-small"
+                        title="Corrige facturas con fechas de inicio/fin fuera del 1\u00ba y \u00faltimo d\u00eda del mes"
+                        onclick="fixInvoicePeriods()">
+                        Corregir fechas
+                      </button>
+                    </div>
                   </div>
                 </div>
                 <div id="billingReportList">
@@ -875,6 +888,10 @@
               Consulta y gestiona la información principal de tus atletas.
             </p>
           </div>
+          <div class="dashboard-workspace-summary">
+            <div id="generalWorkspaceStats" class="dashboard-workspace-stats" aria-label="Resumen rapido del panel familiar"></div>
+            <button type="button" id="generalWorkspaceAction" class="dashboard-workspace-action"></button>
+          </div>
         </div>
         <div class="dashboard-workspace-nav" aria-label="Secciones principales del panel familiar">
           <button type="button" class="dashboard-workspace-pill" data-dashboard-nav-role="general" data-dashboard-module-target="athletes">Deportistas</button>
@@ -1147,6 +1164,10 @@
             <p id="coachWorkspaceDescription" class="dashboard-workspace-description">
               Mantén tu perfil actualizado y accede a tus tareas principales.
             </p>
+          </div>
+          <div class="dashboard-workspace-summary">
+            <div id="coachWorkspaceStats" class="dashboard-workspace-stats" aria-label="Resumen rapido del panel de entrenador"></div>
+            <button type="button" id="coachWorkspaceAction" class="dashboard-workspace-action"></button>
           </div>
         </div>
         <div class="dashboard-workspace-nav" aria-label="Secciones principales del panel de entrenador">
@@ -2041,15 +2062,15 @@
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/locales-all.global.min.js"></script>
   <script src="js/config.js?v=20260428a"></script>
-  <script src="js/dashboard-common.js?v=20260518l"></script>
-  <script src="js/dashboard.js?v=20260518j"></script>
-  <script src="js/dashboard-users.js?v=20260518k"></script>
+  <script src="js/dashboard-common.js?v=20260526d"></script>
+  <script src="js/dashboard.js?v=20260526d"></script>
+  <script src="js/dashboard-users.js?v=20260526d"></script>
   <script src="js/dashboard-coach-assignments.js?v=20260518i"></script>
-  <script src="js/dashboard-athletes.js?v=20260518k"></script>
+  <script src="js/dashboard-athletes.js?v=20260526d"></script>
   <script src="js/dashboard-maintenance.js?v=20260518c"></script>
   <script src="js/dashboard-operations.js?v=20260518e"></script>
   <script src="js/dashboard-reports.js?v=20260518i"></script>
-  <script src="js/dashboard-billing.js?v=20260518h"></script>
+  <script src="js/dashboard-billing.js?v=20260526d"></script>
   <script src="js/dashboard-communications.js?v=20260518a"></script>
   <script src="js/coaches.js?v=20260518i"></script>
   <script src="js/callups.js?v=20260518h"></script>

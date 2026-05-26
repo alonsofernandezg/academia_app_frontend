@@ -9,6 +9,7 @@
     authHeaders,
     getApiBase,
     paginateList,
+    renderStateBlock,
     setStatusMessage,
     showConfirmModal,
     showAlertModal,
@@ -25,17 +26,42 @@
     return role || "-";
   }
 
+  function updateUsersWorkspaceSummary(users) {
+    if (!window.DashboardShell?.setWorkspaceModuleSummary) return;
+
+    const activeCount = users.filter((user) => user.is_active).length;
+    const coachCount = users.filter((user) => user.role === "coach").length;
+
+    window.DashboardShell.setWorkspaceModuleSummary("admin", "users", {
+      metrics: [
+        { label: "Cuentas", value: String(users.length) },
+        { label: "Activas", value: String(activeCount) },
+        { label: "Coaches", value: String(coachCount) },
+      ],
+    });
+  }
+
   async function loadUsers() {
     const box = document.getElementById("usersList");
     if (!box) return;
-    box.innerHTML = `<div class="w3-center w3-text-gray w3-small">Cargando usuarios…</div>`;
+    box.innerHTML = renderStateBlock(
+      "loading",
+      "Estamos preparando los accesos",
+      "En unos segundos verás las cuentas activas y las pendientes de revisión."
+    );
     try {
       const res = await fetch(`${getApiUrl()}/admin/users`, { headers: authHeaders() });
       const users = await res.json();
       if (!res.ok) throw new Error(users.detail || "No se pudieron cargar los usuarios");
 
+      updateUsersWorkspaceSummary(users);
+
       if (!users.length) {
-        box.innerHTML = `<div class="w3-center w3-text-gray w3-small">No hay usuarios todavía.</div>`;
+        box.innerHTML = renderStateBlock(
+          "empty",
+          "Todavía no hay cuentas creadas",
+          "Usa Crear usuario para invitar el primer acceso administrativo o de entrenador."
+        );
         return;
       }
 
@@ -62,7 +88,7 @@
               <button
                 class="w3-button w3-white w3-border w3-round-xxlarge w3-small w3-margin-left"
                 onclick="window.DashboardUsers.resetUserPassword(${user.id})">
-                Restablecer contraseña
+                Enviar clave temporal
               </button>
               <button
                 class="w3-button w3-white w3-border w3-round-xxlarge w3-small"
@@ -77,7 +103,11 @@
         )
         .join("");
     } catch (error) {
-      box.innerHTML = `<div class="w3-center w3-text-red w3-small">${error.message}</div>`;
+      box.innerHTML = renderStateBlock(
+        "error",
+        "No pudimos cargar los accesos",
+        error.message || "Intenta actualizar la vista en unos segundos."
+      );
     }
   }
 
@@ -96,7 +126,7 @@
   }
 
   async function resetUserPassword(userId) {
-    const ok = await showConfirmModal("¿Restablecer contraseña? Se enviará una clave temporal por correo.");
+    const ok = await showConfirmModal("¿Enviar una nueva clave temporal? La persona recibirá el acceso por correo.");
     if (!ok) return;
     try {
       const res = await fetch(`${getApiUrl()}/admin/users/${userId}/reset-password`, {
@@ -110,10 +140,10 @@
         );
       }
       showAlertModal(
-        data.message || "Listo. Se envió una contraseña temporal al correo del usuario."
+        data.message || "Listo. Enviamos una nueva clave temporal al correo del usuario."
       );
     } catch (error) {
-      showAlertModal(error.message || "Ocurrió un error al restablecer la contraseña.");
+      showAlertModal(error.message || "No fue posible enviar la clave temporal en este momento.");
     }
   }
 
@@ -135,7 +165,7 @@
     msg.textContent = "";
 
     try {
-      setStatusMessage(msg, "Guardando...", "w3-small w3-text-gray w3-center");
+      setStatusMessage(msg, "Guardando cambios...", "w3-small w3-text-gray w3-center");
       const res = await fetch(`${getApiUrl()}/admin/create_user`, {
         method: "POST",
         headers: authHeaders(),
@@ -144,7 +174,7 @@
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail || "No se pudo crear el usuario");
       msg.className = "w3-small w3-text-green w3-center";
-      msg.textContent = "Usuario creado y correo enviado.";
+      msg.textContent = "Usuario listo. La invitación ya salió por correo.";
       await loadUsers();
       setTimeout(closeCreateUser, 800);
     } catch (error) {
@@ -175,7 +205,7 @@
     msg.textContent = "";
 
     try {
-      setStatusMessage(msg, "Guardando...", "w3-small w3-text-gray w3-center");
+      setStatusMessage(msg, "Guardando cambios...", "w3-small w3-text-gray w3-center");
       const res = await fetch(`${getApiUrl()}/admin/users/${id}`, {
         method: "PUT",
         headers: authHeaders(),
@@ -184,7 +214,7 @@
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail || "No se pudo actualizar el usuario");
       msg.className = "w3-small w3-text-green w3-center";
-      msg.textContent = "Usuario actualizado correctamente.";
+      msg.textContent = "Cambios guardados correctamente.";
       await loadUsers();
       setTimeout(closeEditUser, 700);
     } catch (error) {
