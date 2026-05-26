@@ -40,9 +40,30 @@
       margin: 0 auto 16px;
     }
 
+    .card label[for] {
+      display: block;
+      margin-bottom: 8px;
+      color: #667085 !important;
+      font-size: 0.72rem !important;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
     .w3-input {
-      height: 42px;
-      border-radius: 10px;
+      min-height: 48px;
+      height: 48px;
+      border-radius: 18px;
+      border: 1px solid #dbe7f5 !important;
+      background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+      box-shadow: 0 10px 24px rgba(15,38,68,.06);
+      padding: 0 14px;
+      color: #0F2644;
+      transition: border-color .18s ease, box-shadow .18s ease, background-color .18s ease;
+    }
+
+    .w3-input::placeholder {
+      color: #91a0b5;
     }
 
     .btn {
@@ -61,7 +82,9 @@
     .w3-input:focus-visible {
       outline: 3px solid rgba(59,130,246,.3);
       outline-offset: 2px;
-      box-shadow: 0 0 0 4px rgba(59,130,246,.14);
+      border-color: #1F4AA8 !important;
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(79,163,247,.12), 0 14px 30px rgba(15,38,68,.10);
     }
 
     .btn[disabled] {

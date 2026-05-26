@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DeportIvA Brand Palette Preview</title>
+  <style>
+    :root {
+      --navy: #0F2644;
+      --royal: #1F4AA8;
+      --sky: #4FA3F7;
+      --aqua: #58D6E8;
+      --lime: #9BE000;
+      --lime-deep: #6FB300;
+      --bg: #F2F5FB;
+      --surface: #FFFFFF;
+      --text: #223047;
+      --muted: #667085;
+      --line: #DCE5F2;
+      --shadow: 0 18px 48px rgba(15, 38, 68, 0.12);
+      --radius-xl: 28px;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Poppins, "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(88, 214, 232, 0.22), transparent 30%),
+        radial-gradient(circle at top right, rgba(155, 224, 0, 0.14), transparent 24%),
+        linear-gradient(180deg, #f7fbff 0%, var(--bg) 100%);
+    }
+
+    .page {
+      width: min(1180px, calc(100% - 32px));
+      margin: 28px auto 40px;
+    }
+
+    .hero {
+      padding: 28px;
+      border-radius: 32px;
+      background: linear-gradient(135deg, rgba(15, 38, 68, 0.96), rgba(31, 74, 168, 0.94));
+      color: white;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -80px -110px auto;
+      width: 260px;
+      height: 260px;
+      background: radial-gradient(circle, rgba(88, 214, 232, 0.4), transparent 65%);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    h1 {
+      margin: 18px 0 8px;
+      font-size: clamp(30px, 4vw, 46px);
+      line-height: 1;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 760px;
+      color: rgba(255, 255, 255, 0.82);
+      font-size: 16px;
+    }
+
+    .swatches {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .swatch {
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+    }
+
+    .chip {
+      height: 52px;
+      border-radius: 14px;
+      margin-bottom: 10px;
+    }
+
+    .swatch strong,
+    .swatch span {
+      display: block;
+    }
+
+    .swatch strong {
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .swatch span {
+      color: rgba(255, 255, 255, 0.76);
+      font-size: 12px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 22px;
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .card-body {
+      padding: 22px;
+    }
+
+    .card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .card-head h2 {
+      margin: 0;
+      font-size: 22px;
+      color: var(--navy);
+    }
+
+    .card-head p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .mini-badge {
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--navy);
+      background: rgba(88, 214, 232, 0.16);
+      border: 1px solid rgba(88, 214, 232, 0.36);
+    }
+
+    .topbar-demo {
+      padding: 14px 18px;
+      background: linear-gradient(135deg, var(--navy), var(--royal));
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .topbar-brand {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .topbar-brand strong {
+      font-size: 20px;
+    }
+
+    .topbar-brand span:first-of-type {
+      color: var(--aqua);
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    .topbar-brand span:last-of-type {
+      color: rgba(255, 255, 255, 0.82);
+      font-size: 12px;
+    }
+
+    .topbar-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .pill-btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 10px 14px;
+      font: inherit;
+      font-weight: 700;
+      cursor: default;
+    }
+
+    .pill-btn.primary {
+      background: linear-gradient(135deg, var(--aqua), #7de2f0);
+      color: var(--navy);
+    }
+
+    .pill-btn.ghost {
+      background: white;
+      color: var(--navy);
+    }
+
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .tab {
+      padding: 11px 16px;
+      border-radius: 999px;
+      border: 1px solid #ced9ef;
+      background: white;
+      color: var(--text);
+      font-weight: 700;
+      position: relative;
+    }
+
+    .tab.active {
+      background: linear-gradient(135deg, var(--royal), #2d67da);
+      color: white;
+      border-color: transparent;
+      box-shadow: 0 12px 26px rgba(31, 74, 168, 0.22);
+    }
+
+    .tab.active::after {
+      content: "";
+      position: absolute;
+      right: 12px;
+      top: 10px;
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--lime);
+      box-shadow: 0 0 0 4px rgba(155, 224, 0, 0.16);
+    }
+
+    .status-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 14px;
+      border-radius: 999px;
+      font-weight: 700;
+      border: 1px solid transparent;
+    }
+
+    .status::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: currentColor;
+    }
+
+    .status.success {
+      color: var(--lime-deep);
+      background: rgba(155, 224, 0, 0.14);
+      border-color: rgba(155, 224, 0, 0.28);
+    }
+
+    .status.info {
+      color: #0b6e8d;
+      background: rgba(88, 214, 232, 0.14);
+      border-color: rgba(88, 214, 232, 0.3);
+    }
+
+    .status.alert {
+      color: var(--royal);
+      background: rgba(79, 163, 247, 0.14);
+      border-color: rgba(79, 163, 247, 0.28);
+    }
+
+    .metric-wrap {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .metric {
+      padding: 18px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, #ffffff 0%, #f5faff 100%);
+      border: 1px solid #dbe7f5;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .metric::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 6px;
+      background: linear-gradient(180deg, var(--aqua), var(--royal));
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 28px;
+      margin-bottom: 6px;
+      color: var(--navy);
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .metric small {
+      display: block;
+      margin-top: 10px;
+      color: var(--lime-deep);
+      font-weight: 700;
+    }
+
+    .note {
+      padding: 18px 22px;
+      border-top: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(88, 214, 232, 0.06), rgba(155, 224, 0, 0.06));
+      color: #415066;
+      font-size: 14px;
+    }
+
+    @media (max-width: 920px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .metric-wrap {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar-demo {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .topbar-actions {
+        justify-content: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <section class="hero">
+      <div class="eyebrow">Paleta sugerida desde el logo</div>
+      <h1>DeportIvA con más identidad visual</h1>
+      <p>La idea no es repintar toda la app, sino reforzar la marca en superficies clave usando azul base, turquesa de acento y verde lima para estados positivos.</p>
+
+      <div class="swatches">
+        <div class="swatch"><div class="chip" style="background:#0F2644"></div><strong>Navy Base</strong><span>#0F2644</span></div>
+        <div class="swatch"><div class="chip" style="background:#1F4AA8"></div><strong>Royal Blue</strong><span>#1F4AA8</span></div>
+        <div class="swatch"><div class="chip" style="background:#4FA3F7"></div><strong>Sky Action</strong><span>#4FA3F7</span></div>
+        <div class="swatch"><div class="chip" style="background:#58D6E8"></div><strong>Aqua Accent</strong><span>#58D6E8</span></div>
+        <div class="swatch"><div class="chip" style="background:#9BE000"></div><strong>Lime Energy</strong><span>#9BE000</span></div>
+        <div class="swatch"><div class="chip" style="background:#6FB300"></div><strong>Lime Deep</strong><span>#6FB300</span></div>
+      </div>
+    </section>
+
+    <section class="grid">
+      <article class="card">
+        <div class="topbar-demo">
+          <div class="topbar-brand">
+            <strong>DeportIvA</strong>
+            <span>Academia Ginga</span>
+            <span>alonso.fernandez@gmail.com</span>
+          </div>
+          <div class="topbar-actions">
+            <button class="pill-btn primary">Estadísticas</button>
+            <button class="pill-btn ghost">Clave</button>
+            <button class="pill-btn ghost">Salir</button>
+          </div>
+        </div>
+        <div class="note"><strong>Uso 1:</strong> topbar principal. Azul oscuro para estructura, turquesa para nombre de academia y botones con más presencia de marca.</div>
+      </article>
+
+      <article class="card">
+        <div class="card-body">
+          <div class="card-head">
+            <div>
+              <h2>Navegación del dashboard</h2>
+              <p>Las tabs ganan identidad sin perder claridad.</p>
+            </div>
+            <span class="mini-badge">Uso 2</span>
+          </div>
+          <div class="tabs">
+            <div class="tab active">Deportistas</div>
+            <div class="tab">Reportes</div>
+            <div class="tab">Pagos</div>
+            <div class="tab">Comunicaciones</div>
+          </div>
+          <div class="note">El azul real sostiene la pestaña activa, el turquesa entra en sombras y bordes, y el verde lima queda como microacento de actividad.</div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-body">
+          <div class="card-head">
+            <div>
+              <h2>Estados y badges</h2>
+              <p>El verde del logo sirve mejor en mensajes positivos y estados rápidos.</p>
+            </div>
+            <span class="mini-badge">Uso 3</span>
+          </div>
+          <div class="status-row">
+            <div class="status success">Activo</div>
+            <div class="status info">Nueva convocatoria</div>
+            <div class="status alert">Revisión pendiente</div>
+          </div>
+          <div class="note">Aquí la marca se siente viva sin saturar formularios ni tablas enteras.</div>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-body">
+          <div class="card-head">
+            <div>
+              <h2>Tarjetas de estadísticas</h2>
+              <p>La zona de métricas acepta mejor gradientes y acentos del isotipo.</p>
+            </div>
+            <span class="mini-badge">Uso 4</span>
+          </div>
+          <div class="metric-wrap">
+            <div class="metric"><strong>92%</strong><span>Asistencia media</span><small>+8% este mes</small></div>
+            <div class="metric"><strong>148</strong><span>Pagos registrados</span><small>Ritmo saludable</small></div>
+            <div class="metric"><strong>18</strong><span>Convocatorias activas</span><small>4 nuevas hoy</small></div>
+          </div>
+        </div>
+      </article>
+    </section>
+  </div>
+</body>
+</html>

@@ -752,17 +752,37 @@ svg {
 .view.active { display:block }
 
 /* Inputs */
-.w3-input, .w3-select {
-  height:44px;
-  border-radius: var(--radius-lg) !important;
-  border: 1px solid #d3d7f3 !important;
-  padding-left:14px;
+.w3-input,
+.w3-select {
+  min-height: 48px;
+  height: 48px;
+  border-radius: 18px !important;
+  border: 1px solid #dbe7f5 !important;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  box-shadow: 0 10px 24px rgba(15,38,68,.06);
+  padding: 0 14px;
+  color: var(--navy);
+  transition: border-color .18s ease, box-shadow .18s ease, background-color .18s ease, transform .18s ease;
+}
+
+.w3-input::placeholder,
+textarea.w3-input::placeholder {
+  color: #91a0b5;
+}
+
+.w3-input:hover,
+.w3-select:hover,
+textarea.w3-input:hover {
+  border-color: #c7d9ef !important;
+  box-shadow: 0 12px 28px rgba(15,38,68,.08);
 }
 
 .w3-input:focus,
 .w3-select:focus,
 textarea.w3-input:focus {
-  border-color: var(--blue) !important;
+  border-color: var(--indigo) !important;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(79,163,247,.12), 0 14px 30px rgba(15,38,68,.10);
 }
 
 .w3-input:focus-visible,
@@ -777,7 +797,42 @@ textarea.w3-input:focus-visible,
 
 textarea.w3-input {
   height:auto;
-  min-height:80px;
+  min-height:104px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  line-height: 1.45;
+  resize: vertical;
+}
+
+.w3-input[type="file"] {
+  height: auto;
+  min-height: 54px;
+  padding: 10px 12px;
+  line-height: 1.3;
+}
+
+.w3-input[type="file"]::file-selector-button {
+  margin-right: 12px;
+  border: 1px solid rgba(31,74,168,.16);
+  border-radius: 999px;
+  background: rgba(79,163,247,.10);
+  color: var(--navy);
+  font: inherit;
+  font-weight: 600;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.dashboard-module-card label[for],
+.w3-modal-content label[for],
+.card label[for] {
+  display: block;
+  margin: 0 0 8px;
+  color: var(--muted) !important;
+  font-size: 0.72rem !important;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 /* Buttons */
