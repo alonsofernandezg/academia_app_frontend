@@ -526,10 +526,10 @@ function setBadge() {
     const email = payload.sub || "";
     document.getElementById("userBadge").innerHTML =
       `<span class="w3-tag w3-white w3-round-xxlarge w3-padding-small">
-        ${email} · rol: <b>${role}</b>
+        ${email}
       </span>`;
   } catch {
-    document.getElementById("userBadge").textContent = `rol: ${role}`;
+    document.getElementById("userBadge").textContent = "";
   }
 }
 

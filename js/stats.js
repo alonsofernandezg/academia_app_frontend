@@ -95,10 +95,9 @@ window.addEventListener("load", async () => {
   try {
     const payload = JSON.parse(atob(token.split(".")[1]));
     const email = payload.sub || "";
-    const role = payload.role || "usuario";
     document.getElementById("userBadge").innerHTML =
       `<span class="w3-tag w3-white w3-round-xxlarge w3-padding-small" style="color:#1565c0">
-        ${email} · rol: <b>${role}</b>
+        ${email}
       </span>`;
   } catch (e) {}
 

@@ -180,10 +180,12 @@ svg {
 }
 
 .app-user-badge .w3-tag {
-  max-width: 210px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  display: inline-block;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  white-space: normal;
+  line-height: 1.15;
+  text-align: left;
 }
 
 .dashboard-workspace-card {
@@ -261,42 +263,40 @@ svg {
   .app-academy-name {
     font-size: 0.76rem;
   }
-
-  .app-user-badge .w3-tag {
-    max-width: 160px;
-  }
 }
 
 @media (max-width: 680px) {
   .app-topbar {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-areas:
-      "left"
-      "right right";
-    column-gap: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
     row-gap: 6px;
     padding: 8px 10px;
     min-height: auto;
   }
 
   .app-topbar-left {
-    grid-area: left;
+    order: 1;
+    flex: 1 1 100%;
     width: 100%;
     flex-wrap: wrap;
+    align-items: flex-start;
     row-gap: 4px;
   }
 
   .app-topbar-right {
-    grid-area: right;
+    order: 2;
+    flex: 1 1 100%;
     width: 100%;
     margin-left: 0;
     justify-content: flex-start;
+    align-items: center;
     row-gap: 6px;
   }
 
   .app-topbar-brand-block {
-    flex: 1 1 180px;
+    flex: 1 1 100%;
+    width: 100%;
   }
 
   .app-academy-name {
@@ -305,15 +305,12 @@ svg {
   }
 
   .app-user-badge {
-    flex: 1 1 100%;
-    min-width: 0;
     text-align: left;
   }
 
   .app-user-badge .w3-tag {
-    display: block;
-    width: 100%;
-    max-width: none;
+    width: auto;
+    max-width: 100%;
   }
 
   .dashboard-workspace-title {
@@ -701,7 +698,7 @@ body .main-tab-btn {
   .app-topbar-right .w3-button,
   .app-topbar-btn {
     width: auto;
-    flex: 0 1 auto;
+    flex: 0 0 auto;
   }
 
   .app-topbar-btn {

@@ -89,8 +89,7 @@ function setAuthStatus() {
   try {
     const payload = JSON.parse(atob(token.split(".")[1]));
     const email = payload.sub || "";
-    const role = localStorage.getItem("role") || "general";
-    el.innerHTML = `✅ Sesión activa: <b>${email}</b> · Rol: <b>${role}</b>
+    el.innerHTML = `✅ Sesión activa: <b>${email}</b>
       <br><button type="button" class="link-button" id="authStatusLogout">Cerrar sesión</button>`;
   } catch {
     el.innerHTML = `✅ Sesión activa · <button type="button" class="link-button" id="authStatusLogout">Cerrar sesión</button>`;
