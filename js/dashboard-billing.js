@@ -37,6 +37,30 @@
     return getApiBase();
   }
 
+  function getCurrentMonthInputRange() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth() + 1;
+    const lastDay = new Date(year, month, 0).getDate();
+    const paddedMonth = String(month).padStart(2, "0");
+    return {
+      start: `${year}-${paddedMonth}-01`,
+      end: `${year}-${paddedMonth}-${String(lastDay).padStart(2, "0")}`,
+    };
+  }
+
+  function syncInvoicePeriodInputsForPlan(plan) {
+    if (!plan || plan.billing_type !== "monthly") return;
+
+    const startInput = document.getElementById("billInvoiceStart");
+    const endInput = document.getElementById("billInvoiceEnd");
+    if (!startInput || !endInput) return;
+
+    const { start, end } = getCurrentMonthInputRange();
+    startInput.value = start;
+    endInput.value = end;
+  }
+
   function updateBillingWorkspaceSummary(visibleInvoices = adminInvoicesCache) {
     if (!window.DashboardShell?.setWorkspaceModuleSummary) return;
 
@@ -526,6 +550,7 @@
         if (plan && amountInput) {
           amountInput.value = plan.amount;
         }
+        syncInvoicePeriodInputsForPlan(plan);
       };
     }
     if (searchInput) searchInput.addEventListener("input", renderAdminInvoices);
