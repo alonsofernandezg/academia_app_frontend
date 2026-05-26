@@ -475,9 +475,12 @@ function updateWorkspaceCopy(roleName, moduleName) {
 }
 
 function getWorkspaceSummaryElements(roleName) {
+  const stats = document.getElementById(`${roleName}WorkspaceStats`);
+  const action = document.getElementById(`${roleName}WorkspaceAction`);
   return {
-    stats: document.getElementById(`${roleName}WorkspaceStats`),
-    action: document.getElementById(`${roleName}WorkspaceAction`),
+    stats,
+    action,
+    container: stats?.closest(".dashboard-workspace-summary") || action?.closest(".dashboard-workspace-summary") || null,
   };
 }
 
@@ -491,19 +494,38 @@ function focusWorkspaceTarget(selector) {
 }
 
 function getWorkspaceSummary(roleName, moduleName) {
-  const config = DASHBOARD_WORKSPACE_SUMMARY_CONFIG[roleName]?.[moduleName] || {};
   const runtime = DASHBOARD_WORKSPACE_SUMMARY_STATE[roleName]?.[moduleName] || {};
   return {
-    metrics: runtime.metrics || config.metrics || [],
-    action: runtime.action || config.action || null,
+    metrics: Array.isArray(runtime.metrics) ? runtime.metrics : [],
   };
 }
 
+function hasNumericWorkspaceMetrics(metrics) {
+  return (metrics || []).some((item) => {
+    const value = item?.value;
+    if (typeof value === "number") return Number.isFinite(value);
+    if (typeof value !== "string") return false;
+    return /^-?\d+(?:[.,]\d+)?$/.test(value.trim());
+  });
+}
+
 function renderWorkspaceSummary(roleName, moduleName) {
-  const { stats, action } = getWorkspaceSummaryElements(roleName);
-  if (!stats || !action) return;
+  const { container, stats, action } = getWorkspaceSummaryElements(roleName);
+  if (!container || !stats || !action) return;
 
   const summary = getWorkspaceSummary(roleName, moduleName);
+  const hasVisibleMetrics = summary.metrics.length > 0 && hasNumericWorkspaceMetrics(summary.metrics);
+
+  container.hidden = !hasVisibleMetrics;
+  action.classList.remove("is-visible");
+  action.textContent = "";
+  action.onclick = null;
+
+  if (!hasVisibleMetrics) {
+    stats.innerHTML = "";
+    return;
+  }
+
   stats.innerHTML = summary.metrics
     .map(
       (item) => `
@@ -514,25 +536,6 @@ function renderWorkspaceSummary(roleName, moduleName) {
       `
     )
     .join("");
-
-  if (!summary.action) {
-    action.classList.remove("is-visible");
-    action.textContent = "";
-    action.onclick = null;
-    return;
-  }
-
-  action.textContent = summary.action.label;
-  action.classList.add("is-visible");
-  action.onclick = async () => {
-    if (typeof summary.action.handler === "function") {
-      await summary.action.handler();
-      return;
-    }
-    if (summary.action.selector) {
-      focusWorkspaceTarget(summary.action.selector);
-    }
-  };
 }
 
 function setWorkspaceModuleSummary(roleName, moduleName, summary) {
