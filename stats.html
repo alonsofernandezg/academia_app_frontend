@@ -216,6 +216,29 @@
       box-shadow: 0 0 0 4px rgba(79,163,247,.12), 0 14px 30px rgba(15,38,68,.10);
     }
 
+    .stats-player-select-wrap {
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex:1 1 240px;
+      min-width:0;
+    }
+
+    .stats-player-select-wrap .filter-select {
+      min-width:0;
+      width:100%;
+      max-width:100%;
+    }
+
+    .stats-player-name {
+      margin:0;
+      color:#fff;
+      line-height:1.25;
+      white-space:normal;
+      overflow-wrap:anywhere;
+      word-break:break-word;
+    }
+
     #teamTableContent,
     #playerHistoryContent {
       overflow-x: auto;
@@ -223,6 +246,11 @@
     }
 
     @media (max-width: 768px) {
+      .stats-player-select-wrap {
+        flex:1 1 100%;
+        width:100%;
+      }
+
       .main-tab-btn {
         flex: 1 1 calc(50% - 6px);
         margin-right: 0;
@@ -367,7 +395,7 @@
           <div class="w3-row-padding" style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;">
 
             <!-- Player selector -->
-            <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:240px;">
+            <div class="stats-player-select-wrap">
               <span>👤</span>
               <select id="playerSelect" class="filter-select" style="flex:1" onchange="onPlayerChange()">
                 <option value="">— Selecciona un jugador —</option>
@@ -403,7 +431,7 @@
 
           <!-- Player name header -->
           <div class="w3-card w3-blue w3-round-large w3-padding w3-margin-bottom">
-            <h3 id="playerNameHeader" style="margin:0;color:#fff"></h3>
+            <h3 id="playerNameHeader" class="stats-player-name"></h3>
           </div>
 
           <!-- Summary stats -->
