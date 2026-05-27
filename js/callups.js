@@ -17,7 +17,7 @@
   const API_URL = getApiBase();
 
 // =====================================================
-// ⚽ CONVOCATORIAS (CALLUPS) — Dashboard-integrated
+// CONVOCATORIAS (CALLUPS) — Dashboard-integrated
 // =====================================================
 // Uses DashboardCommon for auth, session context and shared modals.
 
@@ -43,6 +43,11 @@ function callupShowMsg(elId, text, isError) {
   el.textContent = text;
 }
 
+function callupIconLabel(icon, text, tone = "ui-icon--brand", compact = false) {
+  const compactClass = compact ? " ui-icon-label--compact" : "";
+  return `<span class="ui-icon-label${compactClass}"><span class="ui-icon ${tone}" aria-hidden="true">${icon}</span><span>${text}</span></span>`;
+}
+
 function statusLabel(status) {
   const map = {
     draft: { text: "Borrador", color: "w3-yellow" },
@@ -60,7 +65,10 @@ function eventTypeLabel(type) {
 }
 
 function venueLabel(venue) {
-  const map = { local: "🏠 Local", visita: "✈️ Visita" };
+  const map = {
+    local: callupIconLabel("home", "Local", "ui-icon--brand", true),
+    visita: callupIconLabel("flight_takeoff", "Visita", "ui-icon--brand", true),
+  };
   return map[venue] || venue;
 }
 
@@ -514,7 +522,7 @@ async function loadCallupDetail(callupId) {
           ${data.category_name || ''}${data.level_name ? ' / ' + data.level_name : ''}
         </div>
         <div class="w3-col s6 m3">
-          <span class="w3-small w3-text-gray">Entrenador</span><br>👤 ${data.coach_name || ''}
+          <span class="w3-small w3-text-gray">Entrenador</span><br>${callupIconLabel("person", data.coach_name || "—", "ui-icon--brand", true)}
         </div>
       </div>
       <div class="w3-row-padding w3-margin-top">
@@ -581,7 +589,7 @@ function renderPlayers(players, callupCategoryId) {
         <div>
           <b>${name}</b> ${badge}
         </div>
-        ${canRemove ? `<button class="w3-button w3-tiny w3-red w3-round" onclick="window.DashboardCallups.removePlayer(${p.id})">✕</button>` : ""}
+        ${canRemove ? `<button class="w3-button w3-tiny w3-red w3-round" onclick="window.DashboardCallups.removePlayer(${p.id})"><span class="ui-icon ui-icon--inverse" aria-hidden="true">close</span></button>` : ""}
       </div>
     `;
   }).join("");
@@ -1494,11 +1502,11 @@ function renderMatchStatsPanel() {
           <thead>
             <tr class="w3-light-gray">
               <th style="min-width:150px">Jugador</th>
-              <th style="width:60px;text-align:center">⏱️ Min</th>
-              <th style="width:60px;text-align:center">⚽ Goles</th>
-              <th style="width:60px;text-align:center">🅰️ Asist</th>
-              <th style="width:60px;text-align:center">🟨 TA</th>
-              <th style="width:50px;text-align:center">🟥 TR</th>
+              <th style="width:60px;text-align:center">Min</th>
+              <th style="width:60px;text-align:center">Goles</th>
+              <th style="width:60px;text-align:center">Asist.</th>
+              <th style="width:60px;text-align:center">TA</th>
+              <th style="width:50px;text-align:center">TR</th>
             </tr>
           </thead>
           <tbody>${playerRows}</tbody>
@@ -1555,7 +1563,7 @@ function renderStatsPlayerRows() {
         <td style="text-align:center">
           <div class="w3-bar">
             <span id="goalsCount_${cpId}" class="w3-margin-right">${goals.length}</span>
-            <button class="w3-button w3-tiny w3-green w3-round" onclick="window.DashboardCallups.addGoalToPlayer(${cpId})" title="Agregar gol">+</button>
+            <button class="w3-button w3-tiny w3-green w3-round" onclick="window.DashboardCallups.addGoalToPlayer(${cpId})" title="Agregar gol"><span class="ui-icon ui-icon--inverse" aria-hidden="true">add</span></button>
           </div>
         </td>
         <td style="text-align:center">
@@ -1584,9 +1592,9 @@ function renderPlayerGoals(cpId, goals) {
     <span class="w3-tag w3-round w3-light-gray w3-small w3-margin-right goal-tag" 
           data-cpid="${cpId}" data-goalidx="${idx}" 
           data-half="${g.half}" data-minute="${g.minute || ''}">
-      ⚽ ${halfLabel(g.half)}${g.minute ? " " + g.minute + "'" : ""}
-      <span class="w3-hover-red" style="cursor:pointer;margin-left:4px" 
-            onclick="window.DashboardCallups.removeGoalFromPlayer(${cpId}, ${idx})">✕</span>
+    ${callupIconLabel("sports_soccer", `${halfLabel(g.half)}${g.minute ? " " + g.minute + "'" : ""}`, "ui-icon--navy", true)}
+    <span class="w3-hover-red" style="cursor:pointer;margin-left:4px;display:inline-flex;vertical-align:middle" 
+      onclick="window.DashboardCallups.removeGoalFromPlayer(${cpId}, ${idx})"><span class="ui-icon ui-icon--danger" aria-hidden="true">close</span></span>
     </span>
   `).join("");
 }
@@ -1613,7 +1621,7 @@ function addGoalToPlayer(cpId) {
     <div id="goalModal" class="w3-modal" style="display:block">
       <div class="w3-modal-content w3-card-4 w3-round-large" style="max-width:300px">
         <header class="w3-container w3-purple w3-round-large" style="border-radius:16px 16px 0 0">
-          <h4>⚽ Agregar Gol</h4>
+          <h4>${callupIconLabel("sports_soccer", "Agregar gol", "ui-icon--inverse")}</h4>
         </header>
         <div class="w3-container w3-padding">
           <label class="w3-small">Tiempo</label>
@@ -1628,7 +1636,7 @@ function addGoalToPlayer(cpId) {
         </div>
         <footer class="w3-container w3-padding">
           <button class="w3-button w3-white w3-border w3-round w3-small" onclick="window.DashboardCallups.closeGoalModal()">Cancelar</button>
-          <button class="w3-button w3-purple w3-round w3-small w3-right" onclick="window.DashboardCallups.confirmAddGoal(${cpId})">Agregar</button>
+          <button class="w3-button w3-purple w3-round w3-small w3-right" onclick="window.DashboardCallups.confirmAddGoal(${cpId})">${callupIconLabel("add_circle", "Agregar", "ui-icon--inverse", true)}</button>
         </footer>
       </div>
     </div>

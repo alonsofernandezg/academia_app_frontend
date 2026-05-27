@@ -6,7 +6,8 @@
   <title>DeportIvA — Estadísticas</title>
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap">
-  <link rel="stylesheet" href="css/style.css?v=20260526j">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,500,0,0">
+  <link rel="stylesheet" href="css/style.css?v=20260527a">
   <style>
     body { font-family: 'Poppins', sans-serif; }
 
@@ -290,7 +291,7 @@
   <!-- Topbar -->
   <div class="app-topbar w3-blue w3-card">
     <div class="app-topbar-left">
-      <a href="dashboard.html" class="w3-button w3-white w3-round-xxlarge w3-small app-topbar-btn">← Volver</a>
+      <a href="dashboard.html" class="w3-button w3-white w3-round-xxlarge w3-small app-topbar-btn"><span class="ui-icon-label"><span class="ui-icon ui-icon--brand" aria-hidden="true">arrow_back</span><span>Volver</span></span></a>
       <div class="app-topbar-brand-block">
         <span class="app-brand"><b>DeportIvA</b></span>
         <span id="academyTopbarName" class="app-academy-name">Ginga Academy</span>
@@ -299,7 +300,7 @@
     </div>
 
     <div class="app-topbar-right">
-      <span class="w3-small app-topbar-page-title"><b>📊 Estadísticas</b></span>
+      <span class="w3-small app-topbar-page-title"><b><span class="ui-icon-label"><span class="ui-icon ui-icon--accent" aria-hidden="true">query_stats</span><span>Estadísticas</span></span></b></span>
     </div>
   </div>
 
@@ -317,8 +318,8 @@
       <div class="w3-card w3-white w3-round-large w3-padding w3-margin-bottom">
         <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px">
           <b style="margin-right:8px">Vista:</b>
-          <button class="main-tab-btn active" id="tabTeamBtn"   onclick="switchTab('team')">🏆 Por Equipo</button>
-          <button class="main-tab-btn"        id="tabPlayerBtn" onclick="switchTab('player')">👤 Por Jugador</button>
+          <button class="main-tab-btn active" id="tabTeamBtn"   onclick="switchTab('team')"><span class="ui-icon-label"><span class="ui-icon ui-icon--current" aria-hidden="true">groups</span><span>Por equipo</span></span></button>
+          <button class="main-tab-btn"        id="tabPlayerBtn" onclick="switchTab('player')"><span class="ui-icon-label"><span class="ui-icon ui-icon--current" aria-hidden="true">person</span><span>Por jugador</span></span></button>
         </div>
       </div>
 
@@ -333,7 +334,7 @@
 
             <!-- Level selector -->
             <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:220px;">
-              <span>👥</span>
+              <span class="ui-icon ui-icon--brand" aria-hidden="true">groups</span>
               <select id="teamLevelSelect" class="filter-select" style="flex:1" onchange="onTeamLevelChange()">
                 <option value="">Todos los equipos</option>
               </select>
@@ -341,7 +342,7 @@
 
             <!-- Period -->
             <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
-              <span style="font-size:0.82em;color:#555;margin-right:4px">📅</span>
+              <span class="ui-icon ui-icon--brand" aria-hidden="true">calendar_month</span>
               <button class="pill-btn active-period" id="tp-all"     onclick="setTeamPeriod('all')">Todo</button>
               <button class="pill-btn"               id="tp-year"    onclick="setTeamPeriod('year')">Año</button>
               <button class="pill-btn"               id="tp-quarter" onclick="setTeamPeriod('quarter')">3 meses</button>
@@ -350,10 +351,10 @@
 
             <!-- Venue -->
             <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
-              <span style="font-size:0.82em;color:#555;margin-right:4px">🏟️</span>
+              <span class="ui-icon ui-icon--brand" aria-hidden="true">stadium</span>
               <button class="pill-btn active-venue" id="tv-all"       onclick="setTeamVenue('all')">Ambas</button>
-              <button class="pill-btn"              id="tv-local"     onclick="setTeamVenue('local')">🏠 Local</button>
-              <button class="pill-btn"              id="tv-visita" onclick="setTeamVenue('visita')">✈️ Visita</button>
+              <button class="pill-btn"              id="tv-local"     onclick="setTeamVenue('local')"><span class="ui-icon-label ui-icon-label--compact"><span class="ui-icon ui-icon--current" aria-hidden="true">home</span><span>Local</span></span></button>
+              <button class="pill-btn"              id="tv-visita" onclick="setTeamVenue('visita')"><span class="ui-icon-label ui-icon-label--compact"><span class="ui-icon ui-icon--current" aria-hidden="true">flight_takeoff</span><span>Visita</span></span></button>
             </div>
           </div>
         </div>
@@ -367,13 +368,13 @@
 
           <!-- Match table -->
           <div class="w3-card w3-white w3-round-large w3-padding w3-margin-bottom">
-            <h4 class="w3-text-blue" style="margin-top:0">📋 Resultados por Equipo</h4>
+            <h4 class="w3-text-blue" style="margin-top:0"><span class="ui-icon-label"><span class="ui-icon ui-icon--brand" aria-hidden="true">assignment</span><span>Resultados por equipo</span></span></h4>
             <div id="teamTableContent"></div>
           </div>
 
           <!-- Goals by phase -->
           <div class="w3-card w3-white w3-round-large w3-padding w3-margin-bottom">
-            <h4 class="w3-text-blue" style="margin-top:0">⏱️ Goles por Fase del Partido</h4>
+            <h4 class="w3-text-blue" style="margin-top:0"><span class="ui-icon-label"><span class="ui-icon ui-icon--brand" aria-hidden="true">timer</span><span>Goles por fase del partido</span></span></h4>
             <div id="teamGoalsPhase"></div>
           </div>
 
@@ -396,7 +397,7 @@
 
             <!-- Player selector -->
             <div class="stats-player-select-wrap">
-              <span>👤</span>
+              <span class="ui-icon ui-icon--brand" aria-hidden="true">person</span>
               <select id="playerSelect" class="filter-select" style="flex:1" onchange="onPlayerChange()">
                 <option value="">— Selecciona un jugador —</option>
               </select>
@@ -404,7 +405,7 @@
 
             <!-- Period -->
             <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
-              <span style="font-size:0.82em;color:#555;margin-right:4px">📅</span>
+              <span class="ui-icon ui-icon--brand" aria-hidden="true">calendar_month</span>
               <button class="pill-btn active-period" id="pp-all"     onclick="setPlayerPeriod('all')">Todo</button>
               <button class="pill-btn"               id="pp-year"    onclick="setPlayerPeriod('year')">Año</button>
               <button class="pill-btn"               id="pp-quarter" onclick="setPlayerPeriod('quarter')">3 meses</button>
@@ -413,10 +414,10 @@
 
             <!-- Venue -->
             <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
-              <span style="font-size:0.82em;color:#555;margin-right:4px">🏟️</span>
+              <span class="ui-icon ui-icon--brand" aria-hidden="true">stadium</span>
               <button class="pill-btn active-venue" id="pv-all"       onclick="setPlayerVenue('all')">Ambas</button>
-              <button class="pill-btn"              id="pv-local"     onclick="setPlayerVenue('local')">🏠 Local</button>
-              <button class="pill-btn"              id="pv-visita" onclick="setPlayerVenue('visita')">✈️ Visita</button>
+              <button class="pill-btn"              id="pv-local"     onclick="setPlayerVenue('local')"><span class="ui-icon-label ui-icon-label--compact"><span class="ui-icon ui-icon--current" aria-hidden="true">home</span><span>Local</span></span></button>
+              <button class="pill-btn"              id="pv-visita" onclick="setPlayerVenue('visita')"><span class="ui-icon-label ui-icon-label--compact"><span class="ui-icon ui-icon--current" aria-hidden="true">flight_takeoff</span><span>Visita</span></span></button>
             </div>
           </div>
         </div>
@@ -439,7 +440,7 @@
 
           <!-- Match history -->
           <div class="w3-card w3-white w3-round-large w3-padding w3-margin-bottom">
-            <h4 class="w3-text-blue" style="margin-top:0">📅 Historial de Partidos</h4>
+            <h4 class="w3-text-blue" style="margin-top:0"><span class="ui-icon-label"><span class="ui-icon ui-icon--brand" aria-hidden="true">history</span><span>Historial de partidos</span></span></h4>
             <div id="playerHistoryContent"></div>
           </div>
 
@@ -454,14 +455,14 @@
 
     <!-- No access -->
     <div id="noAccessMsg" class="w3-hide w3-center w3-padding-64">
-      <div class="w3-text-gray w3-xlarge">😕</div>
+      <div class="w3-xlarge"><span class="ui-icon ui-icon--muted" aria-hidden="true">sentiment_neutral</span></div>
       <div class="w3-text-gray">No tienes equipos o jugadores asignados.</div>
-      <a href="dashboard.html" class="w3-button w3-blue w3-round-large w3-margin-top">Volver al Panel</a>
+      <a href="dashboard.html" class="w3-button w3-blue w3-round-large w3-margin-top"><span class="ui-icon-label"><span class="ui-icon ui-icon--inverse" aria-hidden="true">arrow_back</span><span>Volver al panel</span></span></a>
     </div>
 
   </div><!-- /content -->
 
 <script src="js/config.js?v=20260428a"></script>
-<script src="js/stats.js?v=20260526a"></script>
+<script src="js/stats.js?v=20260527a"></script>
 </body>
 </html>

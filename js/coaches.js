@@ -1,6 +1,6 @@
 (function () {
 // =====================================================
-// 🏃 COACHES (ENTRENADORES)
+// COACHES (ENTRENADORES)
 // =====================================================
 // Consume API base from global config.
 var API_BASE = (() => {
@@ -27,6 +27,17 @@ const coachSetStatusMessage = coachDashboardCommon.setStatusMessage || ((msgEl, 
   msgEl.textContent = text;
 });
 const coachPaginateList = coachDashboardCommon.paginateList || ((items) => items);
+
+function coachIconLabel(icon, text, tone = "ui-icon--brand", compact = false) {
+  const compactClass = compact ? " ui-icon-label--compact" : "";
+  return `<span class="ui-icon-label${compactClass}"><span class="ui-icon ${tone}" aria-hidden="true">${icon}</span><span>${text}</span></span>`;
+}
+
+function coachStatusLabel(isActive) {
+  return isActive
+    ? coachIconLabel("check_circle", "Activo", "ui-icon--success", true)
+    : coachIconLabel("cancel", "Inactivo", "ui-icon--danger", true);
+}
 
 // --------------------------------------------------
 // Funciones auxiliares
@@ -79,12 +90,12 @@ async function loadCoaches() {
               <button
                 class="w3-button w3-white w3-border w3-round-xxlarge w3-small"
                 onclick='openEditCoach(${JSON.stringify(c)})'>
-                ✏️ Editar
+                ${coachIconLabel("edit_square", "Editar")}
               </button>
               <button
                 class="w3-button w3-red w3-round-xxlarge w3-small w3-margin-left"
                 onclick='deleteCoach(${c.id})'>
-                🗑️ Eliminar
+                ${coachIconLabel("delete", "Eliminar", "ui-icon--inverse")}
               </button>
             </div>
           </div>
@@ -149,7 +160,7 @@ function openCreateCoach() {
   const adminDiv = document.getElementById("coachUserIdAdmin");
   if (adminDiv) {
     adminDiv.style.display = "block";
-    console.log("✅ Admin form - showing user select");
+    console.log("Admin form - showing user select");
   }
   
   document.getElementById("modalCreateCoach").style.display = "block";
@@ -195,19 +206,19 @@ async function saveCoach() {
 
   msg.textContent = "";
   
-  console.log("🔧 saveCoach called with:", { coachId, userId, fullName, idNumber, phone, notes });
+  console.log("saveCoach called with:", { coachId, userId, fullName, idNumber, phone, notes });
 
   if (!fullName) {
     msg.className = "w3-small w3-text-red w3-center";
     msg.textContent = "El nombre completo es obligatorio.";
-    console.error("❌ fullName is empty");
+    console.error("fullName is empty");
     return;
   }
 
   if (!coachId && !userId) {
     msg.className = "w3-small w3-text-red w3-center";
     msg.textContent = "Debe seleccionar un usuario (entrenador).";
-    console.error("❌ userId is missing (coachId:", coachId, "userId:", userId, ")");
+    console.error("userId is missing (coachId:", coachId, "userId:", userId, ")");
     return;
   }
 
@@ -231,7 +242,7 @@ async function saveCoach() {
       delete body.user_id;
     }
 
-    console.log("📤 Sending request:", { method, url, body });
+    console.log("Sending request:", { method, url, body });
 
     const res = await fetch(url, {
       method: method,
@@ -239,11 +250,11 @@ async function saveCoach() {
       body: JSON.stringify(body),
     });
 
-    console.log("📥 Response status:", res.status);
+    console.log("Response status:", res.status);
     
     const data = await res.json();
     
-    console.log("📋 Response data:", data);
+    console.log("Response data:", data);
 
     if (!res.ok) {
       throw new Error(data.detail || "No se pudo guardar el entrenador");
@@ -251,8 +262,8 @@ async function saveCoach() {
 
     msg.className = "w3-small w3-text-green w3-center";
     msg.textContent = coachId
-      ? "✅ Entrenador actualizado correctamente."
-      : "✅ Entrenador creado correctamente.";
+      ? "Entrenador actualizado correctamente."
+      : "Entrenador creado correctamente.";
 
     // Recargar lista
     if (roleName === "admin") {
@@ -297,7 +308,7 @@ async function deleteCoach(coachId) {
     // Recargar lista
     await loadCoaches();
   } catch (e) {
-    alert("❌ Error: " + e.message);
+    alert("Error: " + e.message);
     console.error("Error eliminando coach:", e);
   }
 }
@@ -309,7 +320,7 @@ async function deleteCoach(coachId) {
 // La carga inicial de coaches y perfil ahora la orquesta dashboard.js por módulo.
 
 // =====================================================
-// 🏃 COACH PROFILE (for coaches to see/edit their own)
+// COACH PROFILE (for coaches to see/edit their own)
 // =====================================================
 
 /**
@@ -319,7 +330,7 @@ async function deleteCoach(coachId) {
 async function loadCoachProfile() {
   const token = localStorage.getItem("token");
   if (!token) {
-    console.error("❌ No token found in localStorage");
+    console.error("No token found in localStorage");
     return;
   }
 
@@ -328,19 +339,19 @@ async function loadCoachProfile() {
     const payload = JSON.parse(atob(token.split(".")[1]));
     const userId = payload.user_id;  // Now includes user_id in token
     
-    console.log("🎫 Token payload:", payload);
-    console.log("👤 user_id from token:", userId);
+    console.log("Token payload:", payload);
+    console.log("user_id from token:", userId);
     
     if (!userId) {
-      console.error("❌ user_id not found in token. Token payload:", payload);
+      console.error("user_id not found in token. Token payload:", payload);
       document.getElementById("coachProfileInfo").innerHTML = 
-        `<div class="w3-center w3-text-red w3-small">❌ Error: user_id no encontrado en el token</div>`;
+        `<div class="w3-center w3-text-red w3-small">Error: user_id no encontrado en el token</div>`;
       return;
     }
 
     const infoDiv = document.getElementById("coachProfileInfo");
     if (!infoDiv) {
-      console.error("❌ coachProfileInfo div not found");
+      console.error("coachProfileInfo div not found");
       return;
     }
 
@@ -349,17 +360,17 @@ async function loadCoachProfile() {
     try {
       // Try to get coach profile by user_id
       const url = `${API_BASE}/coaches/user/${userId}`;
-      console.log("📡 Fetching:", url);
+      console.log("Fetching:", url);
       
       const res = await fetch(url, { 
         headers: coachAuthHeaders() 
       });
 
-      console.log("📥 Response status:", res.status);
+      console.log("Response status:", res.status);
 
       if (res.status === 404) {
         // No coach profile yet, show create button
-        console.log("ℹ️ Coach profile not found (404) - showing create button");
+        console.log("Coach profile not found (404) - showing create button");
         infoDiv.innerHTML = `
           <div class="w3-center w3-text-gray w3-small">
             <p>Aún no has registrado tu perfil como entrenador.</p>
@@ -381,7 +392,7 @@ async function loadCoachProfile() {
       const coach = await res.json();
 
       // Show coach profile
-      const status = coach.is_active ? "🟢 Activo" : "🔴 Inactivo";
+      const status = coachStatusLabel(coach.is_active);
       infoDiv.innerHTML = `
         <div class="w3-card w3-light-blue w3-round-large w3-padding">
           <p class="w3-margin-top-0"><b>${coach.full_name}</b> ${status}</p>
@@ -399,7 +410,7 @@ async function loadCoachProfile() {
       window.currentCoachProfile = coach;
       window.currentCoachUserId = userId;
     } catch (e) {
-      infoDiv.innerHTML = `<div class="w3-center w3-text-red w3-small">❌ Error: ${e.message}</div>`;
+      infoDiv.innerHTML = `<div class="w3-center w3-text-red w3-small">Error: ${e.message}</div>`;
     }
   } catch (e) {
     console.error("Error decoding token:", e);
@@ -412,7 +423,7 @@ async function loadCoachProfile() {
 function openCreateCoachProfile() {
   const modal = document.getElementById("modalCreateCoach");
   if (!modal) {
-    console.error("❌ modalCreateCoach not found");
+    console.error("modalCreateCoach not found");
     return;
   }
 
@@ -442,17 +453,17 @@ function openCreateCoachProfile() {
         userIdSelect.style.display = "none";
         userIdSelect.value = "";
         hiddenInput.value = userId;
-        console.log("✅ Coach form - user_id set to:", userId);
+        console.log("Coach form - user_id set to:", userId);
       }
     } catch (e) {
-      console.error("❌ Error extracting user_id from token", e);
+      console.error("Error extracting user_id from token", e);
     }
   } else {
-    console.error("❌ No token found when opening coach profile form");
+    console.error("No token found when opening coach profile form");
   }
 
   modal.style.display = "block";
-  console.log("🪟 Coach profile modal opened");
+  console.log("Coach profile modal opened");
 }
 
 /**
@@ -464,7 +475,7 @@ function openEditCoachProfile() {
 
   const coach = window.currentCoachProfile;
   if (!coach || !coach.id) {
-    console.error("❌ No current coach profile loaded for edit");
+    console.error("No current coach profile loaded for edit");
     return;
   }
 

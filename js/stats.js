@@ -25,6 +25,20 @@ let currentAthleteId = null;
 let lastMatchHistory = [];
 let responsiveStatsRerenderFrame = null;
 
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function iconLabel(icon, text, tone = "ui-icon--brand", compact = false) {
+  const compactClass = compact ? " ui-icon-label--compact" : "";
+  return `<span class="ui-icon-label${compactClass}"><span class="ui-icon ${tone}" aria-hidden="true">${icon}</span><span>${text}</span></span>`;
+}
+
 function normalizeVenue(value) {
   return String(value || "").trim().toLowerCase();
 }
@@ -266,8 +280,8 @@ async function loadPlayerStats() {
       return;
     }
 
-    document.getElementById("playerNameHeader").textContent = `👤 ${data.name}`;
-  lastMatchHistory = data.match_history || [];
+    document.getElementById("playerNameHeader").innerHTML = iconLabel("person", escapeHtml(data.name), "ui-icon--inverse");
+    lastMatchHistory = data.match_history || [];
     renderPlayerSummary(data.summary);
     renderMatchHistory(data.match_history);
     document.getElementById("playerData").classList.remove("w3-hide");
@@ -411,19 +425,19 @@ function renderGoalsByPhase(g, containerId) {
 function renderPlayerSummary(s) {
   const mvpCard = s.mvp_count > 0
     ? `<div class="scard blue">
-        <div class="scard-val">${s.mvp_count}</div><div class="scard-lbl">🏆 MVP</div>
+        <div class="scard-val">${s.mvp_count}</div><div class="scard-lbl">${iconLabel("emoji_events", "MVP", "ui-icon--warning", true)}</div>
        </div>`
     : '';
   document.getElementById("playerSummaryCards").innerHTML = `
     <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px;width:100%">
       <div class="scard blue"><div class="scard-val">${s.matches}</div><div class="scard-lbl">Partidos</div></div>
-      <div class="scard green"><div class="scard-val">${s.goals}</div><div class="scard-lbl">⚽ Goles</div></div>
-      <div class="scard"><div class="scard-val">${s.assists}</div><div class="scard-lbl">🅰️ Asistencias</div></div>
-      <div class="scard gray"><div class="scard-val">${fmtMin(s.minutes)}</div><div class="scard-lbl">⏱️ Minutos</div></div>
+      <div class="scard green"><div class="scard-val">${s.goals}</div><div class="scard-lbl">${iconLabel("sports_soccer", "Goles", "ui-icon--brand", true)}</div></div>
+      <div class="scard"><div class="scard-val">${s.assists}</div><div class="scard-lbl">${iconLabel("assistant", "Asistencias", "ui-icon--brand", true)}</div></div>
+      <div class="scard gray"><div class="scard-val">${fmtMin(s.minutes)}</div><div class="scard-lbl">${iconLabel("timer", "Minutos", "ui-icon--muted", true)}</div></div>
       <div class="scard gray">
-        <div class="scard-val">${s.yellow_cards}</div><div class="scard-lbl">🟨 Amarillas</div>
+        <div class="scard-val">${s.yellow_cards}</div><div class="scard-lbl">${iconLabel("warning", "Amarillas", "ui-icon--warning", true)}</div>
       </div>
-      <div class="scard orange"><div class="scard-val">${s.red_cards}</div><div class="scard-lbl">🟥 Rojas</div></div>
+      <div class="scard orange"><div class="scard-val">${s.red_cards}</div><div class="scard-lbl">${iconLabel("block", "Rojas", "ui-icon--danger", true)}</div></div>
       ${mvpCard}
     </div>`;
 }
@@ -483,7 +497,7 @@ function renderMatchHistory(history) {
   let html = `
     <div class="mh-row hdr">
       <div>Fecha</div><div>Partido / Equipo</div><div>Localía</div>
-      <div>⚽</div><div>🅰️</div><div>⏱️</div><div>🟨</div><div>🟥</div><div>🏆</div>
+      <div>Goles</div><div>Asist.</div><div>Min</div><div>TA</div><div>TR</div><div>MVP</div>
     </div>`;
   history.forEach(m => {
     const dateStr = m.date ? new Date(m.date).toLocaleDateString("es", { day: "2-digit", month: "short", year: "numeric" }) : "—";
@@ -499,9 +513,9 @@ function renderMatchHistory(history) {
         <div style="font-weight:600;color:#1976d2">${m.goals}</div>
         <div>${m.assists}</div>
         <div style="font-size:0.82em">${fmtMin(m.minutes)}</div>
-        <div>${m.yellow_cards > 0 ? "🟨" : "-"}</div>
-        <div>${m.red_card ? "🟥" : "-"}</div>
-        <div>${m.is_mvp ? "🏆" : "-"}</div>
+        <div>${m.yellow_cards > 0 ? `<span class="ui-icon ui-icon--warning" aria-hidden="true">warning</span>` : "-"}</div>
+        <div>${m.red_card ? `<span class="ui-icon ui-icon--danger" aria-hidden="true">block</span>` : "-"}</div>
+        <div>${m.is_mvp ? `<span class="ui-icon ui-icon--warning" aria-hidden="true">emoji_events</span>` : "-"}</div>
       </div>`;
   });
   document.getElementById("playerHistoryContent").innerHTML = html;

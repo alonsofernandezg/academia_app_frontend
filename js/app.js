@@ -20,12 +20,14 @@ function setMessage(box, kind, text) {
 
 function setButtonPending(button, pending, loadingText) {
   if (!button) return;
-  if (!button.dataset.defaultText) {
-    button.dataset.defaultText = button.textContent.trim();
+  if (!button.dataset.defaultHtml) {
+    button.dataset.defaultHtml = button.innerHTML;
   }
   button.disabled = pending;
   button.setAttribute("aria-busy", pending ? "true" : "false");
-  button.textContent = pending ? loadingText : button.dataset.defaultText;
+  button.innerHTML = pending
+    ? `<span class="ui-icon-label"><span class="ui-icon ui-icon--current" aria-hidden="true">progress_activity</span><span>${loadingText}</span></span>`
+    : button.dataset.defaultHtml;
 }
 
 function focusFirstField(view) {
@@ -83,16 +85,21 @@ function setAuthStatus() {
   const el = document.getElementById("authStatus");
   if (!el) return;
   if (!token) {
-    el.innerHTML = `<span class="w3-text-grey">🔒 No autenticado</span>`;
+    el.innerHTML = `<span class="w3-text-grey">` +
+      `<span class="ui-icon-label ui-icon-label--compact"><span class="ui-icon ui-icon--muted" aria-hidden="true">lock</span><span>No autenticado</span></span>` +
+      `</span>`;
     return;
   }
   try {
     const payload = JSON.parse(atob(token.split(".")[1]));
     const email = payload.sub || "";
-    el.innerHTML = `✅ Sesión activa: <b>${email}</b>
-      <br><button type="button" class="link-button" id="authStatusLogout">Cerrar sesión</button>`;
+    el.innerHTML =
+      `<span class="ui-icon-label ui-icon-label--compact"><span class="ui-icon ui-icon--success" aria-hidden="true">verified_user</span><span>Sesión activa: <b>${email}</b></span></span>` +
+      `<br><button type="button" class="link-button" id="authStatusLogout"><span class="ui-icon-label ui-icon-label--compact"><span class="ui-icon ui-icon--brand" aria-hidden="true">logout</span><span>Cerrar sesión</span></span></button>`;
   } catch {
-    el.innerHTML = `✅ Sesión activa · <button type="button" class="link-button" id="authStatusLogout">Cerrar sesión</button>`;
+    el.innerHTML =
+      `<span class="ui-icon-label ui-icon-label--compact"><span class="ui-icon ui-icon--success" aria-hidden="true">verified_user</span><span>Sesión activa</span></span>` +
+      ` · <button type="button" class="link-button" id="authStatusLogout"><span class="ui-icon-label ui-icon-label--compact"><span class="ui-icon ui-icon--brand" aria-hidden="true">logout</span><span>Cerrar sesión</span></span></button>`;
   }
   document.getElementById("authStatusLogout")?.addEventListener("click", onLogout);
 }

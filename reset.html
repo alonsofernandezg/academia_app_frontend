@@ -8,6 +8,8 @@
   <!-- W3.CSS + fuente -->
   <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,500,0,0">
+  <link rel="stylesheet" href="css/style.css?v=20260527a">
 
   <style>
     body {
@@ -148,7 +150,7 @@
       </svg>
     </div>
 
-    <h3 class="w3-text-indigo">Restablecer contraseña</h3>
+    <h3 class="w3-text-indigo"><span class="ui-icon-label"><span class="ui-icon ui-icon--brand" aria-hidden="true">lock_reset</span><span>Restablecer contraseña</span></span></h3>
     <p class="w3-small w3-text-grey">
       Ingresa una nueva contraseña para tu cuenta de <b>DeportIvA</b>.
     </p>
@@ -159,7 +161,7 @@
       <label for="confirmPass" class="w3-small w3-text-grey w3-left-align" style="display:block;margin-bottom:6px;">Confirmar contraseña</label>
       <input id="confirmPass" class="w3-input w3-border" type="password" placeholder="Confirmar contraseña" autocomplete="new-password" aria-describedby="msg" required>
 
-      <button id="resetSubmitBtn" class="btn w3-margin-top" type="submit">Actualizar contraseña</button>
+      <button id="resetSubmitBtn" class="btn w3-margin-top" type="submit"><span class="ui-icon-label"><span class="ui-icon ui-icon--current" aria-hidden="true">lock_reset</span><span>Actualizar contraseña</span></span></button>
     </form>
 
     <div id="msg" class="feedback w3-small w3-margin-top" role="status" aria-live="polite"></div>
@@ -167,6 +169,6 @@
   </div>
 
   <script src="js/config.js?v=20260513a"></script>
-  <script src="js/reset.js?v=20260516a"></script>
+  <script src="js/reset.js?v=20260527a"></script>
 </body>
 </html>

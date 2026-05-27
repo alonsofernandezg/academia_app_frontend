@@ -90,6 +90,70 @@ svg {
   height: auto;
 }
 
+.ui-icon-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ui-icon-label--compact {
+  gap: 6px;
+}
+
+.ui-icon {
+  font-family: "Material Symbols Rounded";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 18px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  vertical-align: middle;
+  white-space: nowrap;
+  direction: ltr;
+  letter-spacing: normal;
+  text-transform: none;
+  font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+}
+
+.ui-icon--brand {
+  color: var(--indigo);
+}
+
+.ui-icon--navy {
+  color: var(--navy);
+}
+
+.ui-icon--accent {
+  color: var(--aqua);
+}
+
+.ui-icon--success {
+  color: var(--success-dark);
+}
+
+.ui-icon--danger {
+  color: var(--danger);
+}
+
+.ui-icon--warning {
+  color: #b97700;
+}
+
+.ui-icon--muted {
+  color: var(--muted);
+}
+
+.ui-icon--inverse {
+  color: #fff;
+}
+
+.ui-icon--current {
+  color: currentColor;
+}
+
 /* ====================== */
 /*  L O G I N  &  C A R D */
 /* ====================== */
@@ -263,6 +327,10 @@ svg {
   height: 34px;
   min-height: 34px;
   padding: 6px 12px !important;
+}
+
+.app-topbar-btn .ui-icon-label {
+  justify-content: center;
 }
 
 .app-btn-label-short {

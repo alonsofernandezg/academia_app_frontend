@@ -23,11 +23,13 @@ function setFeedback(element, kind, text) {
 
 function setPending(button, pending) {
   if (!button) return;
-  if (!button.dataset.defaultText) {
-    button.dataset.defaultText = button.textContent.trim();
+  if (!button.dataset.defaultHtml) {
+    button.dataset.defaultHtml = button.innerHTML;
   }
   button.disabled = pending;
-  button.textContent = pending ? "Actualizando..." : button.dataset.defaultText;
+  button.innerHTML = pending
+    ? `<span class="ui-icon-label"><span class="ui-icon ui-icon--current" aria-hidden="true">progress_activity</span><span>Actualizando...</span></span>`
+    : button.dataset.defaultHtml;
 }
 
 async function resetPassword() {
