@@ -152,6 +152,9 @@
   }
 
   function formatAnnouncementTarget(target) {
+    if (target.scope === "athlete") {
+      return `Atleta: ${target.athlete_name || "-"}`;
+    }
     if (target.scope === "academy") {
       return `Academia: ${target.academy_name || "-"}`;
     }

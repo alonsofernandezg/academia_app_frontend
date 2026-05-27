@@ -516,18 +516,6 @@ svg {
   box-shadow: 0 10px 24px rgba(31,74,168,.18);
 }
 
-.dashboard-workspace-pill.is-active::after {
-  content: "";
-  position: absolute;
-  top: 9px;
-  right: 11px;
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  background: var(--success);
-  box-shadow: 0 0 0 4px rgba(155,224,0,.15);
-}
-
 .dashboard-module-card {
   animation: fade .2s ease;
 }
