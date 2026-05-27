@@ -261,13 +261,13 @@ async function autoResolveCoach() {
     if (data.auto_resolved && data.coaches.length === 1) {
       document.getElementById("cCoach").value = data.coaches[0].coach_user_id;
       msgEl.className = "w3-small w3-text-green w3-margin-top";
-      msgEl.textContent = `✅ Auto-resuelto: ${data.coaches[0].coach_name}`;
+      msgEl.textContent = `Auto-resuelto: ${data.coaches[0].coach_name}`;
     } else if (data.coaches.length > 1) {
       msgEl.className = "w3-small w3-text-orange w3-margin-top";
-      msgEl.textContent = `⚠️ ${data.coaches.length} entrenadores encontrados. Selecciona manualmente.`;
+      msgEl.textContent = `${data.coaches.length} entrenadores encontrados. Selecciona manualmente.`;
     } else {
       msgEl.className = "w3-small w3-text-red w3-margin-top";
-      msgEl.textContent = "❌ No se encontró entrenador activo para esta combinación.";
+      msgEl.textContent = "No se encontró entrenador activo para esta combinación.";
     }
   } catch (err) {
     msgEl.className = "w3-small w3-text-red w3-margin-top";
@@ -344,7 +344,7 @@ async function autoFillCoachCreateForm() {
   const msgEl = document.getElementById("coachResolveMsg");
   if (msgEl) {
     msgEl.className = "w3-small w3-text-green w3-margin-top";
-    msgEl.textContent = "✅ Datos pre-llenados desde tu asignación activa.";
+    msgEl.textContent = "Datos pre-llenados desde tu asignación activa.";
   }
 }
 
@@ -409,12 +409,12 @@ async function loadCallups() {
             </span>
             <br>
             <span class="w3-small w3-text-gray">
-              📍 ${c.location} · ${venueLabel(c.venue)} · ${c.category_name || ''}${c.level_name ? ' / ' + c.level_name : ''}
+              <span class="ui-icon-label ui-icon-label--compact"><span class="ui-icon ui-icon--brand" aria-hidden="true">place</span><span>${c.location}</span></span> · ${venueLabel(c.venue)} · ${c.category_name || ''}${c.level_name ? ' / ' + c.level_name : ''}
             </span>
           </div>
           <div class="w3-col s4 w3-right-align">
-            <span class="w3-small w3-text-gray">🏃 ${c.players_count} jugadores</span><br>
-            <span class="w3-small w3-text-gray">👤 ${c.coach_name || ''}</span>
+            <span class="w3-small w3-text-gray"><span class="ui-icon-label ui-icon-label--compact"><span class="ui-icon ui-icon--brand" aria-hidden="true">groups</span><span>${c.players_count} jugadores</span></span></span><br>
+            <span class="w3-small w3-text-gray"><span class="ui-icon-label ui-icon-label--compact"><span class="ui-icon ui-icon--brand" aria-hidden="true">sports</span><span>${c.coach_name || ''}</span></span></span>
           </div>
         </div>
       </div>
@@ -461,7 +461,7 @@ async function createCallup() {
     const data = await res.json();
     if (!res.ok) throw new Error(data.detail || "Error al crear");
 
-    callupShowMsg("createMsg", "✅ Convocatoria creada", false);
+    callupShowMsg("createMsg", "Convocatoria creada", false);
     setTimeout(() => {
       hideCreateForm();
       document.getElementById("filterAcademy").value = academy_id;
@@ -499,7 +499,7 @@ async function loadCallupDetail(callupId) {
           <span class="w3-small w3-text-gray">Fecha / Hora</span><br>${data.event_date} · ${data.event_time}
         </div>
         <div class="w3-col s6 m3">
-          <span class="w3-small w3-text-gray">Ubicación</span><br>📍 ${data.location}
+          <span class="w3-small w3-text-gray">Ubicación</span><br><span class="ui-icon-label ui-icon-label--compact"><span class="ui-icon ui-icon--brand" aria-hidden="true">place</span><span>${data.location}</span></span>
         </div>
       </div>
       <div class="w3-row-padding w3-margin-top">
@@ -725,7 +725,7 @@ function renderActionButtons(data) {
   }
 
   const sendLabel = data.status === "sent" ? "Reenviar Convocatoria" : "Enviar Convocatoria";
-  const sendIcon = data.status === "sent" ? "🔄" : "📤";
+  const sendIcon = data.status === "sent" ? "refresh" : "send";
 
   let buttons = "";
 
@@ -733,16 +733,16 @@ function renderActionButtons(data) {
     buttons += `
       <button class="w3-button w3-blue w3-round w3-margin-right"
               onclick="window.DashboardCallups.showEditForm(${data.id})">
-        ✏️ Editar
+        <span class="ui-icon-label"><span class="ui-icon ui-icon--inverse" aria-hidden="true">edit_square</span><span>Editar</span></span>
       </button>
       <button class="w3-button w3-green w3-round w3-margin-right"
               onclick="window.DashboardCallups.sendCallup(${data.id})"
               ${data.players_count === 0 ? 'disabled title="Agrega al menos un jugador"' : ''}>
-        ${sendIcon} ${sendLabel}
+        <span class="ui-icon-label"><span class="ui-icon ui-icon--inverse" aria-hidden="true">${sendIcon}</span><span>${sendLabel}</span></span>
       </button>
       <button class="w3-button w3-red w3-round w3-margin-right"
               onclick="window.DashboardCallups.cancelCallup(${data.id})">
-        ❌ Cancelar
+        <span class="ui-icon-label"><span class="ui-icon ui-icon--inverse" aria-hidden="true">cancel</span><span>Cancelar</span></span>
       </button>
     `;
   }
@@ -751,7 +751,7 @@ function renderActionButtons(data) {
     buttons += `
       <button class="w3-button w3-teal w3-round"
               onclick="window.DashboardCallups.completeCallup(${data.id})">
-        ✅ Completar
+        <span class="ui-icon-label"><span class="ui-icon ui-icon--inverse" aria-hidden="true">task_alt</span><span>Completar</span></span>
       </button>
     `;
   }
@@ -760,7 +760,7 @@ function renderActionButtons(data) {
     buttons += `
       <button class="w3-button w3-purple w3-round"
               onclick="window.DashboardCallups.showMatchStatsPanel(${data.id})">
-        📊 Estadísticas
+        <span class="ui-icon-label"><span class="ui-icon ui-icon--inverse" aria-hidden="true">query_stats</span><span>Estadísticas</span></span>
       </button>
     `;
   }
@@ -787,10 +787,10 @@ async function sendCallup(callupId) {
     const data = await res.json();
     if (!res.ok) throw new Error(data.detail || "Error al enviar");
 
-    showAlertModal("✅ Convocatoria enviada exitosamente.");
+    showAlertModal("Convocatoria enviada exitosamente.");
     loadCallupDetail(callupId);
   } catch (err) {
-    showAlertModal("❌ " + err.message);
+    showAlertModal(err.message);
   }
 }
 
@@ -830,14 +830,14 @@ async function cancelCallup(callupId) {
     const data = await res.json();
     if (!res.ok) throw new Error(data.detail || "Error al cancelar");
 
-    let msg = "✅ Convocatoria cancelada.";
+    let msg = "Convocatoria cancelada.";
     if (data.cancelled_invoices > 0) {
       msg += ` ${data.cancelled_invoices} factura(s) pendiente(s) cancelada(s).`;
     }
     showAlertModal(msg);
     loadCallupDetail(callupId);
   } catch (err) {
-    showAlertModal("❌ " + err.message);
+    showAlertModal(err.message);
   }
 }
 
@@ -857,10 +857,10 @@ async function completeCallup(callupId) {
     const data = await res.json();
     if (!res.ok) throw new Error(data.detail || "Error al completar");
 
-    showAlertModal("✅ Convocatoria completada.");
+    showAlertModal("Convocatoria completada.");
     loadCallupDetail(callupId);
   } catch (err) {
-    showAlertModal("❌ " + err.message);
+    showAlertModal(err.message);
   }
 }
 
@@ -891,7 +891,7 @@ async function showEditForm(callupId) {
   }
 
   editSection.innerHTML = `
-    <h4 class="w3-text-blue" style="margin:4px 0">✏️ Editar Convocatoria</h4>
+    <h4 class="w3-text-blue" style="margin:4px 0"><span class="ui-icon-label"><span class="ui-icon ui-icon--brand" aria-hidden="true">edit_square</span><span>Editar Convocatoria</span></span></h4>
     <div id="editMsg" class="w3-small w3-center"></div>
     <div id="editConflictWarning"></div>
     <div class="w3-row-padding">
@@ -999,7 +999,7 @@ async function updateCallup(callupId) {
     if (!res.ok) throw new Error(data.detail || "Error al actualizar");
 
     hideEditForm();
-    showAlertModal("✅ Convocatoria actualizada.");
+    showAlertModal("Convocatoria actualizada.");
     loadCallupDetail(callupId);
   } catch (err) {
     callupShowMsg("editMsg", err.message, true);
@@ -1032,7 +1032,7 @@ async function checkDateConflict(academyId, categoryId, eventDate, warningElId) 
       ).join(", ");
       warningEl.innerHTML = `
         <div class="w3-panel w3-pale-yellow w3-border w3-border-yellow w3-round-large w3-small">
-          ⚠️ <b>Conflicto de fecha:</b> Ya existen convocatorias para esta categoría en la misma fecha: ${conflicts}
+          <span class="ui-icon-label"><span class="ui-icon ui-icon--warning" aria-hidden="true">warning</span><span><b>Conflicto de fecha:</b> Ya existen convocatorias para esta categoría en la misma fecha: ${conflicts}</span></span>
         </div>
       `;
     } else {
@@ -1104,7 +1104,7 @@ async function renderInvoiceSection(callupData) {
 
   // ── T012: Summary panel ──
   html += `<div class="w3-card w3-round-large w3-padding w3-margin-top" style="background:#f9f9f9">`;
-  html += `<h5 style="margin-top:0">💰 Facturación</h5>`;
+  html += `<h5 style="margin-top:0"><span class="ui-icon-label"><span class="ui-icon ui-icon--brand" aria-hidden="true">payments</span><span>Facturación</span></span></h5>`;
 
   if (!summary || summary.total_invoices === 0) {
     html += `<div class="w3-text-gray w3-small">No se han generado facturas para esta convocatoria.</div>`;
@@ -1114,7 +1114,7 @@ async function renderInvoiceSection(callupData) {
       : 0;
 
     if (summary.all_paid) {
-      html += `<div class="w3-tag w3-green w3-round w3-margin-bottom" style="font-size:12px">✅ Todas las facturas pagadas</div>`;
+      html += `<div class="w3-tag w3-green w3-round w3-margin-bottom" style="font-size:12px"><span class="ui-icon-label ui-icon-label--compact"><span class="ui-icon ui-icon--inverse" aria-hidden="true">check_circle</span><span>Todas las facturas pagadas</span></span></div>`;
     }
 
     html += `
@@ -1160,7 +1160,7 @@ async function renderInvoiceSection(callupData) {
         <div class="w3-col s6 m4" style="padding-top:18px">
           <button class="w3-button w3-teal w3-round w3-small"
                   onclick="window.DashboardCallups.generateCallupInvoices(${callupData.id})">
-            🧾 Generar Facturas
+            <span class="ui-icon-label"><span class="ui-icon ui-icon--inverse" aria-hidden="true">receipt_long</span><span>Generar facturas</span></span>
           </button>
         </div>
       </div>
@@ -1199,7 +1199,7 @@ async function generateCallupInvoices(callupId) {
     if (res.status === 400) {
       // All already invoiced or validation error — show info toast
       if (msgEl) {
-        msgEl.innerHTML = `<div class="w3-pale-yellow w3-border w3-border-yellow w3-round w3-padding-small w3-small">ℹ️ ${data.detail}</div>`;
+        msgEl.innerHTML = `<div class="w3-pale-yellow w3-border w3-border-yellow w3-round w3-padding-small w3-small"><span class="ui-icon-label"><span class="ui-icon ui-icon--brand" aria-hidden="true">info</span><span>${data.detail}</span></span></div>`;
       }
       return;
     }
@@ -1207,7 +1207,7 @@ async function generateCallupInvoices(callupId) {
     if (!res.ok) throw new Error(data.detail || "Error al generar facturas");
 
     // Success: show summary
-    let msg = `✅ ${data.created} factura(s) creada(s).`;
+    let msg = `${data.created} factura(s) creada(s).`;
     if (data.skipped > 0) {
       msg += ` ${data.skipped} omitida(s) (ya existían).`;
     }
@@ -1215,7 +1215,7 @@ async function generateCallupInvoices(callupId) {
     let warningHtml = "";
     if (data.warnings && data.warnings.length > 0) {
       warningHtml = data.warnings.map(w =>
-        `<div class="w3-pale-yellow w3-border w3-border-yellow w3-round w3-padding-small w3-small w3-margin-top">⚠️ ${w}</div>`
+        `<div class="w3-pale-yellow w3-border w3-border-yellow w3-round w3-padding-small w3-small w3-margin-top"><span class="ui-icon-label"><span class="ui-icon ui-icon--warning" aria-hidden="true">warning</span><span>${w}</span></span></div>`
       ).join("");
     }
 
@@ -1228,13 +1228,13 @@ async function generateCallupInvoices(callupId) {
 
   } catch (err) {
     if (msgEl) {
-      msgEl.innerHTML = `<div class="w3-text-red w3-small">❌ ${err.message}</div>`;
+      msgEl.innerHTML = `<div class="w3-text-red w3-small">${err.message}</div>`;
     }
   }
 }
 
 // =====================================================
-// 📊 MATCH STATISTICS (Estadísticas de Partido)
+// MATCH STATISTICS (Estadísticas de Partido)
 // =====================================================
 
 let currentStatsCallupId = null;
@@ -1317,12 +1317,12 @@ function buildApiErrorMessage(payload, fallback) {
 
 function resultLabel(result) {
   const map = {
-    won: { text: "Victoria", color: "w3-green", icon: "🏆" },
-    draw: { text: "Empate", color: "w3-yellow", icon: "🤝" },
-    lost: { text: "Derrota", color: "w3-red", icon: "😞" }
+    won: { text: "Victoria", color: "w3-green", icon: "emoji_events", tone: "ui-icon--inverse" },
+    draw: { text: "Empate", color: "w3-yellow", icon: "handshake", tone: "ui-icon--navy" },
+    lost: { text: "Derrota", color: "w3-red", icon: "sentiment_dissatisfied", tone: "ui-icon--inverse" }
   };
-  const r = map[result] || { text: result, color: "w3-gray", icon: "❓" };
-  return `<span class="w3-tag w3-round ${r.color}" style="font-size:12px">${r.icon} ${r.text}</span>`;
+  const r = map[result] || { text: result, color: "w3-gray", icon: "help", tone: "ui-icon--muted" };
+  return `<span class="w3-tag w3-round ${r.color}" style="font-size:12px"><span class="ui-icon-label ui-icon-label--compact"><span class="ui-icon ${r.tone}" aria-hidden="true">${r.icon}</span><span>${r.text}</span></span></span>`;
 }
 
 async function showMatchStatsPanel(callupId) {
@@ -1386,10 +1386,10 @@ function renderMatchStatsPanel() {
   const roleName = getCurrentRole();
   const canEdit = roleName === "admin" || roleName === "coach";
 
-  let headerHtml = `<h4 class="w3-text-purple" style="margin:4px 0">📊 Estadísticas del Partido</h4>`;
+  let headerHtml = `<h4 class="w3-text-purple" style="margin:4px 0"><span class="ui-icon-label"><span class="ui-icon ui-icon--brand" aria-hidden="true">query_stats</span><span>Estadísticas del Partido</span></span></h4>`;
   if (currentMatchStats) {
     const mvpLine = currentMatchStats.mvp_player_name
-      ? `<span class="w3-margin-left w3-small w3-text-amber">🏆 MVP: <b>${currentMatchStats.mvp_player_name}</b></span>`
+      ? `<span class="w3-margin-left w3-small ui-icon-label"><span class="ui-icon ui-icon--warning" aria-hidden="true">emoji_events</span><span>MVP: <b>${currentMatchStats.mvp_player_name}</b></span></span>`
       : '';
     headerHtml += `
       <div class="w3-margin-bottom">
@@ -1423,7 +1423,7 @@ function renderMatchStatsPanel() {
       </div>
       <div class="w3-row-padding w3-margin-top">
         <div class="w3-col s12 m6">
-          <label class="w3-small w3-text-gray">🏆 MVP del Partido</label>
+          <label class="w3-small w3-text-gray"><span class="ui-icon-label"><span class="ui-icon ui-icon--warning" aria-hidden="true">emoji_events</span><span>MVP del Partido</span></span></label>
           <select id="statsMvpPlayer" class="w3-select w3-border w3-round-large">
             <option value="">— Sin MVP —</option>
             ${currentStatsPlayers.map(p => {
@@ -1442,11 +1442,11 @@ function renderMatchStatsPanel() {
           <thead>
             <tr class="w3-light-gray">
               <th style="min-width:150px">Jugador</th>
-              <th style="width:60px;text-align:center">⏱️ Min</th>
-              <th style="width:60px;text-align:center">⚽ Goles</th>
-              <th style="width:60px;text-align:center">🅰️ Asist</th>
-              <th style="width:60px;text-align:center">🟨 TA</th>
-              <th style="width:50px;text-align:center">🟥 TR</th>
+              <th style="width:60px;text-align:center">Min</th>
+              <th style="width:60px;text-align:center">Goles</th>
+              <th style="width:60px;text-align:center">Asist.</th>
+              <th style="width:60px;text-align:center">TA</th>
+              <th style="width:50px;text-align:center">TR</th>
             </tr>
           </thead>
           <tbody id="statsPlayersBody">
@@ -1459,7 +1459,7 @@ function renderMatchStatsPanel() {
       <div class="w3-row-padding w3-margin-top">
         <div class="w3-col s12 w3-right-align">
           <button class="w3-button w3-white w3-border w3-round-xxlarge w3-small" onclick="window.DashboardCallups.hideMatchStatsPanel()">Cerrar</button>
-          <button class="w3-button w3-purple w3-round-xxlarge w3-small w3-margin-left" onclick="window.DashboardCallups.saveMatchStats()">💾 Guardar Estadísticas</button>
+          <button class="w3-button w3-purple w3-round-xxlarge w3-small w3-margin-left" onclick="window.DashboardCallups.saveMatchStats()"><span class="ui-icon-label"><span class="ui-icon ui-icon--inverse" aria-hidden="true">save</span><span>Guardar Estadísticas</span></span></button>
         </div>
       </div>
       <div id="statsMsg" class="w3-margin-top w3-small w3-center"></div>
@@ -1478,12 +1478,12 @@ function renderMatchStatsPanel() {
       const isMvp = currentMatchStats?.mvp_callup_player_id === p.id;
       return `
         <tr>
-          <td>${name}${isMvp ? ' <span class="w3-tag w3-amber w3-round w3-small">🏆 MVP</span>' : ''}</td>
+          <td>${name}${isMvp ? ' <span class="w3-tag w3-amber w3-round w3-small"><span class="ui-icon-label ui-icon-label--compact"><span class="ui-icon ui-icon--navy" aria-hidden="true">emoji_events</span><span>MVP</span></span></span>' : ''}</td>
           <td style="text-align:center">${ps?.minutes_played ?? 0}</td>
           <td style="text-align:center">${ps?.goals_count ?? 0}</td>
           <td style="text-align:center">${ps?.assists ?? 0}</td>
           <td style="text-align:center">${ps?.yellow_cards ?? 0}</td>
-          <td style="text-align:center">${ps?.red_card ? '🟥' : '-'}</td>
+          <td style="text-align:center">${ps?.red_card ? '<span class="ui-icon ui-icon--danger" aria-hidden="true">stop</span>' : '-'}</td>
         </tr>
       `;
     }).join('');
@@ -1759,12 +1759,12 @@ async function saveMatchStats() {
 
     const currentMsgEl = document.getElementById("statsMsg") || msgEl;
     if (currentMsgEl) {
-      currentMsgEl.innerHTML = `<div class="w3-text-green">✅ Estadísticas guardadas correctamente.</div>`;
+      currentMsgEl.innerHTML = `<div class="w3-text-green">Estadísticas guardadas correctamente.</div>`;
     }
   } catch (err) {
     const currentMsgEl = document.getElementById("statsMsg") || msgEl;
     if (currentMsgEl) {
-      currentMsgEl.innerHTML = `<div class="w3-text-red">❌ ${err.message}</div>`;
+      currentMsgEl.innerHTML = `<div class="w3-text-red">${err.message}</div>`;
     }
   }
 }

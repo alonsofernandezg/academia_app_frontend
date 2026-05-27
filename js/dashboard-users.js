@@ -83,12 +83,12 @@
               <button
                 class="w3-button w3-white w3-border w3-round-xxlarge w3-small"
                 onclick='window.DashboardUsers.openEditUser(${JSON.stringify(user)})'>
-                ✏️ Editar
+                <span class="ui-icon-label"><span class="ui-icon ui-icon--brand" aria-hidden="true">edit_square</span><span>Editar</span></span>
               </button>
               <button
                 class="w3-button w3-white w3-border w3-round-xxlarge w3-small w3-margin-left"
                 onclick="window.DashboardUsers.resetUserPassword(${user.id})">
-                Enviar clave temporal
+                <span class="ui-icon-label"><span class="ui-icon ui-icon--brand" aria-hidden="true">vpn_key</span><span>Enviar clave temporal</span></span>
               </button>
               <button
                 class="w3-button w3-white w3-border w3-round-xxlarge w3-small"

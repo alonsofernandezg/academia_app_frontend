@@ -324,7 +324,7 @@
 
       if (msg) {
         msg.className = "w3-small w3-text-green w3-center";
-        msg.textContent = "✅ Atleta creado correctamente.";
+        msg.textContent = "Atleta creado correctamente.";
       }
       await loadAthletes();
       setTimeout(closeCreateAthlete, 800);
@@ -400,7 +400,7 @@
 
       if (msg) {
         msg.className = "w3-small w3-text-green w3-center";
-        msg.textContent = "✅ Atleta actualizado correctamente.";
+        msg.textContent = "Atleta actualizado correctamente.";
       }
       await loadAthletes();
       setTimeout(closeEditAthlete, 800);
@@ -423,7 +423,7 @@
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail || "No se pudo eliminar el atleta");
-      showAlertModal(data.message ? `✅ ${data.message}` : "Atleta eliminado correctamente.");
+      showAlertModal(data.message || "Atleta eliminado correctamente.");
       await loadAthletes();
     } catch (error) {
       showAlertModal(`Error: ${error.message}`);
@@ -507,12 +507,12 @@
           <button
             class="w3-button w3-white w3-border w3-round-xxlarge w3-small"
             onclick='window.DashboardAthletes.openEditAthlete(${JSON.stringify(athlete)})'>
-            ✏️ Editar
+            <span class="ui-icon-label"><span class="ui-icon ui-icon--brand" aria-hidden="true">edit_square</span><span>Editar</span></span>
           </button>
           <button
             class="w3-button w3-red w3-round-xxlarge w3-small w3-margin-left"
             onclick='window.DashboardAthletes.deleteAthlete(${athlete.id})'>
-            🗑️ Eliminar
+            <span class="ui-icon-label"><span class="ui-icon ui-icon--inverse" aria-hidden="true">delete</span><span>Eliminar</span></span>
           </button>
         `;
         }
@@ -522,7 +522,7 @@
             ? `<button
                 class="w3-button w3-blue w3-round-xxlarge w3-small w3-margin-left"
                 onclick="window.DashboardAthletes.openAssignLevel(${athlete.id})">
-                + Asignar nivel
+                <span class="ui-icon-label"><span class="ui-icon ui-icon--inverse" aria-hidden="true">playlist_add</span><span>Asignar nivel</span></span>
               </button>`
             : "";
 

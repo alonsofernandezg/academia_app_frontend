@@ -283,7 +283,7 @@
               <span class="w3-small w3-text-gray">
                 Plan: ${invoice.plan_name || "Manual"}${invoice.billing_type ? " (" + formatBillingType(invoice.billing_type) + ")" : ""}
               </span><br>
-              ${invoice.callup_id ? `<span class="w3-small w3-text-blue" style="cursor:pointer" onclick="window.location.hash='#callups';setTimeout(()=>window.DashboardCallups.loadCallupDetail(${invoice.callup_id}),200)">📋 Convocatoria: ${invoice.callup_title || "Ver"}</span><br>` : ""}
+              ${invoice.callup_id ? `<span class="w3-small w3-text-blue" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px" onclick="window.location.hash='#callups';setTimeout(()=>window.DashboardCallups.loadCallupDetail(${invoice.callup_id}),200)"><span class="ui-icon ui-icon--brand" aria-hidden="true">assignment</span><span>Convocatoria: ${invoice.callup_title || "Ver"}</span></span><br>` : ""}
               <span class="w3-small w3-text-gray">Periodo: ${periodText}</span><br>
               <span class="w3-small w3-text-gray">Monto: ${formatMoney(invoice.total_amount, invoice.currency)}</span><br>
               <span class="w3-small ${statusClass}">Estado: ${formatInvoiceStatus(invoice.status)}</span>
@@ -475,6 +475,7 @@
     if (methodInput) methodInput.value = "transfer";
     if (fileInput) fileInput.value = "";
     if (msg) msg.textContent = "";
+    syncPaymentProofRequirement();
 
     summary.textContent = `${invoice.athlete_name || "-"} - ${formatMoney(
       invoice.total_amount,
@@ -489,6 +490,23 @@
     if (modal) modal.style.display = "none";
   }
 
+  function syncPaymentProofRequirement() {
+    const methodInput = document.getElementById("paymentMethod");
+    const fileInput = document.getElementById("paymentProofFile");
+    const label = document.getElementById("paymentProofLabel");
+    const note = document.getElementById("paymentProofNote");
+    if (!methodInput || !fileInput || !label || !note) return;
+
+    const requiresProof = methodInput.value !== "cash";
+    label.textContent = requiresProof
+      ? "Comprobante (imagen o PDF)"
+      : "Comprobante (opcional para efectivo)";
+    note.textContent = requiresProof
+      ? "Para transferencia seguimos requiriendo el comprobante."
+      : "Si registras pago en efectivo, puedes enviarlo sin adjuntar archivo.";
+    fileInput.required = requiresProof;
+  }
+
   async function submitPaymentProof() {
     const invoiceId = document.getElementById("paymentInvoiceId").value;
     const amount = document.getElementById("paymentAmount").value;
@@ -498,7 +516,7 @@
     if (msg) msg.textContent = "";
 
     if (!invoiceId) return;
-    if (!file) {
+    if (method !== "cash" && !file) {
       if (msg) {
         msg.className = "w3-small w3-text-red w3-center";
         msg.textContent = "Debes adjuntar el comprobante.";
@@ -511,7 +529,7 @@
       const formData = new FormData();
       if (amount) formData.append("amount", amount);
       formData.append("method", method);
-      formData.append("file", file);
+      if (file) formData.append("file", file);
 
       const currentToken = localStorage.getItem("token");
       const res = await fetch(`${getApiUrl()}/billing/invoices/${invoiceId}/payments`, {
@@ -524,7 +542,9 @@
 
       if (msg) {
         msg.className = "w3-small w3-text-green w3-center";
-        msg.textContent = "Comprobante enviado correctamente.";
+        msg.textContent = method === "cash"
+          ? "Pago en efectivo registrado correctamente."
+          : "Comprobante enviado correctamente.";
       }
       await loadGeneralPayments();
       setTimeout(closePaymentProof, 800);
@@ -935,7 +955,7 @@
           <span class="w3-small w3-text-gray">
             Plan: ${invoice.plan_name || "Manual"}${invoice.billing_type ? " (" + formatBillingType(invoice.billing_type) + ")" : ""}
           </span><br>
-          ${invoice.callup_id ? `<span class="w3-small w3-text-blue" style="cursor:pointer" onclick="window.location.hash='#callups';setTimeout(()=>window.DashboardCallups.loadCallupDetail(${invoice.callup_id}),200)">📋 Convocatoria: ${invoice.callup_title || "Ver"}</span><br>` : ""}
+              ${invoice.callup_id ? `<span class="w3-small w3-text-blue" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px" onclick="window.location.hash='#callups';setTimeout(()=>window.DashboardCallups.loadCallupDetail(${invoice.callup_id}),200)"><span class="ui-icon ui-icon--brand" aria-hidden="true">assignment</span><span>Convocatoria: ${invoice.callup_title || "Ver"}</span></span><br>` : ""}
           <span class="w3-small w3-text-gray">Periodo: ${periodText}</span><br>
           <span class="w3-small w3-text-gray">Monto: ${formatMoney(invoice.total_amount, invoice.currency)}</span><br>
           <span class="w3-small ${statusClass}">Estado: ${formatInvoiceStatus(invoice.status)}</span>
@@ -1282,6 +1302,7 @@
     selectAthletePlan,
     openPaymentProof,
     closePaymentProof,
+    syncPaymentProofRequirement,
     submitPaymentProof,
     loadAdminBilling,
     createBillingPlan,

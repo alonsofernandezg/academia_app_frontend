@@ -346,7 +346,7 @@
       cancelEditCoachAssignment();
       await loadCoachAssignments(coachId);
     } catch (error) {
-      showAlertModal(`❌ ${error.message}`);
+      showAlertModal(error.message);
     }
   }
 
