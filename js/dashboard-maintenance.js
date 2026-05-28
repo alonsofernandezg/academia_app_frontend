@@ -271,7 +271,7 @@
   }
 
   async function deleteAcademy(academyId) {
-    const ok = await showConfirmModal("\u00bfEliminar esta academia?");
+    const ok = await showConfirmModal("\u00bfEliminar permanentemente esta academia? Esta accion no se puede deshacer.");
     if (!ok) return;
     try {
       const res = await fetch(`${getApiUrl()}/academies/${academyId}`, {
@@ -462,7 +462,7 @@
   }
 
   async function deleteCategory(categoryId) {
-    const ok = await showConfirmModal("\u00bfEliminar esta categoria?");
+    const ok = await showConfirmModal("\u00bfEliminar permanentemente esta categoria? Esta accion no se puede deshacer.");
     if (!ok) return;
     try {
       const res = await fetch(`${getApiUrl()}/categories/${categoryId}`, {
@@ -625,7 +625,7 @@
   }
 
   async function deleteLevel(levelId) {
-    const ok = await showConfirmModal("\u00bfEliminar este nivel?");
+    const ok = await showConfirmModal("\u00bfEliminar permanentemente este nivel? Esta accion no se puede deshacer.");
     if (!ok) return;
     try {
       const res = await fetch(`${getApiUrl()}/levels/${levelId}`, {
