@@ -1,22 +1,3 @@
-# Archivos de instalación
-*.msi
-*.exe
-
-# Dependencias
-node_modules/
-package-lock.json
-yarn.lock
-
-# Archivos del sistema
-.DS_Store
-Thumbs.db
-
-# IDE
+﻿Thumbs.db
+Desktop.ini
 .vscode/
-.idea/
-*.swp
-*.swo
-
-# Environment
-.env
-.env.local

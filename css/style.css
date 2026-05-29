@@ -154,6 +154,51 @@ svg {
   color: currentColor;
 }
 
+.pwa-install-shell {
+  position: fixed;
+  right: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  z-index: 1200;
+}
+
+.pwa-install-cta {
+  border: 0;
+  min-height: 50px;
+  padding: 0 18px;
+  border-radius: 999px;
+  font: inherit;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+  background: linear-gradient(135deg, var(--indigo), #2d67da);
+  box-shadow: 0 16px 36px rgba(31,74,168,.26);
+}
+
+.pwa-install-cta:hover {
+  filter: brightness(1.03);
+}
+
+.pwa-install-cta[hidden],
+.pwa-install-shell[hidden] {
+  display: none !important;
+}
+
+.pwa-install-cta:disabled {
+  opacity: .7;
+  cursor: wait;
+}
+
+@media (max-width: 640px) {
+  .pwa-install-shell {
+    left: 16px;
+    right: 16px;
+  }
+
+  .pwa-install-cta {
+    width: 100%;
+  }
+}
+
 /* ====================== */
 /*  L O G I N  &  C A R D */
 /* ====================== */
