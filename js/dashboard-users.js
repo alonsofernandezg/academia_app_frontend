@@ -119,7 +119,6 @@
         </div>
       `;
         })
-        )
         .join("");
     } catch (error) {
       box.innerHTML = renderStateBlock(
