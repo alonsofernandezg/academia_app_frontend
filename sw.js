@@ -1,5 +1,5 @@
-const STATIC_CACHE = "deportiva-static-v20260528a";
-const PAGE_CACHE = "deportiva-pages-v20260528a";
+const STATIC_CACHE = "deportiva-static-v20260613a";
+const PAGE_CACHE = "deportiva-pages-v20260613a";
 const CORE_ASSETS = [
   "./",
   "./index.html",
@@ -67,7 +67,10 @@ async function networkFirst(request) {
 }
 
 async function staleWhileRevalidate(request) {
-  const cached = await caches.match(request, { ignoreSearch: true });
+  const hasVersionQuery = Boolean(new URL(request.url).search);
+  const cached = hasVersionQuery
+    ? await caches.match(request)
+    : await caches.match(request, { ignoreSearch: true });
   const networkFetch = fetch(request)
     .then(async (response) => {
       if (response && response.ok) {

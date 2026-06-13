@@ -19,6 +19,8 @@
     return getApiBase();
   }
 
+  const usersById = new Map();
+
   function formatUserRoleLabel(role) {
     if (role === "coach") return "Entrenador";
     if (role === "admin") return "Admin";
@@ -53,6 +55,11 @@
       const res = await fetch(`${getApiUrl()}/admin/users`, { headers: authHeaders() });
       const users = await res.json();
       if (!res.ok) throw new Error(users.detail || "No se pudieron cargar los usuarios");
+
+      usersById.clear();
+      users.forEach((user) => {
+        usersById.set(user.id, user);
+      });
 
       updateUsersWorkspaceSummary(users);
 
@@ -104,7 +111,7 @@
               </span>
               <button
                 class="w3-button w3-white w3-border w3-round-xxlarge w3-small"
-                onclick='window.DashboardUsers.openEditUser(${JSON.stringify(user)})'>
+                onclick="window.DashboardUsers.openEditUserById(${user.id})">
                 <span class="ui-icon-label"><span class="ui-icon ui-icon--brand" aria-hidden="true">edit_square</span><span>Editar</span></span>
               </button>
               ${actionButton}
@@ -231,6 +238,15 @@
     document.getElementById("modalEditUser").style.display = "block";
   }
 
+  function openEditUserById(userId) {
+    const user = usersById.get(Number(userId));
+    if (!user) {
+      showAlertModal("No pudimos encontrar los datos de ese usuario. Actualiza la lista e intenta de nuevo.");
+      return;
+    }
+    openEditUser(user);
+  }
+
   function closeEditUser() {
     document.getElementById("modalEditUser").style.display = "none";
   }
@@ -271,6 +287,7 @@
     closeCreateUser,
     createUser,
     openEditUser,
+    openEditUserById,
     closeEditUser,
     updateUser,
   };
