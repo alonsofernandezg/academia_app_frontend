@@ -68,8 +68,27 @@
       const pageItems = paginateList(users, "users", "usersList", loadUsers);
 
       box.innerHTML = pageItems
-        .map(
-          (user) => `
+        .map((user) => {
+          const canResendInvite = !user.is_verified && (user.role === "coach" || user.role === "admin");
+          const actionButton = user.is_verified
+            ? `
+              <button
+                class="w3-button w3-white w3-border w3-round-xxlarge w3-small w3-margin-left"
+                onclick="window.DashboardUsers.resetUserPassword(${user.id})">
+                <span class="ui-icon-label"><span class="ui-icon ui-icon--brand" aria-hidden="true">vpn_key</span><span>Enviar clave temporal</span></span>
+              </button>
+              `
+            : canResendInvite
+              ? `
+              <button
+                class="w3-button w3-white w3-border w3-round-xxlarge w3-small w3-margin-left"
+                onclick="window.DashboardUsers.resendInvite(${user.id})">
+                <span class="ui-icon-label"><span class="ui-icon ui-icon--brand" aria-hidden="true">mail</span><span>Reenviar invitación</span></span>
+              </button>
+              `
+              : "";
+
+          return `
         <div class="w3-card w3-round-xxlarge w3-padding w3-margin-bottom">
           <div class="w3-row">
             <div class="w3-col s12 m7">
@@ -80,16 +99,15 @@
               <span class="w3-small ${user.is_active ? "w3-text-green" : "w3-text-red"}" style="margin-right:8px">
                 ${user.is_active ? "Activo" : "Inactivo"}
               </span>
+              <span class="w3-small ${user.is_verified ? "w3-text-green" : "w3-text-orange"}" style="margin-right:8px">
+                ${user.is_verified ? "Verificado" : "Pendiente"}
+              </span>
               <button
                 class="w3-button w3-white w3-border w3-round-xxlarge w3-small"
                 onclick='window.DashboardUsers.openEditUser(${JSON.stringify(user)})'>
                 <span class="ui-icon-label"><span class="ui-icon ui-icon--brand" aria-hidden="true">edit_square</span><span>Editar</span></span>
               </button>
-              <button
-                class="w3-button w3-white w3-border w3-round-xxlarge w3-small w3-margin-left"
-                onclick="window.DashboardUsers.resetUserPassword(${user.id})">
-                <span class="ui-icon-label"><span class="ui-icon ui-icon--brand" aria-hidden="true">vpn_key</span><span>Enviar clave temporal</span></span>
-              </button>
+              ${actionButton}
               <button
                 class="w3-button w3-white w3-border w3-round-xxlarge w3-small"
                 style="margin-left:6px"
@@ -99,7 +117,8 @@
             </div>
           </div>
         </div>
-      `
+      `;
+        })
         )
         .join("");
     } catch (error) {
@@ -144,6 +163,27 @@
       );
     } catch (error) {
       showAlertModal(error.message || "No fue posible enviar la clave temporal en este momento.");
+    }
+  }
+
+  async function resendInvite(userId) {
+    const ok = await showConfirmModal(
+      "¿Reenviar la invitación? Se generará una nueva contraseña temporal y un nuevo código de verificación."
+    );
+    if (!ok) return;
+    try {
+      const res = await fetch(`${getApiUrl()}/admin/users/${userId}/resend-invite`, {
+        method: "POST",
+        headers: authHeaders(),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.detail || "No pudimos reenviar la invitación. Intenta de nuevo.");
+      }
+      showAlertModal(data.message || "Listo. Reenviamos la invitación al correo del usuario.");
+      await loadUsers();
+    } catch (error) {
+      showAlertModal(error.message || "No fue posible reenviar la invitación en este momento.");
     }
   }
 
@@ -227,6 +267,7 @@
     loadUsers,
     toggleStatus,
     resetUserPassword,
+    resendInvite,
     openCreateUser,
     closeCreateUser,
     createUser,

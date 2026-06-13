@@ -835,6 +835,12 @@
   }
 
   function openEditInvoice(invoice) {
+    const status = String(invoice.status || "").toLowerCase();
+    if (status === "paid" || status === "cancelled") {
+      showAlertModal("No se puede editar una factura pagada o cancelada.");
+      return;
+    }
+
     editingInvoiceId = invoice.id;
     document.getElementById("billInvoiceAthlete").value = String(invoice.athlete_id || "");
     document.getElementById("billInvoicePlan").value = invoice.plan_id ? String(invoice.plan_id) : "";
@@ -944,11 +950,14 @@
                 Cancelar
               </button>`
             : "";
-        const editButton = `<button
+        const editButton =
+          invoice.status !== "paid" && invoice.status !== "cancelled"
+            ? `<button
                 class="w3-button w3-white w3-border w3-round-xxlarge w3-tiny w3-margin-top w3-margin-left"
                 onclick='openEditInvoice(${JSON.stringify(invoice)})'>
                 Editar
-              </button>`;
+              </button>`
+            : "";
         return `
         <div class="w3-padding-small w3-border-bottom">
           <b>${invoice.athlete_name || "-"}</b><br>
@@ -1161,6 +1170,14 @@
     return rows
       .map((row) => {
         const periodText = formatBillingReportPeriod(row);
+        const notesMarkup = row.notes
+          ? `
+              <div>
+                <dt>Notas</dt>
+                <dd>${row.notes}</dd>
+              </div>
+            `
+          : "";
         return `
           <article class="billing-report-card">
             <div class="billing-report-card-head">
@@ -1183,6 +1200,7 @@
                 <dt>Monto</dt>
                 <dd>${formatMoney(row.total_amount, row.currency)}</dd>
               </div>
+              ${notesMarkup}
             </dl>
           </article>
         `;
@@ -1201,6 +1219,7 @@
             <th>Periodo</th>
             <th>Monto</th>
             <th>Estado</th>
+            <th>Notas</th>
           </tr>
         </thead>
         <tbody>
@@ -1216,6 +1235,7 @@
           <td>${periodText}</td>
           <td>${formatMoney(row.total_amount, row.currency)}</td>
           <td>${formatInvoiceStatus(row.status)}</td>
+          <td>${row.notes || "-"}</td>
         </tr>
       `;
       })
@@ -1228,7 +1248,7 @@
       showAlertModal("No hay datos para exportar.");
       return;
     }
-    const header = ["Factura", "Deportista", "Plan", "Periodo", "Monto", "Estado"];
+    const header = ["Factura", "Deportista", "Plan", "Periodo", "Monto", "Estado", "Notas"];
     const rows = billingReportCache.map((row) => {
       const periodStart = row.period_start || "";
       const periodEnd = row.period_end || "";
@@ -1240,6 +1260,7 @@
         periodText,
         `${row.total_amount} ${row.currency}`,
         formatInvoiceStatus(row.status),
+        row.notes || "",
       ];
     });
 
