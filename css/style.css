@@ -421,6 +421,11 @@ svg {
   border: 1px solid rgba(15,38,68,.08) !important;
 }
 
+body .app-topbar.w3-card {
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+}
+
 .dashboard-workspace-card {
   margin-bottom: 16px;
 }
