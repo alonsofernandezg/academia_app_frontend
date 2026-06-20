@@ -315,6 +315,9 @@ svg {
   min-height: 58px;
   padding: 9px 14px;
   background: linear-gradient(135deg, var(--navy) 0%, var(--indigo) 72%) !important;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+  overflow: hidden;
   box-shadow: 0 14px 32px rgba(15,38,68,.18);
 }
 
@@ -376,6 +379,8 @@ svg {
 
 .app-topbar-btn .ui-icon-label {
   justify-content: center;
+  gap: 10px;
+  line-height: 1.2;
 }
 
 .app-btn-label-short {
@@ -779,7 +784,7 @@ svg {
     display: flex;
     flex-wrap: wrap;
     align-items: stretch;
-    row-gap: 6px;
+    row-gap: 8px;
     padding: 8px 10px;
     min-height: auto;
   }
@@ -1341,7 +1346,7 @@ body .main-tab-btn {
 
 @media (max-width: 540px) {
   .app-topbar {
-    row-gap: 5px;
+    row-gap: 8px;
   }
 
   .app-topbar-left,
